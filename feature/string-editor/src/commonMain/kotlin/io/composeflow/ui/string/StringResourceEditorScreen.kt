@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -71,8 +72,10 @@ import io.composeflow.apply_change
 import io.composeflow.auth.LocalFirebaseIdToken
 import io.composeflow.cancel
 import io.composeflow.default_locale_label
-import io.composeflow.delete_string_resource
+import io.composeflow.delete
 import io.composeflow.delete_string_resource_confirmation
+import io.composeflow.delete_string_resources
+import io.composeflow.delete_string_resources_confirmation
 import io.composeflow.edit_supported_locales
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.string.ResourceLocale
@@ -145,7 +148,8 @@ private fun StringResourceEditorContent(
     var addResourceDialogOpen by remember { mutableStateOf(false) }
     var addLocaleDialogOpen by remember { mutableStateOf(false) }
     var localeToDelete by remember { mutableStateOf<ResourceLocale?>(null) }
-    var resourceToDelete by remember { mutableStateOf<StringResource?>(null) }
+    var selectedResources by remember { mutableStateOf(setOf<StringResource>()) }
+    var showDeleteMultipleDialog by remember { mutableStateOf(false) }
 
     val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
     val onAllDialogsClosed = LocalOnAllDialogsClosed.current
@@ -172,12 +176,34 @@ private fun StringResourceEditorContent(
                 .padding(16.dp),
     ) {
         Column {
-            Text(
-                text = stringResource(Res.string.string_resources),
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = 8.dp).padding(bottom = 16.dp),
-                color = MaterialTheme.colorScheme.onSurface,
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 8.dp),
+            ) {
+                Text(
+                    text = stringResource(Res.string.string_resources),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(vertical = 8.dp),
+                )
+                TextButton(
+                    onClick = { showDeleteMultipleDialog = true },
+                    enabled = selectedResources.isNotEmpty(),
+                    colors =
+                        ButtonDefaults.textButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(stringResource(Res.string.delete_string_resources))
+                }
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -194,6 +220,17 @@ private fun StringResourceEditorContent(
                     onUpdateDefaultLocale = onUpdateDefaultLocale,
                     onRemoveLocale = { locale -> localeToDelete = locale },
                     onEditLocales = { addLocaleDialogOpen = true },
+                    allSelected =
+                        project.stringResourceHolder.stringResources.isNotEmpty() &&
+                            project.stringResourceHolder.stringResources.all { selectedResources.contains(it) },
+                    onSelectAll = { selected ->
+                        selectedResources =
+                            if (selected) {
+                                project.stringResourceHolder.stringResources.toSet()
+                            } else {
+                                emptySet()
+                            }
+                    },
                     modifier = Modifier.onSizeChanged { tableWidthPx = it.width },
                 )
 
@@ -216,13 +253,19 @@ private fun StringResourceEditorContent(
                             resource = resource,
                             supportedLocales = supportedLocales,
                             defaultLocale = defaultLocale,
+                            isSelected = selectedResources.contains(resource),
+                            onSelectionChange = { selected ->
+                                selectedResources =
+                                    if (selected) {
+                                        selectedResources + resource
+                                    } else {
+                                        selectedResources - resource
+                                    }
+                            },
                             onUpdateKey = { onUpdateStringResourceKey(resource, it) },
                             onUpdateDescription = { onUpdateStringResourceDescription(resource, it) },
                             onUpdateValue = { locale, value ->
                                 onUpdateStringResourceValue(resource, locale, value)
-                            },
-                            onDelete = {
-                                resourceToDelete = resource
                             },
                         )
                     }
@@ -285,17 +328,25 @@ private fun StringResourceEditorContent(
         )
     }
 
-    resourceToDelete?.let { resource ->
+    if (showDeleteMultipleDialog) {
         onAnyDialogIsShown()
         SimpleConfirmationDialog(
-            text = stringResource(Res.string.delete_string_resource_confirmation, resource.key),
+            text =
+                if (selectedResources.size == 1) {
+                    stringResource(Res.string.delete_string_resource_confirmation, selectedResources.first().key)
+                } else {
+                    stringResource(Res.string.delete_string_resources_confirmation, selectedResources.size)
+                },
             onConfirmClick = {
-                onDeleteStringResource(resource)
-                resourceToDelete = null
+                selectedResources.forEach { resource ->
+                    onDeleteStringResource(resource)
+                }
+                selectedResources = emptySet()
+                showDeleteMultipleDialog = false
                 onAllDialogsClosed()
             },
             onCloseClick = {
-                resourceToDelete = null
+                showDeleteMultipleDialog = false
                 onAllDialogsClosed()
             },
             positiveText = stringResource(Res.string.remove),
@@ -310,10 +361,22 @@ private fun StringResourceTableHeader(
     onUpdateDefaultLocale: (ResourceLocale) -> Unit,
     onRemoveLocale: (ResourceLocale) -> Unit,
     onEditLocales: () -> Unit,
+    allSelected: Boolean,
+    onSelectAll: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier.width(IntrinsicSize.Max)) {
         Row(Modifier.height(IntrinsicSize.Max)) {
+            Box(
+                modifier = Modifier.width(40.dp).fillMaxHeight(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Checkbox(
+                    checked = allSelected,
+                    onCheckedChange = onSelectAll,
+                )
+            }
+            VerticalDivider()
             Box(
                 modifier = Modifier.width(200.dp).fillMaxHeight(),
                 contentAlignment = Alignment.CenterStart,
@@ -372,10 +435,11 @@ private fun StringResourceTableRow(
     resource: StringResource,
     supportedLocales: List<ResourceLocale>,
     defaultLocale: ResourceLocale,
+    isSelected: Boolean,
+    onSelectionChange: (Boolean) -> Unit,
     onUpdateKey: (String) -> Unit,
     onUpdateDescription: (String) -> Unit,
     onUpdateValue: (ResourceLocale, String) -> Unit,
-    onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(Modifier.width(IntrinsicSize.Max)) {
@@ -383,6 +447,16 @@ private fun StringResourceTableRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier.height(IntrinsicSize.Max),
         ) {
+            Box(
+                modifier = Modifier.width(40.dp).fillMaxHeight(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Checkbox(
+                    checked = isSelected,
+                    onCheckedChange = onSelectionChange,
+                )
+            }
+            VerticalDivider()
             Box(
                 modifier = Modifier.width(200.dp).fillMaxHeight(),
                 contentAlignment = Alignment.CenterStart,
@@ -423,18 +497,6 @@ private fun StringResourceTableRow(
                         enabled = locale == defaultLocale,
                     )
                 }
-            }
-
-            VerticalDivider()
-
-            IconButton(
-                onClick = onDelete,
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = stringResource(Res.string.delete_string_resource),
-                    tint = MaterialTheme.colorScheme.error,
-                )
             }
         }
         HorizontalDivider()

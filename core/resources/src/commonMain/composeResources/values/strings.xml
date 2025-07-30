@@ -504,12 +504,13 @@ instead of in the canvas.</string>
 
     <!-- String Resource Editor -->
     <string name="action_add">Add</string>
-    <string name="edit_supported_locales">Edit Supported Locales</string>
     <string name="add_new_string_resource">Add New String Resource</string>
     <string name="add_string_resource">+ Add String Resource</string>
     <string name="default_locale_label"> (default)</string>
-    <string name="delete_string_resource">Delete String Resource</string>
     <string name="delete_string_resource_confirmation">Are you sure you want to delete the string resource "%1$s"?</string>
+    <string name="delete_string_resources">Delete strings</string>
+    <string name="delete_string_resources_confirmation">Are you sure you want to delete %1$d string resources?</string>
+    <string name="edit_supported_locales">Edit Supported Locales</string>
     <string name="more_options">More options</string>
     <string name="no_locales_found_matching">No locales found matching "%1$s"</string>
     <string name="remove_locale">Remove locale</string>
