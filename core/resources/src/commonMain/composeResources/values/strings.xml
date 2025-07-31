@@ -520,8 +520,10 @@ instead of in the canvas.</string>
     <string name="string_resource_default_value_placeholder">Default value (%1$s)</string>
     <string name="string_resource_description">Description</string>
     <string name="string_resource_description_placeholder">Description (optional)</string>
-    <string name="string_resource_key">Key</string>
+    <string name="string_resource_description_tooltip">An optional description explaining the purpose or context of this string resource,\nmainly used to provide guidance for translators.</string>
+    <string name="string_resource_key">Resource key</string>
     <string name="string_resource_key_placeholder">Resource key</string>
+    <string name="string_resource_key_tooltip">The unique identifier for this string resource, used to reference it in UI and other resources.</string>
     <string name="string_resources">String Resources</string>
 
     <!-- Locale display names -->

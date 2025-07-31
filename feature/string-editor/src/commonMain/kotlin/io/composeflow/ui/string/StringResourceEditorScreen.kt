@@ -90,11 +90,14 @@ import io.composeflow.set_as_default_locale
 import io.composeflow.string_resource_default_value_placeholder
 import io.composeflow.string_resource_description
 import io.composeflow.string_resource_description_placeholder
+import io.composeflow.string_resource_description_tooltip
 import io.composeflow.string_resource_key
 import io.composeflow.string_resource_key_placeholder
+import io.composeflow.string_resource_key_tooltip
 import io.composeflow.string_resources
 import io.composeflow.ui.LocalOnAllDialogsClosed
 import io.composeflow.ui.LocalOnAnyDialogIsShown
+import io.composeflow.ui.Tooltip
 import io.composeflow.ui.modifier.backgroundContainerNeutral
 import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.textfield.SmallOutlinedTextField
@@ -385,28 +388,36 @@ private fun StringResourceTableHeader(
                 )
             }
             VerticalDivider()
-            Box(
-                modifier = Modifier.width(200.dp).fillMaxHeight(),
-                contentAlignment = Alignment.CenterStart,
+            Tooltip(
+                text = stringResource(Res.string.string_resource_key_tooltip),
             ) {
-                Text(
-                    text = stringResource(Res.string.string_resource_key),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                )
+                Box(
+                    modifier = Modifier.width(200.dp).fillMaxHeight(),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = stringResource(Res.string.string_resource_key),
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
             }
             VerticalDivider()
-            Box(
-                modifier = Modifier.width(200.dp).fillMaxHeight(),
-                contentAlignment = Alignment.CenterStart,
+            Tooltip(
+                text = stringResource(Res.string.string_resource_description_tooltip),
             ) {
-                Text(
-                    text = stringResource(Res.string.string_resource_description),
-                    color = MaterialTheme.colorScheme.secondary,
-                    style = MaterialTheme.typography.titleSmall,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                )
+                Box(
+                    modifier = Modifier.width(200.dp).fillMaxHeight(),
+                    contentAlignment = Alignment.CenterStart,
+                ) {
+                    Text(
+                        text = stringResource(Res.string.string_resource_description),
+                        color = MaterialTheme.colorScheme.secondary,
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
             }
             supportedLocales.forEach { locale ->
                 VerticalDivider()
