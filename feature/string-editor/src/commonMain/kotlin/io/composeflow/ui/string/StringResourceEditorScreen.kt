@@ -72,7 +72,6 @@ import io.composeflow.apply_change
 import io.composeflow.auth.LocalFirebaseIdToken
 import io.composeflow.cancel
 import io.composeflow.default_locale_label
-import io.composeflow.delete
 import io.composeflow.delete_string_resource_confirmation
 import io.composeflow.delete_string_resources
 import io.composeflow.delete_string_resources_confirmation
@@ -146,7 +145,7 @@ private fun StringResourceEditorContent(
     modifier: Modifier = Modifier,
 ) {
     var addResourceDialogOpen by remember { mutableStateOf(false) }
-    var addLocaleDialogOpen by remember { mutableStateOf(false) }
+    var editLocalesDialogOpen by remember { mutableStateOf(false) }
     var localeToDelete by remember { mutableStateOf<ResourceLocale?>(null) }
     var selectedResources by remember { mutableStateOf(setOf<StringResource>()) }
     var showDeleteMultipleDialog by remember { mutableStateOf(false) }
@@ -177,7 +176,6 @@ private fun StringResourceEditorContent(
     ) {
         Column {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(bottom = 8.dp),
             ) {
@@ -185,8 +183,20 @@ private fun StringResourceEditorContent(
                     text = stringResource(Res.string.string_resources),
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(vertical = 8.dp),
                 )
+                Spacer(modifier = Modifier.width(32.dp))
+                TextButton(
+                    onClick = { editLocalesDialogOpen = true },
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(text = stringResource(Res.string.edit_supported_locales))
+                }
+                Spacer(modifier = Modifier.width(16.dp))
                 TextButton(
                     onClick = { showDeleteMultipleDialog = true },
                     enabled = selectedResources.isNotEmpty(),
@@ -219,7 +229,6 @@ private fun StringResourceEditorContent(
                     defaultLocale = defaultLocale,
                     onUpdateDefaultLocale = onUpdateDefaultLocale,
                     onRemoveLocale = { locale -> localeToDelete = locale },
-                    onEditLocales = { addLocaleDialogOpen = true },
                     allSelected =
                         project.stringResourceHolder.stringResources.isNotEmpty() &&
                             project.stringResourceHolder.stringResources.all { selectedResources.contains(it) },
@@ -290,18 +299,18 @@ private fun StringResourceEditorContent(
         )
     }
 
-    if (addLocaleDialogOpen) {
+    if (editLocalesDialogOpen) {
         onAnyDialogIsShown()
         EditSupportedLocalesDialog(
             currentLocales = supportedLocales,
             defaultLocale = defaultLocale,
             onUpdateLocales = { newLocales ->
                 onUpdateSupportedLocales(newLocales)
-                addLocaleDialogOpen = false
+                editLocalesDialogOpen = false
                 onAllDialogsClosed()
             },
             onDismiss = {
-                addLocaleDialogOpen = false
+                editLocalesDialogOpen = false
                 onAllDialogsClosed()
             },
         )
@@ -360,7 +369,6 @@ private fun StringResourceTableHeader(
     defaultLocale: ResourceLocale,
     onUpdateDefaultLocale: (ResourceLocale) -> Unit,
     onRemoveLocale: (ResourceLocale) -> Unit,
-    onEditLocales: () -> Unit,
     allSelected: Boolean,
     onSelectAll: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
@@ -409,21 +417,6 @@ private fun StringResourceTableHeader(
                     onRemove = { onRemoveLocale(locale) },
                     modifier = Modifier.width(200.dp).fillMaxHeight(),
                 )
-            }
-            VerticalDivider()
-            Box(
-                modifier = Modifier.width(40.dp).fillMaxHeight(),
-                contentAlignment = Alignment.Center,
-            ) {
-                IconButton(
-                    onClick = onEditLocales,
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Edit,
-                        contentDescription = stringResource(Res.string.edit_supported_locales),
-                        tint = MaterialTheme.colorScheme.secondary,
-                    )
-                }
             }
         }
         HorizontalDivider()
