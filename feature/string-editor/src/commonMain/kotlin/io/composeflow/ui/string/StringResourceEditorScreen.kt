@@ -41,6 +41,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -153,6 +154,13 @@ private fun StringResourceEditorContent(
     var selectedResources by remember { mutableStateOf(setOf<StringResource>()) }
     var showDeleteMultipleDialog by remember { mutableStateOf(false) }
 
+    val allSelected by remember {
+        derivedStateOf {
+            project.stringResourceHolder.stringResources.isNotEmpty() &&
+                project.stringResourceHolder.stringResources.all { selectedResources.contains(it) }
+        }
+    }
+
     val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
     val onAllDialogsClosed = LocalOnAllDialogsClosed.current
 
@@ -232,9 +240,7 @@ private fun StringResourceEditorContent(
                     defaultLocale = defaultLocale,
                     onUpdateDefaultLocale = onUpdateDefaultLocale,
                     onRemoveLocale = { locale -> localeToDelete = locale },
-                    allSelected =
-                        project.stringResourceHolder.stringResources.isNotEmpty() &&
-                            project.stringResourceHolder.stringResources.all { selectedResources.contains(it) },
+                    allSelected = allSelected,
                     onSelectAll = { selected ->
                         selectedResources =
                             if (selected) {
