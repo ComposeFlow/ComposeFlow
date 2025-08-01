@@ -14,7 +14,7 @@ plugins {
 }
 
 group = "io.composeflow"
-version = "0.9.1"
+version = "0.9.2"
 
 kotlin {
     jvm {
