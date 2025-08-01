@@ -1,5 +1,6 @@
 package io.composeflow.ui.string
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -165,16 +166,7 @@ private fun StringResourceEditorContent(
     val onAllDialogsClosed = LocalOnAllDialogsClosed.current
 
     val defaultLocale by project.stringResourceHolder.defaultLocale
-    val supportedLocales =
-        project.stringResourceHolder.supportedLocales.sortedWith { a, b ->
-            when {
-                // Default locale always comes first
-                a == defaultLocale -> -1
-                b == defaultLocale -> 1
-                // Otherwise sort by ordinal value
-                else -> a.ordinal.compareTo(b.ordinal)
-            }
-        }
+    val supportedLocales = project.stringResourceHolder.supportedLocales.sortedBy { it.ordinal }
     Column(
         modifier =
             modifier
@@ -229,13 +221,11 @@ private fun StringResourceEditorContent(
             Spacer(modifier = Modifier.height(8.dp))
 
             val horizontalScrollState = rememberScrollState()
-            Column(
-                modifier = Modifier.horizontalScroll(horizontalScrollState),
-            ) {
+            Column {
                 var tableWidthPx by remember { mutableStateOf(0) }
                 val tableWidthDp = with(LocalDensity.current) { tableWidthPx.toDp() }
 
-                StringResourceTableHeader(
+                StringResourceTableHeaderRow(
                     supportedLocales = supportedLocales,
                     defaultLocale = defaultLocale,
                     onUpdateDefaultLocale = onUpdateDefaultLocale,
@@ -249,8 +239,10 @@ private fun StringResourceEditorContent(
                                 emptySet()
                             }
                     },
+                    horizontalScrollState = horizontalScrollState,
                     modifier = Modifier.onSizeChanged { tableWidthPx = it.width },
                 )
+                HorizontalDivider(modifier = Modifier.width(tableWidthDp))
 
                 TextButton(
                     shape = RectangleShape,
@@ -267,7 +259,7 @@ private fun StringResourceEditorContent(
                     modifier = Modifier.weight(1f),
                 ) {
                     items(project.stringResourceHolder.stringResources) { resource ->
-                        StringResourceTableRow(
+                        StringResourceTableDataRow(
                             resource = resource,
                             supportedLocales = supportedLocales,
                             defaultLocale = defaultLocale,
@@ -285,7 +277,9 @@ private fun StringResourceEditorContent(
                             onUpdateValue = { locale, value ->
                                 onUpdateStringResourceValue(resource, locale, value)
                             },
+                            horizontalScrollState = horizontalScrollState,
                         )
+                        HorizontalDivider(modifier = Modifier.width(tableWidthDp))
                     }
                 }
             }
@@ -373,17 +367,21 @@ private fun StringResourceEditorContent(
 }
 
 @Composable
-private fun StringResourceTableHeader(
+private fun StringResourceTableHeaderRow(
     supportedLocales: List<ResourceLocale>,
     defaultLocale: ResourceLocale,
     onUpdateDefaultLocale: (ResourceLocale) -> Unit,
     onRemoveLocale: (ResourceLocale) -> Unit,
     allSelected: Boolean,
     onSelectAll: (Boolean) -> Unit,
+    horizontalScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier.width(IntrinsicSize.Max)) {
-        Row(Modifier.height(IntrinsicSize.Max)) {
+    val nonDefaultLocales = supportedLocales.filter { it != defaultLocale }
+
+    Row(modifier.height(IntrinsicSize.Max)) {
+        // Fixed header columns
+        Row {
             Box(
                 modifier = Modifier.width(40.dp).fillMaxHeight(),
                 contentAlignment = Alignment.Center,
@@ -425,23 +423,41 @@ private fun StringResourceTableHeader(
                     )
                 }
             }
-            supportedLocales.forEach { locale ->
+            VerticalDivider()
+
+            // Default locale column
+            LocaleHeaderCell(
+                locale = defaultLocale,
+                isDefault = true,
+                onSetAsDefault = { },
+                onRemove = { onRemoveLocale(defaultLocale) },
+                modifier = Modifier.width(200.dp).fillMaxHeight(),
+            )
+            if (nonDefaultLocales.isNotEmpty()) {
                 VerticalDivider()
+            }
+        }
+
+        // Scrollable locale columns (excluding default)
+        Row(modifier = Modifier.horizontalScroll(horizontalScrollState)) {
+            nonDefaultLocales.forEach { locale ->
                 LocaleHeaderCell(
                     locale = locale,
-                    isDefault = locale == defaultLocale,
+                    isDefault = false,
                     onSetAsDefault = { onUpdateDefaultLocale(locale) },
                     onRemove = { onRemoveLocale(locale) },
                     modifier = Modifier.width(200.dp).fillMaxHeight(),
                 )
+                if (locale != nonDefaultLocales.last()) {
+                    VerticalDivider()
+                }
             }
         }
-        HorizontalDivider()
     }
 }
 
 @Composable
-private fun StringResourceTableRow(
+private fun StringResourceTableDataRow(
     resource: StringResource,
     supportedLocales: List<ResourceLocale>,
     defaultLocale: ResourceLocale,
@@ -450,13 +466,17 @@ private fun StringResourceTableRow(
     onUpdateKey: (String) -> Unit,
     onUpdateDescription: (String) -> Unit,
     onUpdateValue: (ResourceLocale, String) -> Unit,
+    horizontalScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
-    Column(Modifier.width(IntrinsicSize.Max)) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier.height(IntrinsicSize.Max),
-        ) {
+    val nonDefaultLocales = supportedLocales.filter { it != defaultLocale }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier.height(IntrinsicSize.Max),
+    ) {
+        // Fixed columns
+        Row(modifier = Modifier.width(IntrinsicSize.Max)) {
             Box(
                 modifier = Modifier.width(40.dp).fillMaxHeight(),
                 contentAlignment = Alignment.Center,
@@ -478,9 +498,7 @@ private fun StringResourceTableRow(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 )
             }
-
             VerticalDivider()
-
             Box(
                 modifier = Modifier.width(200.dp).fillMaxHeight(),
                 contentAlignment = Alignment.CenterStart,
@@ -488,13 +506,36 @@ private fun StringResourceTableRow(
                 CellEditableText(
                     initialText = resource.description ?: "",
                     onValueChange = onUpdateDescription,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurfaceVariant),
+                    textStyle =
+                        MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                 )
             }
+            VerticalDivider()
 
-            supportedLocales.forEach { locale ->
+            // Default locale column
+            Box(
+                modifier = Modifier.width(200.dp).fillMaxHeight(),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                CellEditableText(
+                    initialText = resource.localizedValues[defaultLocale] ?: "",
+                    onValueChange = { onUpdateValue(defaultLocale, it) },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    enabled = true,
+                )
+            }
+            if (nonDefaultLocales.isNotEmpty()) {
                 VerticalDivider()
+            }
+        }
+
+        // Scrollable locale columns (excluding default)
+        Row(modifier = Modifier.horizontalScroll(horizontalScrollState)) {
+            nonDefaultLocales.forEach { locale ->
                 Box(
                     modifier = Modifier.width(200.dp).fillMaxHeight(),
                     contentAlignment = Alignment.CenterStart,
@@ -504,12 +545,14 @@ private fun StringResourceTableRow(
                         onValueChange = { onUpdateValue(locale, it) },
                         textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
-                        enabled = locale == defaultLocale,
+                        enabled = false,
                     )
+                }
+                if (locale != nonDefaultLocales.last()) {
+                    VerticalDivider()
                 }
             }
         }
-        HorizontalDivider()
     }
 }
 
