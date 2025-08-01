@@ -31,7 +31,7 @@ class ComposeFlowAppViewModel(
                         // User logged in - identify user for analytics
                         // Only send non-PII data to comply with privacy practices
                         analytics.identify(
-                            userId = token.user_id,
+                            userId = token.user_id.hashCode().toString(),
                             properties =
                                 mapOf(
                                     "email_verified" to token.email_verified,
