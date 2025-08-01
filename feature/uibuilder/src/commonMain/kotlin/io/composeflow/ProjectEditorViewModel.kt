@@ -15,9 +15,9 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class ProjectEditorViewModel(
-    firebaseIdToken: FirebaseIdToken,
+    firebaseIdToken: FirebaseIdToken?,
     projectId: String,
-    private val projectRepository: ProjectRepository = ProjectRepository(firebaseIdToken),
+    private val projectRepository: ProjectRepository = if (firebaseIdToken != null) ProjectRepository(firebaseIdToken) else ProjectRepository.createAnonymous(),
 ) : ViewModel() {
     private val _projectUiState: MutableStateFlow<LoadedProjectUiState> =
         MutableStateFlow(LoadedProjectUiState.Loading)

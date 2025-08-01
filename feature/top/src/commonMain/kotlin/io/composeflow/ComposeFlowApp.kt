@@ -49,6 +49,7 @@ fun ComposeFlowApp(
                     },
                     onTitleBarRightContentSet = onTitleBarRightContentSet,
                     onTitleBarLeftContentSet = onTitleBarLeftContentSet,
+                    onUseWithoutSignIn = appViewModel::onUseWithoutSignIn,
                 )
             }
         }

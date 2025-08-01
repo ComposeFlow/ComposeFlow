@@ -48,7 +48,7 @@ const val TOOLBAR_RUN_BUTTON_TEST_TAG = "$TOOLBAR_TEST_TAG/RunButton"
 
 @Composable
 fun RightToolbar(
-    firebaseIdToken: FirebaseIdToken,
+    firebaseIdToken: FirebaseIdToken?,
     projectFileName: String,
     onStatusBarUiStateChanged: (StatusBarUiState) -> Unit,
     statusBarUiState: StatusBarUiState,
@@ -56,7 +56,7 @@ fun RightToolbar(
     modifier: Modifier = Modifier,
 ) {
     val viewModel =
-        viewModel(modelClass = ToolbarViewModel::class, keys = listOf(firebaseIdToken)) {
+        viewModel(modelClass = ToolbarViewModel::class, keys = listOf(firebaseIdToken?.user_id ?: "anonymous")) {
             ToolbarViewModel(
                 firebaseIdTokenArg = firebaseIdToken,
             )

@@ -30,12 +30,18 @@ val LocalFirebaseIdToken =
         throw IllegalStateException("No FirebaseUserInfo provided")
     }
 
+// Helper to check if FirebaseIdToken is available in the current composition
+val LocalFirebaseIdTokenOrNull = staticCompositionLocalOf<FirebaseIdToken?> { null }
+
 @Composable
 fun ProvideFirebaseIdToken(
     firebaseIdToken: FirebaseIdToken,
     content: @Composable () -> Unit,
 ) {
-    CompositionLocalProvider(LocalFirebaseIdToken provides firebaseIdToken) {
+    CompositionLocalProvider(
+        LocalFirebaseIdToken provides firebaseIdToken,
+        LocalFirebaseIdTokenOrNull provides firebaseIdToken
+    ) {
         content()
     }
 }

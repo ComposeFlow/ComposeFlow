@@ -11,6 +11,7 @@ fun RouteBuilder.loginScreen(
     onLogOut: () -> Unit,
     onTitleBarRightContentSet: (TitleBarContent) -> Unit = {},
     onTitleBarLeftContentSet: (TitleBarContent) -> Unit = {},
+    onUseWithoutSignIn: () -> Unit = {},
     navTransition: NavTransition? = null,
 ) {
     scene(
@@ -22,6 +23,7 @@ fun RouteBuilder.loginScreen(
             onLogOut = onLogOut,
             onTitleBarRightContentSet = onTitleBarRightContentSet,
             onTitleBarLeftContentSet = onTitleBarLeftContentSet,
+            onUseWithoutSignIn = onUseWithoutSignIn,
         )
     }
 }

@@ -21,8 +21,8 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TopScreenViewModel(
-    private val firebaseIdToken: FirebaseIdToken,
-    private val projectRepository: ProjectRepository = ProjectRepository(firebaseIdToken),
+    private val firebaseIdToken: FirebaseIdToken?,
+    private val projectRepository: ProjectRepository = if (firebaseIdToken != null) ProjectRepository(firebaseIdToken) else ProjectRepository.createAnonymous(),
     settingsRepository: SettingsRepository = SettingsRepository(),
     authRepository: AuthRepository = AuthRepository(),
 ) : ViewModel() {
@@ -52,8 +52,11 @@ class TopScreenViewModel(
                     ProjectUiState.HasNotSelected.ProjectListLoading -> {}
                     is ProjectUiState.Selected -> {
                         CloudProjectSaverRunner.projectId = it.project.id
-                        CloudProjectSaverRunner.userId = firebaseIdToken.user_id
-                        CloudProjectSaverRunner.startSavingProjectPeriodically()
+                        CloudProjectSaverRunner.userId = firebaseIdToken?.user_id ?: "anonymous"
+                        // Only start cloud saving for authenticated users
+                        if (firebaseIdToken != null) {
+                            CloudProjectSaverRunner.startSavingProjectPeriodically()
+                        }
                     }
                 }
             }
