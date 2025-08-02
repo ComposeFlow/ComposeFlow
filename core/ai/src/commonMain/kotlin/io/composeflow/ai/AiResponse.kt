@@ -41,3 +41,8 @@ data class CreateProjectAiResponse(
     val message: String, // Shown to the user, explaining the response briefly. But without providing any details.
     val createProject: CreateProject?,
 )
+
+@Serializable
+data class TranslateStringsResponse(
+    val translations: Map<String, Map<String, String>>, // key -> locale -> translation
+)

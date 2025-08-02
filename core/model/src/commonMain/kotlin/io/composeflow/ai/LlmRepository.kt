@@ -8,6 +8,8 @@ import io.composeflow.ai.openrouter.tools.ToolExecutionStatus
 import io.composeflow.di.ServiceLocator
 import io.composeflow.model.project.appscreen.screen.Screen
 import io.composeflow.model.project.appscreen.screen.createCopyOfNewName
+import io.composeflow.model.project.string.ResourceLocale
+import io.composeflow.model.project.string.StringResource
 import io.composeflow.platform.getCacheDir
 import io.composeflow.serializer.decodeFromStringWithFallback
 import kotlinx.coroutines.CoroutineDispatcher
@@ -269,6 +271,49 @@ class LlmRepository(
                         throwable = it,
                         message = it.message ?: "Unknown error preparing architecture",
                         previousToolArgs = previousToolArgs,
+                    )
+                },
+            )
+        }
+
+    suspend fun translateStrings(
+        firebaseIdToken: String,
+        stringResources: List<StringResource>,
+        defaultLocale: ResourceLocale,
+        targetLocales: List<ResourceLocale>,
+    ): TranslateStringsResult =
+        withTimeout(5.minutes) {
+            Logger.i("Translating ${stringResources.size} strings from $defaultLocale to ${targetLocales.joinToString()}")
+
+            val translateResources =
+                stringResources.map { resource ->
+                    TranslateStringResource(
+                        key = resource.key,
+                        defaultValue = resource.localizedValues[defaultLocale] ?: "",
+                        description = resource.description,
+                    )
+                }
+
+            val response =
+                client.invokeTranslateStrings(
+                    firebaseIdToken = firebaseIdToken,
+                    stringResources = translateResources,
+                    defaultLocale = defaultLocale.languageCode,
+                    targetLocales = targetLocales.map { it.languageCode },
+                )
+
+            response.mapBoth(
+                success = { translateResponse ->
+                    TranslateStringsResult.Success(
+                        translations = translateResponse.translations,
+                        message = "Successfully translated ${stringResources.size} strings",
+                    )
+                },
+                failure = {
+                    Logger.e("Failed to translate strings: ${it.message}")
+                    TranslateStringsResult.Error(
+                        message = it.message ?: "Unknown error occurred during translation",
+                        throwable = it,
                     )
                 },
             )
@@ -613,4 +658,16 @@ data class ScreenContext(
     val screenName: String,
 ) {
     fun toContextString() = "Screen(ID: $id, screenName:$screenName)"
+}
+
+sealed class TranslateStringsResult {
+    data class Success(
+        val translations: Map<String, Map<String, String>>, // key -> locale -> translation
+        val message: String,
+    ) : TranslateStringsResult()
+
+    data class Error(
+        val message: String,
+        val throwable: Throwable,
+    ) : TranslateStringsResult()
 }

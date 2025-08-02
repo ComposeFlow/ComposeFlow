@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.onClick
@@ -28,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -97,6 +99,8 @@ import io.composeflow.string_resource_key
 import io.composeflow.string_resource_key_placeholder
 import io.composeflow.string_resource_key_tooltip
 import io.composeflow.string_resources
+import io.composeflow.translate_strings
+import io.composeflow.translating_strings
 import io.composeflow.ui.LocalOnAllDialogsClosed
 import io.composeflow.ui.LocalOnAnyDialogIsShown
 import io.composeflow.ui.Tooltip
@@ -119,6 +123,11 @@ fun StringResourceEditorScreen(
     Surface(modifier = modifier.fillMaxSize()) {
         StringResourceEditorContent(
             project = project,
+            selectedResourceIds = viewModel.selectedResourceIds,
+            isTranslating = viewModel.isTranslating,
+            onUpdateResourceSelection = viewModel::onUpdateResourceSelection,
+            onSelectAllResources = viewModel::onSelectAllResources,
+            onClearResourceSelection = viewModel::onClearResourceSelection,
             onAddStringResource = viewModel::onAddStringResource,
             onUpdateStringResourceKey = viewModel::onUpdateStringResourceKey,
             onUpdateStringResourceDescription = viewModel::onUpdateStringResourceDescription,
@@ -131,6 +140,7 @@ fun StringResourceEditorScreen(
                 viewModel.onUpdateSupportedLocales(currentLocales - locale)
             },
             onUpdateDefaultLocale = viewModel::onUpdateDefaultLocale,
+            onTranslateStrings = viewModel::onTranslateStrings,
             modifier = Modifier.fillMaxSize(),
         )
     }
@@ -139,6 +149,11 @@ fun StringResourceEditorScreen(
 @Composable
 private fun StringResourceEditorContent(
     project: Project,
+    selectedResourceIds: Set<String>,
+    isTranslating: Boolean,
+    onUpdateResourceSelection: (String, Boolean) -> Unit,
+    onSelectAllResources: () -> Unit,
+    onClearResourceSelection: () -> Unit,
     onAddStringResource: (key: String, description: String, defaultValue: String) -> Unit,
     onUpdateStringResourceKey: (StringResource, String) -> Unit,
     onUpdateStringResourceDescription: (StringResource, String) -> Unit,
@@ -147,18 +162,18 @@ private fun StringResourceEditorContent(
     onUpdateSupportedLocales: (List<ResourceLocale>) -> Unit,
     onRemoveLocale: (ResourceLocale) -> Unit,
     onUpdateDefaultLocale: (ResourceLocale) -> Unit,
+    onTranslateStrings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var addResourceDialogOpen by remember { mutableStateOf(false) }
     var editLocalesDialogOpen by remember { mutableStateOf(false) }
     var localeToDelete by remember { mutableStateOf<ResourceLocale?>(null) }
-    var selectedResources by remember { mutableStateOf(setOf<StringResource>()) }
     var showDeleteMultipleDialog by remember { mutableStateOf(false) }
 
     val allSelected by remember {
         derivedStateOf {
             project.stringResourceHolder.stringResources.isNotEmpty() &&
-                project.stringResourceHolder.stringResources.all { selectedResources.contains(it) }
+                selectedResourceIds.size == project.stringResourceHolder.stringResources.size
         }
     }
 
@@ -177,11 +192,14 @@ private fun StringResourceEditorContent(
                 .background(color = MaterialTheme.colorScheme.surface)
                 .padding(16.dp),
     ) {
-        Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp),
-            ) {
+        var tableWidthPx by remember { mutableStateOf(0) }
+        val tableWidthDp = with(LocalDensity.current) { tableWidthPx.toDp() }
+
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.widthIn(min = tableWidthDp).padding(bottom = 8.dp),
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = stringResource(Res.string.string_resources),
                     style = MaterialTheme.typography.titleLarge,
@@ -189,20 +207,28 @@ private fun StringResourceEditorContent(
                 )
                 Spacer(modifier = Modifier.width(32.dp))
                 TextButton(
-                    onClick = { editLocalesDialogOpen = true },
+                    onClick = { onTranslateStrings() },
+                    enabled = selectedResourceIds.isNotEmpty() && supportedLocales.any { it != defaultLocale } && !isTranslating,
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.Edit,
+                        imageVector = Icons.Outlined.Translate,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = stringResource(Res.string.edit_supported_locales))
+                    Text(
+                        text =
+                            if (isTranslating) {
+                                stringResource(Res.string.translating_strings)
+                            } else {
+                                stringResource(Res.string.translate_strings)
+                            },
+                    )
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 TextButton(
                     onClick = { showDeleteMultipleDialog = true },
-                    enabled = selectedResources.isNotEmpty(),
+                    enabled = selectedResourceIds.isNotEmpty(),
                     colors =
                         ButtonDefaults.textButtonColors(
                             contentColor = MaterialTheme.colorScheme.error,
@@ -216,72 +242,78 @@ private fun StringResourceEditorContent(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(stringResource(Res.string.delete_string_resources))
                 }
+                Spacer(modifier = Modifier.width(16.dp))
             }
+            TextButton(
+                onClick = { editLocalesDialogOpen = true },
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Edit,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(text = stringResource(Res.string.edit_supported_locales))
+            }
+        }
 
-            Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-            val horizontalScrollState = rememberScrollState()
-            Column {
-                var tableWidthPx by remember { mutableStateOf(0) }
-                val tableWidthDp = with(LocalDensity.current) { tableWidthPx.toDp() }
+        val horizontalScrollState = rememberScrollState()
+        StringResourceTableHeaderRow(
+            supportedLocales = supportedLocales,
+            defaultLocale = defaultLocale,
+            onUpdateDefaultLocale = onUpdateDefaultLocale,
+            onRemoveLocale = { locale -> localeToDelete = locale },
+            allSelected = allSelected,
+            onSelectAll = { selected ->
+                if (selected) {
+                    onSelectAllResources()
+                } else {
+                    onClearResourceSelection()
+                }
+            },
+            horizontalScrollState = horizontalScrollState,
+            modifier = Modifier.onSizeChanged { tableWidthPx = it.width },
+        )
+        HorizontalDivider(modifier = Modifier.width(tableWidthDp))
 
-                StringResourceTableHeaderRow(
+        TextButton(
+            shape = RectangleShape,
+            onClick = {
+                addResourceDialogOpen = true
+            },
+            modifier = Modifier.width(tableWidthDp),
+        ) {
+            Text(text = stringResource(Res.string.add_string_resource))
+        }
+        HorizontalDivider(modifier = Modifier.width(tableWidthDp))
+
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+        ) {
+            items(project.stringResourceHolder.stringResources) { resource ->
+                StringResourceTableDataRow(
+                    resource = resource,
                     supportedLocales = supportedLocales,
                     defaultLocale = defaultLocale,
-                    onUpdateDefaultLocale = onUpdateDefaultLocale,
-                    onRemoveLocale = { locale -> localeToDelete = locale },
-                    allSelected = allSelected,
-                    onSelectAll = { selected ->
-                        selectedResources =
-                            if (selected) {
-                                project.stringResourceHolder.stringResources.toSet()
-                            } else {
-                                emptySet()
-                            }
+                    isSelected = selectedResourceIds.contains(resource.id),
+                    onSelectionChange = { selected ->
+                        onUpdateResourceSelection(resource.id, selected)
+                    },
+                    onUpdateKey = { onUpdateStringResourceKey(resource, it) },
+                    onUpdateDescription = {
+                        onUpdateStringResourceDescription(
+                            resource,
+                            it,
+                        )
+                    },
+                    onUpdateValue = { locale, value ->
+                        onUpdateStringResourceValue(resource, locale, value)
                     },
                     horizontalScrollState = horizontalScrollState,
-                    modifier = Modifier.onSizeChanged { tableWidthPx = it.width },
                 )
                 HorizontalDivider(modifier = Modifier.width(tableWidthDp))
-
-                TextButton(
-                    shape = RectangleShape,
-                    onClick = {
-                        addResourceDialogOpen = true
-                    },
-                    modifier = Modifier.width(tableWidthDp),
-                ) {
-                    Text(text = stringResource(Res.string.add_string_resource))
-                }
-                HorizontalDivider(modifier = Modifier.width(tableWidthDp))
-
-                LazyColumn(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    items(project.stringResourceHolder.stringResources) { resource ->
-                        StringResourceTableDataRow(
-                            resource = resource,
-                            supportedLocales = supportedLocales,
-                            defaultLocale = defaultLocale,
-                            isSelected = selectedResources.contains(resource),
-                            onSelectionChange = { selected ->
-                                selectedResources =
-                                    if (selected) {
-                                        selectedResources + resource
-                                    } else {
-                                        selectedResources - resource
-                                    }
-                            },
-                            onUpdateKey = { onUpdateStringResourceKey(resource, it) },
-                            onUpdateDescription = { onUpdateStringResourceDescription(resource, it) },
-                            onUpdateValue = { locale, value ->
-                                onUpdateStringResourceValue(resource, locale, value)
-                            },
-                            horizontalScrollState = horizontalScrollState,
-                        )
-                        HorizontalDivider(modifier = Modifier.width(tableWidthDp))
-                    }
-                }
             }
         }
     }
@@ -342,6 +374,10 @@ private fun StringResourceEditorContent(
 
     if (showDeleteMultipleDialog) {
         onAnyDialogIsShown()
+        val selectedResources =
+            project.stringResourceHolder.stringResources
+                .filter { selectedResourceIds.contains(it.id) }
+
         SimpleConfirmationDialog(
             text =
                 if (selectedResources.size == 1) {
@@ -353,7 +389,6 @@ private fun StringResourceEditorContent(
                 selectedResources.forEach { resource ->
                     onDeleteStringResource(resource)
                 }
-                selectedResources = emptySet()
                 showDeleteMultipleDialog = false
                 onAllDialogsClosed()
             },

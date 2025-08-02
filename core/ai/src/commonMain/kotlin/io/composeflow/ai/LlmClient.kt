@@ -245,6 +245,84 @@ class LlmClient(
             }
         }
 
+    suspend fun invokeTranslateStrings(
+        firebaseIdToken: String,
+        stringResources: List<TranslateStringResource>,
+        defaultLocale: String,
+        targetLocales: List<String>,
+        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        retryCount: Int = 0,
+    ): Result<TranslateStringsResponse, Throwable> =
+        runCatching {
+            if (retryCount >= 3) {
+                Logger.e("Failed to generate response. Tried maximum number of attempts.")
+                throw IllegalStateException("Failed to generate response. Tried maximum number of attempts.")
+            }
+            val url = "${BuildConfig.LLM_ENDPOINT}/translate_strings"
+            val mediaType = "application/json".toMediaType()
+
+            val requestData =
+                TranslateStringsRequest(
+                    stringResources = stringResources,
+                    defaultLocale = defaultLocale,
+                    targetLocales = targetLocales,
+                )
+
+            val jsonBody = Json.encodeToString(requestData)
+            Logger.i("Translate strings request body: $jsonBody")
+            val requestBody = jsonBody.toRequestBody(mediaType)
+
+            val request =
+                Request
+                    .Builder()
+                    .url(url)
+                    .post(requestBody)
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Authorization", "Bearer $firebaseIdToken")
+                    .build()
+
+            withContext(dispatcher) {
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        val errorBody = response.body.string()
+                        Logger.e("LLM API call failed. Code: ${response.code}, Body: $errorBody. Request: $requestBody")
+                        throw Exception("Unexpected code ${response.code}, $errorBody")
+                    } else {
+                        val responseBodyString = response.body.string()
+
+                        // Log the raw response for debugging
+                        Logger.i("Raw response body: $responseBodyString")
+
+                        try {
+                            val translateRawResponse =
+                                jsonSerializer.decodeFromString<OpenRouterResponseWrapper>(
+                                    responseBodyString,
+                                )
+                            val translateResponse =
+                                jsonSerializer.decodeFromString(
+                                    TranslateStringsResponse.serializer(),
+                                    extractContent(
+                                        translateRawResponse.response.choices[0]
+                                            .message.content ?: "",
+                                    ),
+                                )
+                            translateResponse
+                        } catch (e: SerializationException) {
+                            Logger.e("Error during JSON deserialization: ${e.message}")
+                            return@withContext invokeTranslateStrings(
+                                firebaseIdToken = firebaseIdToken,
+                                stringResources = stringResources,
+                                defaultLocale = defaultLocale,
+                                targetLocales = targetLocales,
+                                dispatcher = dispatcher,
+                                retryCount = retryCount + 1,
+                            ).getOrThrow() // Rethrow any exception from the recursive call
+                        }
+                    }
+                }
+            }
+        }
+
     /**
      * Extract the content wrapped with
      * ```json
