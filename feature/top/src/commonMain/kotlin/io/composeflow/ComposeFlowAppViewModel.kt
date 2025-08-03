@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -29,13 +30,11 @@ class ComposeFlowAppViewModel(
             authRepository.firebaseIdToken,
             _isAnonymous
         ) { token, isAnonymous ->
-            val result = when {
+            when {
                 isAnonymous -> LoginResultUiState.Anonymous
                 token != null -> LoginResultUiState.Success(token)
                 else -> LoginResultUiState.NotStarted
             }
-            println("DEBUG: loginResultUiState changed to: $result (isAnonymous=$isAnonymous, token=$token)")
-            result  
         }.onEach { state ->
             // Handle analytics user identification on authentication state changes
             try {
@@ -77,11 +76,7 @@ class ComposeFlowAppViewModel(
     }
     
     fun onUseWithoutSignIn() {
-        // Set anonymous state without attempting authentication
-        // This bypasses the auth flow and allows direct access to the app
-        println("DEBUG: onUseWithoutSignIn called")
         _isAnonymous.value = true
-        println("DEBUG: _isAnonymous set to true")
     }
 
     suspend fun onLogOut() {

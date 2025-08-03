@@ -33,7 +33,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import io.composeflow.ai.AiChatDialog
 import io.composeflow.auth.LocalFirebaseIdTokenOrNull
-import io.composeflow.isAiConfigured
+import io.composeflow.auth.isAiEnabled
 import io.composeflow.model.ProvideNavigator
 import io.composeflow.model.TopLevelDestination
 import io.composeflow.ui.Tooltip
@@ -82,8 +82,7 @@ fun ProjectEditorContent(
     onTitleBarLeftContentSet: (TitleBarContent) -> Unit,
 ) {
     val firebaseIdToken = LocalFirebaseIdTokenOrNull.current
-    val isAnonymous = firebaseIdToken == null
-    val isAiEnabled = !isAnonymous && isAiConfigured()
+    val isAiEnabled = isAiEnabled()
 
     val viewModel =
         viewModel(modelClass = ProjectEditorViewModel::class) {

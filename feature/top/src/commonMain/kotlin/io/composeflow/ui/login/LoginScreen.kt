@@ -33,7 +33,6 @@ import io.composeflow.ui.common.ComposeFlowTheme
 import io.composeflow.ui.jewel.TitleBarContent
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.top.TopScreen
-import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -43,10 +42,8 @@ fun LoginScreen(
     onTitleBarRightContentSet: (TitleBarContent) -> Unit,
     onTitleBarLeftContentSet: (TitleBarContent) -> Unit,
     onUseWithoutSignIn: () -> Unit = {},
+    loginUiState: LoginResultUiState,
 ) {
-    val appViewModel =
-        viewModel(modelClass = ComposeFlowAppViewModel::class) { ComposeFlowAppViewModel() }
-    val loginUiState by appViewModel.loginResultUiState.collectAsState()
     ComposeFlowTheme(useDarkTheme = true) {
         Surface {
             when (val state = loginUiState) {

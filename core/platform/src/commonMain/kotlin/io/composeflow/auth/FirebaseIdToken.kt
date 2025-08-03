@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
 import io.composeflow.auth.google.TokenResponse
+import io.composeflow.isAiConfigured
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
@@ -32,6 +33,9 @@ val LocalFirebaseIdToken =
 
 // Helper to check if FirebaseIdToken is available in the current composition
 val LocalFirebaseIdTokenOrNull = staticCompositionLocalOf<FirebaseIdToken?> { null }
+
+@Composable
+fun isAiEnabled(): Boolean = LocalFirebaseIdTokenOrNull.current != null && isAiConfigured()
 
 @Composable
 fun ProvideFirebaseIdToken(

@@ -25,6 +25,7 @@
     <string name="ai_prompt_suggestion_chat">A chat messaging app with groups and media sharing</string>
     <string name="ai_login_needed">You need to login in order to process the request</string>
     <string name="ai_screen_creation_placeholder">Describe what kind of screen you want to build</string>
+    <string name="ai_need_to_sign_in_to_use_ai_assisted_project_creation">You need to sign in to use AI-assisted project creation</string>
     <string name="add_action">Add action</string>
     <string name="add_action_icon">Add a Action icon</string>
     <string name="add_app_state">Add app state</string>

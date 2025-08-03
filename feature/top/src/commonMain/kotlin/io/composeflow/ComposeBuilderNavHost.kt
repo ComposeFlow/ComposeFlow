@@ -15,6 +15,7 @@ fun ComposeBuilderNavHost(
     onTitleBarRightContentSet: (TitleBarContent) -> Unit = {},
     onTitleBarLeftContentSet: (TitleBarContent) -> Unit = {},
     onUseWithoutSignIn: () -> Unit = {},
+    loginUiStateProvider: @Composable () -> LoginResultUiState,
 ) {
     NavHost(
         navigator = navigator,
@@ -26,6 +27,7 @@ fun ComposeBuilderNavHost(
             onTitleBarRightContentSet = onTitleBarRightContentSet,
             onTitleBarLeftContentSet = onTitleBarLeftContentSet,
             onUseWithoutSignIn = onUseWithoutSignIn,
+            loginUiStateProvider = loginUiStateProvider,
         )
     }
 }
