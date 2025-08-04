@@ -1,5 +1,9 @@
 package io.composeflow.ai
 
+import io.composeflow.ai.AiAssistantUiState
+import io.composeflow.ai.AiChatDialogViewModel
+import io.composeflow.ai.LlmRepository
+import io.composeflow.ai.ToolDispatcher
 import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.model.project.Project
 import io.composeflow.repository.ProjectRepository
@@ -40,7 +44,7 @@ class AiChatDialogViewModelTest {
     }
 
     private fun createMockFirebaseIdToken(): FirebaseIdToken =
-        FirebaseIdToken(
+        FirebaseIdToken.SignedInToken(
             name = "Test User",
             picture = "https://example.com/picture.jpg",
             iss = "https://securetoken.google.com/test-project",

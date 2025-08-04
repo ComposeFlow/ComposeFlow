@@ -13,6 +13,7 @@ import kotlinx.serialization.json.JsonElement
 sealed interface FirebaseIdToken {
     @Suppress("ktlint:standard:property-naming")
     val user_id: String
+    val rawToken: String?
 
     @Serializable
     data class SignedInToken(
@@ -32,12 +33,13 @@ sealed interface FirebaseIdToken {
         val email_verified: Boolean,
         val firebase: JsonElement, // TODO: Define appropriate scheme for each ID provider
         val googleTokenResponse: TokenResponse? = null,
-        val rawToken: String? = null,
+        override val rawToken: String? = null,
     ) : FirebaseIdToken
 
     data object Anonymouse : FirebaseIdToken {
         @Suppress("ktlint:standard:property-naming")
         override val user_id: String = ANONYMOUSE_USER_ID
+        override val rawToken: String? = null
     }
 }
 
@@ -47,7 +49,8 @@ val LocalFirebaseIdToken =
     }
 
 @Composable
-fun isAiEnabled(): Boolean = LocalFirebaseIdToken.current != FirebaseIdToken.Anonymouse && isAiConfigured()
+fun isAiEnabled(): Boolean =
+    LocalFirebaseIdToken.current != FirebaseIdToken.Anonymouse && isAiConfigured()
 
 @Composable
 fun ProvideFirebaseIdToken(
