@@ -45,6 +45,7 @@ import com.seiko.imageloader.LocalImageLoader
 import com.seiko.imageloader.createDefault
 import io.composeflow.ProjectEditorView
 import io.composeflow.Res
+import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.auth.LocalFirebaseIdToken
 import io.composeflow.formatter.ProvideCodeTheme
 import io.composeflow.log_out
@@ -290,12 +291,13 @@ private fun AnonymousUserContainer(onLogOut: () -> Unit) {
             modifier = Modifier.wrapContentSize(),
         ) {
             Box(
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .size(width = 48.dp, height = 48.dp)
-                    .clip(shape = CircleShape)
-                    .background(color = MaterialTheme.colorScheme.primary),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .padding(all = 8.dp)
+                        .size(width = 48.dp, height = 48.dp)
+                        .clip(shape = CircleShape)
+                        .background(color = MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = "A",
@@ -338,51 +340,55 @@ private fun AnonymousUserContainer(onLogOut: () -> Unit) {
 @Composable
 private fun UserProfileContainer(onLogOut: () -> Unit) {
     val firebaseIdToken = LocalFirebaseIdToken.current
-    Column {
-        Row(
-            verticalAlignment = Alignment.Top,
-            modifier = Modifier.wrapContentSize(),
-        ) {
-            AsyncImage(
-                url = firebaseIdToken.picture,
-                contentDescription = stringResource(Res.string.profile_image),
-                modifier =
-                    Modifier
-                        .padding(all = 8.dp)
-                        .size(
-                            width = 48.dp,
-                            height = 48.dp,
-                        ).clip(shape = CircleShape)
-                        .hoverIconClickable(),
-            )
-            Column(
-                modifier = Modifier.wrapContentSize().padding(vertical = 8.dp),
-            ) {
-                Text(
-                    text = firebaseIdToken.name,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Text(
-                    text = firebaseIdToken.email,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
-            }
-        }
+    val signedInToken = firebaseIdToken as? FirebaseIdToken.SignedInToken
 
-        TextButton(
-            onClick = {
-                onLogOut()
-            },
-            modifier = Modifier.padding(start = 8.dp),
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Outlined.Logout,
-                contentDescription = stringResource(Res.string.log_out),
-            )
-            Text(stringResource(Res.string.log_out))
+    if (signedInToken != null) {
+        Column {
+            Row(
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.wrapContentSize(),
+            ) {
+                AsyncImage(
+                    url = signedInToken.picture,
+                    contentDescription = stringResource(Res.string.profile_image),
+                    modifier =
+                        Modifier
+                            .padding(all = 8.dp)
+                            .size(
+                                width = 48.dp,
+                                height = 48.dp,
+                            ).clip(shape = CircleShape)
+                            .hoverIconClickable(),
+                )
+                Column(
+                    modifier = Modifier.wrapContentSize().padding(vertical = 8.dp),
+                ) {
+                    Text(
+                        text = signedInToken.name,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = signedInToken.email,
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(top = 8.dp),
+                    )
+                }
+            }
+
+            TextButton(
+                onClick = {
+                    onLogOut()
+                },
+                modifier = Modifier.padding(start = 8.dp),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.Logout,
+                    contentDescription = stringResource(Res.string.log_out),
+                )
+                Text(stringResource(Res.string.log_out))
+            }
         }
     }
 }

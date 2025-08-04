@@ -40,34 +40,39 @@ class AuthRepository {
         dataStore.data.map { preferences ->
             preferences[serializedFirebaseUserInfoKey]?.let {
                 val firebaseIdToken = jsonSerializer.decodeFromString<FirebaseIdToken>(it)
-                val expirationTime = Instant.fromEpochSeconds(firebaseIdToken.exp)
-                val currentTime = Clock.System.now()
 
-                if (expirationTime > currentTime) {
-                    Logger.i("New firebaseIdToken detected. ${firebaseIdToken.user_id}")
-                    firebaseIdToken
-                } else {
-                    Logger.i(
-                        "FirebaseIdToken expired. ${firebaseIdToken.user_id}, expirationTime: $expirationTime, currentTime: ${Clock.System.now()}",
-                    )
-                    if (firebaseIdToken.googleTokenResponse != null && firebaseIdToken.googleTokenResponse.refresh_token !== "") {
-                        googleOAuth2
-                            .refreshToken(firebaseIdToken.googleTokenResponse)
-                            .mapBoth({ refreshedToken ->
+                if (firebaseIdToken is FirebaseIdToken.SignedInToken) {
+                    val expirationTime = Instant.fromEpochSeconds(firebaseIdToken.exp)
+                    val currentTime = Clock.System.now()
 
-                                // Save refreshed token into DataStore
-                                dataStore.edit { prefs ->
-                                    prefs[serializedFirebaseUserInfoKey] =
-                                        jsonSerializer.encodeToString(refreshedToken)
-                                }
-                                return@let refreshedToken
-                            }, { error ->
-                                Logger.e("Failed to refresh token. ", error)
-                                null
-                            })
+                    if (expirationTime > currentTime) {
+                        Logger.i("New firebaseIdToken detected. ${firebaseIdToken.user_id}")
+                        firebaseIdToken
                     } else {
-                        null
+                        Logger.i(
+                            "FirebaseIdToken expired. ${firebaseIdToken.user_id}, expirationTime: $expirationTime, currentTime: ${Clock.System.now()}",
+                        )
+                        if (firebaseIdToken.googleTokenResponse != null && firebaseIdToken.googleTokenResponse.refresh_token !== "") {
+                            googleOAuth2
+                                .refreshToken(firebaseIdToken.googleTokenResponse)
+                                .mapBoth({ refreshedToken ->
+
+                                    // Save refreshed token into DataStore
+                                    dataStore.edit { prefs ->
+                                        prefs[serializedFirebaseUserInfoKey] =
+                                            jsonSerializer.encodeToString(refreshedToken)
+                                    }
+                                    return@let refreshedToken
+                                }, { error ->
+                                    Logger.e("Failed to refresh token. ", error)
+                                    null
+                                })
+                        } else {
+                            null
+                        }
                     }
+                } else {
+                    null
                 }
             }
         }

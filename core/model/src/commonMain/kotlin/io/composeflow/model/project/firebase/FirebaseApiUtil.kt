@@ -18,7 +18,8 @@ suspend fun StateFlow<FirebaseIdToken?>.prepareFirebaseApiCall(
     ignoreInsufficientScope: Boolean = false,
     executeApiCall: suspend (FirebaseAppIdentifier) -> Unit,
 ) {
-    if (value?.googleTokenResponse?.hasSufficientScopes(
+    val signedInToken = value as? FirebaseIdToken.SignedInToken
+    if (signedInToken?.googleTokenResponse?.hasSufficientScopes(
             FIREBASE_SCOPE,
             IDENTITY_TOOLKIT_SCOPE,
         ) != true
@@ -32,7 +33,7 @@ suspend fun StateFlow<FirebaseIdToken?>.prepareFirebaseApiCall(
         authRepository.startFirebaseManagementGrantInFlow()
         // After the user grants the scope, the firebaseIdToken will be updated
         collect { newFirebaseIdToken ->
-            newFirebaseIdToken?.googleTokenResponse?.let {
+            (newFirebaseIdToken as? FirebaseIdToken.SignedInToken)?.googleTokenResponse?.let {
                 val identifier =
                     FirebaseAppIdentifier(
                         firebaseProjectId = firebaseProjectId,
@@ -42,7 +43,7 @@ suspend fun StateFlow<FirebaseIdToken?>.prepareFirebaseApiCall(
             }
         }
     } else {
-        value?.googleTokenResponse?.let {
+        signedInToken?.googleTokenResponse?.let {
             val identifier =
                 FirebaseAppIdentifier(
                     firebaseProjectId = firebaseProjectId,

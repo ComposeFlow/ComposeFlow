@@ -16,6 +16,7 @@ import io.composeflow.ai_failed_to_generate_response_timeout
 import io.composeflow.ai_login_needed
 import io.composeflow.ai_preparing_architecture
 import io.composeflow.auth.AuthRepository
+import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.Screen
 import io.composeflow.model.project.appscreen.screen.postProcessAfterAiGeneration
@@ -88,7 +89,7 @@ class AiAssistantViewModel(
 
     private fun onSendProjectCreationQuery(projectCreationQuery: String) {
         viewModelScope.launch {
-            val rawToken = firebaseIdToken.value?.rawToken
+            val rawToken = (firebaseIdToken.value as? FirebaseIdToken.SignedInToken)?.rawToken
 
             if (rawToken == null) {
                 _messages.value +=
@@ -226,7 +227,7 @@ class AiAssistantViewModel(
                     val originalPrompts = state.screenPrompts
                     val updatedPrompts = originalPrompts.toMutableList()
 
-                    val firebaseIdTokenRawValue = firebaseIdToken.value?.rawToken
+                    val firebaseIdTokenRawValue = (firebaseIdToken.value as? FirebaseIdToken.SignedInToken)?.rawToken
                     if (firebaseIdTokenRawValue == null) {
                         _messages.value +=
                             MessageModel(
@@ -507,7 +508,7 @@ class AiAssistantViewModel(
                     else -> ""
                 }
 
-            val firebaseIdTokenRawValue = firebaseIdToken.value?.rawToken
+            val firebaseIdTokenRawValue = (firebaseIdToken.value as? FirebaseIdToken.SignedInToken)?.rawToken
             if (firebaseIdTokenRawValue == null) {
                 _messages.value +=
                     MessageModel(

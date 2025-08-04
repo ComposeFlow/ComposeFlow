@@ -68,7 +68,8 @@ data class GoogleOAuth2Client(
 
                     val idToken = jsonElement.jsonObject["idToken"]?.jsonPrimitive?.content ?: ""
                     val decodeIdToken = decodeIdToken(idToken)
-                    val firebaseIdToken = Json.decodeFromString<FirebaseIdToken>(decodeIdToken)
+                    val firebaseIdToken =
+                        Json.decodeFromString<FirebaseIdToken.SignedInToken>(decodeIdToken)
                     firebaseIdToken.copy(
                         googleTokenResponse = googleTokenResponse,
                         rawToken = idToken,
@@ -102,7 +103,8 @@ data class GoogleOAuth2Client(
                 response.body.string().let {
                     val withIdpResponse = Json.decodeFromString<SignInWithIdpResponse>(it)
                     val decodeIdToken = decodeIdToken(withIdpResponse.idToken)
-                    val firebaseIdToken = Json.decodeFromString<FirebaseIdToken>(decodeIdToken)
+                    val firebaseIdToken =
+                        Json.decodeFromString<FirebaseIdToken.SignedInToken>(decodeIdToken)
                     firebaseIdToken.copy(
                         googleTokenResponse = googleTokenResponse,
                         rawToken = withIdpResponse.idToken,

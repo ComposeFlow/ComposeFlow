@@ -1,8 +1,10 @@
 package io.composeflow
 
+import co.touchlab.kermit.Logger
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.runCatching
 import io.composeflow.auth.AuthRepository
+import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.di.ServiceLocator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +31,28 @@ class BillingClient(
         runCatching {
             withContext(ioDispatcher) {
                 // TODO: Consider a case when the token expires
-                val token =
+                val firebaseIdToken =
                     authRepository.firebaseIdToken
                         .take(1)
                         .last()
-                        ?.rawToken
-                        ?: throw Exception("No token")
+
+                val token =
+                    when (firebaseIdToken) {
+                        is FirebaseIdToken.SignedInToken -> {
+                            firebaseIdToken.rawToken
+                                ?: throw Exception("Signed-in user has no raw token")
+                        }
+
+                        is FirebaseIdToken.Anonymouse -> {
+                            Logger.i("Anonymous user attempted to create pricing table link. Feature not available for anonymous users.")
+                            return@withContext null
+                        }
+
+                        null -> {
+                            Logger.i("No authenticated user found for pricing table link creation.")
+                            return@withContext null
+                        }
+                    }
 
                 val requestBuilder =
                     okhttp3.Request
@@ -49,7 +67,7 @@ class BillingClient(
                 val request = requestBuilder.build()
 
                 okHttpClient.newCall(request).execute().use { response ->
-                    response.body?.string()?.let { body ->
+                    response.body.string().let { body ->
                         val jsonElement = Json.parseToJsonElement(body)
 
                         val error = jsonElement.jsonObject["error"]
@@ -64,6 +82,6 @@ class BillingClient(
                         return@withContext url
                     }
                 }
-            }?.toString() ?: throw Exception("No res")
+            } ?: throw Exception("No res")
         }
 }

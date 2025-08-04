@@ -11,11 +11,10 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
@@ -24,11 +23,13 @@ class ComposeFlowAppViewModel(
     private val projectSaver: ProjectSaver = LocalFirstProjectSaver(),
 ) : ViewModel() {
     private val _isAnonymous = MutableStateFlow(false)
+    val isAnonymous: StateFlow<Boolean> = _isAnonymous.asStateFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val loginResultUiState: StateFlow<LoginResultUiState> =
         combine(
             authRepository.firebaseIdToken,
-            _isAnonymous
+            _isAnonymous,
         ) { token, isAnonymous ->
             when {
                 isAnonymous -> LoginResultUiState.Anonymous
@@ -43,11 +44,15 @@ class ComposeFlowAppViewModel(
                     is LoginResultUiState.Success -> {
                         // User logged in - identify user for analytics
                         // Only send non-PII data to comply with privacy practices
+                        val signedInToken = state.firebaseIdToken as? FirebaseIdToken.SignedInToken
                         analytics.identify(
-                            userId = state.firebaseIdToken.user_id.hashCode().toString(),
+                            userId =
+                                state.firebaseIdToken.user_id
+                                    .hashCode()
+                                    .toString(),
                             properties =
                                 mapOf(
-                                    "email_verified" to state.firebaseIdToken.email_verified,
+                                    "email_verified" to (signedInToken?.email_verified ?: false),
                                     "login_method" to "google",
                                 ),
                         )
@@ -74,7 +79,7 @@ class ComposeFlowAppViewModel(
     fun onGoogleSignClicked() {
         authRepository.startGoogleSignInFlow()
     }
-    
+
     fun onUseWithoutSignIn() {
         _isAnonymous.value = true
     }
@@ -101,6 +106,6 @@ sealed interface LoginResultUiState {
     data class Success(
         val firebaseIdToken: FirebaseIdToken,
     ) : LoginResultUiState
-    
+
     data object Anonymous : LoginResultUiState
 }

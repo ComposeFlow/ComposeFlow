@@ -1,15 +1,16 @@
 package io.composeflow.cloud.storage
 
+import co.touchlab.kermit.Logger
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.runCatching
 import io.composeflow.auth.AuthRepository
+import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.di.ServiceLocator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
-import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -20,6 +21,11 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import kotlin.time.Instant
+
+class AnonymousUserException(
+    message: String = "Firebase Storage operations are not available for anonymous users. Please sign in to access cloud storage.",
+) : Exception(message)
 
 @OptIn(kotlin.time.ExperimentalTime::class)
 class FirebaseStorageClient(
@@ -33,6 +39,40 @@ class FirebaseStorageClient(
             Dispatchers.IO
         },
 ) {
+    private suspend fun getAuthToken(): String {
+        val firebaseIdToken =
+            authRepository.firebaseIdToken
+                .take(1)
+                .last()
+
+        return when (firebaseIdToken) {
+            is FirebaseIdToken.SignedInToken -> {
+                firebaseIdToken.rawToken ?: throw Exception("Signed-in user has no raw token")
+            }
+
+            is FirebaseIdToken.Anonymouse -> {
+                Logger.i("Anonymous user attempted Firebase Storage operation. Feature not available for anonymous users.")
+                throw AnonymousUserException()
+            }
+
+            null -> {
+                Logger.i("No authenticated user found for Firebase Storage operation.")
+                throw AnonymousUserException()
+            }
+        }
+    }
+
+    suspend fun isAvailable(): Boolean =
+        try {
+            val firebaseIdToken =
+                authRepository.firebaseIdToken
+                    .take(1)
+                    .last()
+            firebaseIdToken is FirebaseIdToken.SignedInToken
+        } catch (e: Exception) {
+            false
+        }
+
     suspend fun listAll(location: Location): ListResult {
         val accumulator =
             ListResult(
@@ -53,12 +93,7 @@ class FirebaseStorageClient(
         runCatching {
             withContext(ioDispatcher) {
                 // TODO: Consider a case when the token expires
-                val token =
-                    authRepository.firebaseIdToken
-                        .take(1)
-                        .last()
-                        ?.rawToken
-                        ?: throw Exception("No token")
+                val token = getAuthToken()
                 val url =
                     HttpUrl
                         .Builder()
@@ -87,7 +122,7 @@ class FirebaseStorageClient(
                             addHeader("X-Firebase-Storage-Version", clientVersion)
                         }.build()
                 okHttpClient.newCall(request).execute().use { response ->
-                    response.body?.string()?.let {
+                    response.body.string().let {
                         val jsonElement = Json.parseToJsonElement(it)
 
                         val error = jsonElement.jsonObject["error"]
@@ -137,12 +172,7 @@ class FirebaseStorageClient(
     suspend fun getMetadata(location: Location): Map<String, String> {
         val metadata = mutableMapOf<String, String>()
         withContext(ioDispatcher) {
-            val token =
-                authRepository.firebaseIdToken
-                    .take(1)
-                    .last()
-                    ?.rawToken
-                    ?: throw Exception("No token")
+            val token = getAuthToken()
             val url =
                 HttpUrl
                     .Builder()
@@ -167,7 +197,7 @@ class FirebaseStorageClient(
                     }.build()
 
             okHttpClient.newCall(request).execute().use { response ->
-                response.body?.string()?.let { body ->
+                response.body.string().let { body ->
                     val jsonElement = Json.parseToJsonElement(body)
 
                     val error = jsonElement.jsonObject["error"]
@@ -191,12 +221,7 @@ class FirebaseStorageClient(
 
         var res: BlobInfoWrapper? = null
         withContext(ioDispatcher) {
-            val token =
-                authRepository.firebaseIdToken
-                    .take(1)
-                    .last()
-                    ?.rawToken
-                    ?: throw Exception("No token")
+            val token = getAuthToken()
             val url =
                 HttpUrl
                     .Builder()
@@ -223,7 +248,7 @@ class FirebaseStorageClient(
 
             okHttpClient.newCall(request).execute().use { response ->
                 if (response.code == 200) {
-                    response.body?.bytes()?.let { bytes ->
+                    response.body.bytes().let { bytes ->
                         res =
                             BlobInfoWrapper(
                                 blobId =
@@ -264,12 +289,7 @@ class FirebaseStorageClient(
         val contentByes = blobInfo.contentBytes ?: throw Exception("No content")
 
         withContext(ioDispatcher) {
-            val token =
-                authRepository.firebaseIdToken
-                    .take(1)
-                    .last()
-                    ?.rawToken
-                    ?: throw Exception("No token")
+            val token = getAuthToken()
             val url =
                 HttpUrl
                     .Builder()
@@ -322,7 +342,7 @@ class FirebaseStorageClient(
                     }.build()
 
             okHttpClient.newCall(request).execute().use { response ->
-                response.body?.string()?.let { body ->
+                response.body.string().let { body ->
                     val jsonElement = Json.parseToJsonElement(body)
 
                     val error = jsonElement.jsonObject["error"]
@@ -373,12 +393,7 @@ class FirebaseStorageClient(
 
     suspend fun delete(location: Location) {
         withContext(ioDispatcher) {
-            val token =
-                authRepository.firebaseIdToken
-                    .take(1)
-                    .last()
-                    ?.rawToken
-                    ?: throw Exception("No token")
+            val token = getAuthToken()
             val url =
                 HttpUrl
                     .Builder()
@@ -404,7 +419,7 @@ class FirebaseStorageClient(
 
             okHttpClient.newCall(request).execute().use { response ->
                 if (response.code != 204) {
-                    response.body?.string()?.let { body ->
+                    response.body.string().let { body ->
                         val jsonElement = Json.parseToJsonElement(body)
 
                         val error = jsonElement.jsonObject["error"]

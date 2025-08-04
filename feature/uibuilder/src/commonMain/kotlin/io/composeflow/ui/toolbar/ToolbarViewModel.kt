@@ -51,7 +51,14 @@ import org.jetbrains.compose.resources.getString
 
 class ToolbarViewModel(
     private val firebaseIdTokenArg: FirebaseIdToken?,
-    private val projectRepository: ProjectRepository = if (firebaseIdTokenArg != null) ProjectRepository(firebaseIdTokenArg) else ProjectRepository.createAnonymous(),
+    private val projectRepository: ProjectRepository =
+        if (firebaseIdTokenArg !=
+            null
+        ) {
+            ProjectRepository(firebaseIdTokenArg)
+        } else {
+            ProjectRepository.createAnonymous()
+        },
     private val authRepository: AuthRepository = AuthRepository(),
     private val firebaseApiCaller: FirebaseApiCaller = FirebaseApiCaller(),
     private val settingsRepository: SettingsRepository = SettingsRepository(),

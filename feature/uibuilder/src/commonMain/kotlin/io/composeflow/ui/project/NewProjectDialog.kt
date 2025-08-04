@@ -123,7 +123,7 @@ private fun AiAssistedCreationContent(
                     userQuery = newQuery
                     queryValidator = NonEmptyStringValidator().validate(newQuery)
                 },
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
         } else {
             Tooltip(stringResource(Res.string.ai_need_to_sign_in_to_use_ai_assisted_project_creation)) {
@@ -133,8 +133,10 @@ private fun AiAssistedCreationContent(
                         userQuery = newQuery
                         queryValidator = NonEmptyStringValidator().validate(newQuery)
                     },
-                    modifier = Modifier.alpha(0.3f)
-                        .weight(1f)
+                    modifier =
+                        Modifier
+                            .alpha(0.3f)
+                            .weight(1f),
                 )
             }
         }
@@ -181,7 +183,7 @@ private fun AiAssistedCreationContent(
                 }
             } else {
                 Tooltip(
-                    stringResource(Res.string.ai_need_to_sign_in_to_use_ai_assisted_project_creation)
+                    stringResource(Res.string.ai_need_to_sign_in_to_use_ai_assisted_project_creation),
                 ) {
                     OutlinedButton(
                         onClick = {
@@ -293,7 +295,7 @@ fun AiAssistedCreationContentInput(
             },
             enabled = isAiEnabled(),
             singleLine = false,
-            minLines = 7,
+            minLines = 9,
             modifier =
                 Modifier
                     .fillMaxWidth()

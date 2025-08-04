@@ -32,7 +32,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import io.composeflow.ai.AiChatDialog
-import io.composeflow.auth.LocalFirebaseIdTokenOrNull
+import io.composeflow.auth.LocalFirebaseIdToken
 import io.composeflow.auth.isAiEnabled
 import io.composeflow.model.ProvideNavigator
 import io.composeflow.model.TopLevelDestination
@@ -81,7 +81,7 @@ fun ProjectEditorContent(
     onTitleBarRightContentSet: (TitleBarContent) -> Unit,
     onTitleBarLeftContentSet: (TitleBarContent) -> Unit,
 ) {
-    val firebaseIdToken = LocalFirebaseIdTokenOrNull.current
+    val firebaseIdToken = LocalFirebaseIdToken.current
     val isAiEnabled = isAiEnabled()
 
     val viewModel =
@@ -232,7 +232,7 @@ fun ProjectEditorContent(
             }
         }
     }
-    if (showAiChatDialog && isAiEnabled && firebaseIdToken != null) {
+    if (showAiChatDialog && isAiEnabled) {
         AiChatDialog(
             project = project,
             aiAssistantUiState = aiAssistantUiState,

@@ -76,7 +76,7 @@ class AiChatDialogViewModel(
 
         generationJob =
             viewModelScope.launch {
-                val firebaseIdTokenRawValue = firebaseIdToken.value?.rawToken
+                val firebaseIdTokenRawValue = (firebaseIdToken.value as? FirebaseIdToken.SignedInToken)?.rawToken
                 if (firebaseIdTokenRawValue == null) {
                     _messages.value +=
                         MessageModel(

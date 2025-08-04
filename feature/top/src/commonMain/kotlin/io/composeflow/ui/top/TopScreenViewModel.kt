@@ -22,7 +22,14 @@ import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TopScreenViewModel(
     private val firebaseIdToken: FirebaseIdToken?,
-    private val projectRepository: ProjectRepository = if (firebaseIdToken != null) ProjectRepository(firebaseIdToken) else ProjectRepository.createAnonymous(),
+    private val projectRepository: ProjectRepository =
+        if (firebaseIdToken !=
+            null
+        ) {
+            ProjectRepository(firebaseIdToken)
+        } else {
+            ProjectRepository.createAnonymous()
+        },
     settingsRepository: SettingsRepository = SettingsRepository(),
     authRepository: AuthRepository = AuthRepository(),
 ) : ViewModel() {

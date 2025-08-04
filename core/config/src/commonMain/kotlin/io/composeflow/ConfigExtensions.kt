@@ -12,14 +12,11 @@ fun String.isNullStringOrEmpty(): Boolean = this.isNullString() || this.isEmpty(
 /**
  * Check if authentication services are properly configured
  */
-fun isAuthConfigured(): Boolean {
-    return !BuildConfig.AUTH_ENDPOINT.isNullStringOrEmpty() &&
+fun isAuthConfigured(): Boolean =
+    !BuildConfig.AUTH_ENDPOINT.isNullStringOrEmpty() &&
         !BuildConfig.FIREBASE_API_KEY.isNullStringOrEmpty()
-}
 
 /**
  * Check if AI/LLM services are properly configured
  */
-fun isAiConfigured(): Boolean {
-    return !BuildConfig.LLM_ENDPOINT.isNullStringOrEmpty()
-}
+fun isAiConfigured(): Boolean = !BuildConfig.LLM_ENDPOINT.isNullStringOrEmpty()

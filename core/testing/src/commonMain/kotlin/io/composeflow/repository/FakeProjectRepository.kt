@@ -6,7 +6,7 @@ import io.composeflow.datastore.ProjectYamlNameWithLastModified
 import kotlinx.serialization.json.JsonObject
 
 val fakeFirebaseIdToken =
-    FirebaseIdToken(
+    FirebaseIdToken.SignedInToken(
         name = "John Doe",
         picture = "pictureUrl",
         iss = "iss",

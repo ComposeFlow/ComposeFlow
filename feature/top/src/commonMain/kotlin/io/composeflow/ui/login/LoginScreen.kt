@@ -13,7 +13,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,7 +21,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
-import io.composeflow.ComposeFlowAppViewModel
 import io.composeflow.LoginResultUiState
 import io.composeflow.Res
 import io.composeflow.auth.ProvideFirebaseIdToken
@@ -83,7 +81,7 @@ private fun InitialContent(
     onUseWithoutSignIn: () -> Unit,
 ) {
     val isAuthConfigured = isAuthConfigured()
-    
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -99,7 +97,7 @@ private fun InitialContent(
             contentDescription = stringResource(Res.string.composeflow_main_logo),
             modifier = Modifier.scale(scale),
         )
-        
+
         if (isAuthConfigured) {
             Image(
                 bitmap =
@@ -115,28 +113,28 @@ private fun InitialContent(
                             onGoogleSignInClicked()
                         },
             )
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             OutlinedButton(
-                onClick = onUseWithoutSignIn
+                onClick = onUseWithoutSignIn,
             ) {
                 Text("Use without sign in")
             }
         } else {
             Spacer(modifier = Modifier.height(32.dp))
-            
+
             Button(
-                onClick = onUseWithoutSignIn
+                onClick = onUseWithoutSignIn,
             ) {
                 Text("Get Started")
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Text(
                 text = "Sign in is not available - configure authentication in local.properties",
-                modifier = Modifier.scale(0.8f)
+                modifier = Modifier.scale(0.8f),
             )
         }
     }

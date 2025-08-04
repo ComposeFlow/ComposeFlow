@@ -52,7 +52,7 @@ fun ComposeFlowApp(
                     onTitleBarRightContentSet = onTitleBarRightContentSet,
                     onTitleBarLeftContentSet = onTitleBarLeftContentSet,
                     onUseWithoutSignIn = appViewModel::onUseWithoutSignIn,
-                    loginUiStateProvider = { 
+                    loginUiStateProvider = {
                         appViewModel.loginResultUiState.collectAsState().value
                     },
                 )

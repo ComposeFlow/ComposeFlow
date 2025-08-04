@@ -1,6 +1,7 @@
 package io.composeflow.datastore
 
 const val PROJECT_YAML_FILE_NAME = "project.yaml"
+const val ANONYMOUSE_USER_ID = "anonymous"
 
 interface ProjectSaver {
     suspend fun saveProjectYaml(

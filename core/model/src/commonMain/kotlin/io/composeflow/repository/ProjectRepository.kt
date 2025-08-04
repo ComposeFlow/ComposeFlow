@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class ProjectRepository(
-    private val firebaseIdToken: FirebaseIdToken?,
+    private val firebaseIdToken: FirebaseIdToken,
     private val projectSaver: ProjectSaver = LocalFirstProjectSaver(),
     private val dataStore: DataStore<Preferences> = ServiceLocator.getOrPut { getOrCreateDataStore() },
 ) {
@@ -45,7 +45,7 @@ class ProjectRepository(
                 packageName = packageName.toPackageName(),
             )
         projectSaver.saveProjectYaml(
-            userId = firebaseIdToken?.user_id ?: "anonymous",
+            userId = firebaseIdToken.user_id,
             projectId = project.id,
             yamlContent = project.serialize(),
         )
@@ -54,7 +54,7 @@ class ProjectRepository(
 
     suspend fun deleteProject(projectId: String) {
         projectSaver.deleteProject(
-            userId = firebaseIdToken?.user_id ?: "anonymous",
+            userId = firebaseIdToken.user_id,
             projectId = projectId,
         )
     }
@@ -63,7 +63,7 @@ class ProjectRepository(
         runCatching {
             val loaded =
                 projectSaver.loadProject(
-                    userId = firebaseIdToken?.user_id ?: "anonymous",
+                    userId = firebaseIdToken.user_id,
                     projectId = projectId.removeSuffix(".yaml"),
                 )
             loaded?.let {
@@ -78,7 +78,7 @@ class ProjectRepository(
         syncWithCloud: Boolean = false,
     ) {
         projectSaver.saveProjectYaml(
-            userId = firebaseIdToken?.user_id ?: "anonymous",
+            userId = firebaseIdToken.user_id,
             projectId = project.id,
             yamlContent = project.serialize(),
             syncWithCloud = syncWithCloud,
@@ -90,11 +90,9 @@ class ProjectRepository(
         }
     }
 
-    suspend fun loadProjectIdList(): List<String> = projectSaver.loadProjectIdList(userId = firebaseIdToken?.user_id ?: "anonymous")
-    
+    suspend fun loadProjectIdList(): List<String> = projectSaver.loadProjectIdList(userId = firebaseIdToken.user_id)
+
     companion object {
-        fun createAnonymous(): ProjectRepository {
-            return ProjectRepository(firebaseIdToken = null)
-        }
+        fun createAnonymous(): ProjectRepository = ProjectRepository(firebaseIdToken = FirebaseIdToken.Anonymouse)
     }
 }
