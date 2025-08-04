@@ -38,6 +38,8 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
+import io.composeflow.auth.FirebaseIdToken
+import io.composeflow.auth.LocalFirebaseIdToken
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Apple
 import io.composeflow.custom.composeflowicons.Plugin
@@ -48,6 +50,7 @@ import io.composeflow.enabled
 import io.composeflow.firebase.management.FIREBASE_CONSOLE_URL
 import io.composeflow.firebase_auth_description
 import io.composeflow.firebase_integration_description
+import io.composeflow.firebase_settings_sign_in_required
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.firebase.FirebaseAppInfo
 import io.composeflow.model.project.firebase.FirebaseConnectedStatus
@@ -71,6 +74,9 @@ fun FirebaseSettingsContent(
     settingsCallbacks: SettingsCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val currentUser = LocalFirebaseIdToken.current
+    val isFirebaseAvailable = currentUser is FirebaseIdToken.SignedInToken
+
     Column(modifier = modifier.padding(16.dp)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -90,20 +96,44 @@ fun FirebaseSettingsContent(
                 )
             }
         }
-        FirebaseProjectIdEditor(
-            firebaseAppInfo = project.firebaseAppInfoHolder.firebaseAppInfo,
-            firebaseApiResultState = firebaseApiResultState,
-            firebaseApiAppResultState = firebaseApiAppResultState,
-            settingsCallbacks = settingsCallbacks,
-        )
 
-        if (firebaseApiResultState is FirebaseApiResultState.Success ||
-            firebaseApiResultState is FirebaseApiResultState.PartialSuccess
-        ) {
-            FirebaseAuthContent(
+        if (isFirebaseAvailable) {
+            FirebaseProjectIdEditor(
                 firebaseAppInfo = project.firebaseAppInfoHolder.firebaseAppInfo,
-                modifier = Modifier.padding(top = 32.dp),
+                firebaseApiResultState = firebaseApiResultState,
+                firebaseApiAppResultState = firebaseApiAppResultState,
+                settingsCallbacks = settingsCallbacks,
             )
+
+            if (firebaseApiResultState is FirebaseApiResultState.Success ||
+                firebaseApiResultState is FirebaseApiResultState.PartialSuccess
+            ) {
+                FirebaseAuthContent(
+                    firebaseAppInfo = project.firebaseAppInfoHolder.firebaseAppInfo,
+                    modifier = Modifier.padding(top = 32.dp),
+                )
+            }
+        } else {
+            Tooltip(stringResource(Res.string.firebase_settings_sign_in_required)) {
+                Column(modifier = Modifier.alpha(0.3f)) {
+                    FirebaseProjectIdEditor(
+                        firebaseAppInfo = project.firebaseAppInfoHolder.firebaseAppInfo,
+                        firebaseApiResultState = firebaseApiResultState,
+                        firebaseApiAppResultState = firebaseApiAppResultState,
+                        settingsCallbacks = settingsCallbacks,
+                        isEnabled = false,
+                    )
+
+                    if (firebaseApiResultState is FirebaseApiResultState.Success ||
+                        firebaseApiResultState is FirebaseApiResultState.PartialSuccess
+                    ) {
+                        FirebaseAuthContent(
+                            firebaseAppInfo = project.firebaseAppInfoHolder.firebaseAppInfo,
+                            modifier = Modifier.padding(top = 32.dp),
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -119,6 +149,7 @@ private fun FirebaseProjectIdEditor(
     firebaseApiAppResultState: FirebaseApiAppResultState,
     settingsCallbacks: SettingsCallbacks,
     modifier: Modifier = Modifier,
+    isEnabled: Boolean = true,
 ) {
     var firebaseProjectIdInEdit by remember {
         mutableStateOf(
@@ -167,6 +198,7 @@ private fun FirebaseProjectIdEditor(
                     },
                     singleLine = true,
                     readOnly = !idInEdit,
+                    enabled = isEnabled,
                     modifier =
                         Modifier
                             .width(350.dp)
@@ -177,7 +209,7 @@ private fun FirebaseProjectIdEditor(
                     onClick = {
                         idInEdit = true
                     },
-                    enabled = !idInEdit,
+                    enabled = !idInEdit && isEnabled,
                 ) {
                     val editFirebaseProjectId = stringResource(Res.string.edit_firebase_project_id)
                     ComposeFlowIcon(
@@ -195,13 +227,16 @@ private fun FirebaseProjectIdEditor(
                         settingsCallbacks.onConnectFirebaseProjectId(firebaseProjectIdInEdit)
                     },
                     enabled =
-                        (
-                            firebaseProjectIdInEdit.isNotEmpty() &&
-                                firebaseProjectIdInEdit != firebaseAppInfo.firebaseProjectId
-                        ) ||
+                        isEnabled &&
                             (
-                                firebaseProjectIdInEdit.isNotEmpty() &&
-                                    firebaseAppInfo.getConnectedStatus() == FirebaseConnectedStatus.PartiallyConnected
+                                (
+                                    firebaseProjectIdInEdit.isNotEmpty() &&
+                                        firebaseProjectIdInEdit != firebaseAppInfo.firebaseProjectId
+                                ) ||
+                                    (
+                                        firebaseProjectIdInEdit.isNotEmpty() &&
+                                            firebaseAppInfo.getConnectedStatus() == FirebaseConnectedStatus.PartiallyConnected
+                                    )
                             ),
                 ) {
                     Row {

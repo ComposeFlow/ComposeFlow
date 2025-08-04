@@ -1,5 +1,6 @@
 package io.composeflow.ui.asset
 
+import co.touchlab.kermit.Logger
 import com.github.michaelbull.result.get
 import com.github.michaelbull.result.mapBoth
 import io.composeflow.auth.FirebaseIdToken
@@ -39,104 +40,194 @@ class AssetEditorViewModel(
         MutableStateFlow(RemoveResult.NotStarted)
     val removeResult: StateFlow<RemoveResult> = _removeResult
 
+    private val isCloudStorageAvailable: Boolean
+        get() = firebaseIdToken is FirebaseIdToken.SignedInToken
+
     fun onDeleteImageAsset(blobInfoWrapper: BlobInfoWrapper) {
         viewModelScope.launch {
             _removeResult.value = RemoveResult.Removing(blobInfoWrapper)
-            val result = storageWrapper.deleteFile(fullPath = blobInfoWrapper.blobId.name)
-            result.mapBoth(
-                success = {
-                    _removeResult.value = RemoveResult.Success(blobInfoWrapper)
-                    project.assetHolder.images.remove(blobInfoWrapper)
+
+            if (isCloudStorageAvailable) {
+                // For signed-in users: delete from cloud storage
+                val result = storageWrapper.deleteFile(fullPath = blobInfoWrapper.blobId.name)
+                result.mapBoth(
+                    success = {
+                        _removeResult.value = RemoveResult.Success(blobInfoWrapper)
+                        project.assetHolder.images.remove(blobInfoWrapper)
+                        localAssetSaver.deleteAsset(
+                            userId = firebaseIdToken.user_id,
+                            projectId = project.id,
+                            blobInfoWrapper = blobInfoWrapper,
+                        )
+                        saveProject()
+                    },
+                    failure = {
+                        Logger.e("Failed to delete image asset from cloud storage", it)
+                        _removeResult.value = RemoveResult.Failure(it.message, it.cause)
+                    },
+                )
+            } else {
+                // For anonymous users: delete only locally
+                try {
                     localAssetSaver.deleteAsset(
                         userId = firebaseIdToken.user_id,
                         projectId = project.id,
                         blobInfoWrapper = blobInfoWrapper,
                     )
+                    project.assetHolder.images.remove(blobInfoWrapper)
                     saveProject()
-                },
-                failure = {
-                },
-            )
+                    _removeResult.value = RemoveResult.Success(blobInfoWrapper)
+                    Logger.i("Deleted image asset locally for anonymous user")
+                } catch (e: Exception) {
+                    Logger.e("Failed to delete image asset locally", e)
+                    _removeResult.value = RemoveResult.Failure(e.message, e.cause)
+                }
+            }
         }
     }
 
     fun onUploadImageFile(file: PlatformFile) {
         viewModelScope.launch(ioDispatcher) {
             _uploadResult.value = UploadResult.Uploading
-            val result =
-                storageWrapper.uploadAsset(
-                    userId = firebaseIdToken.user_id,
-                    projectId = project.id,
-                    file,
+
+            if (isCloudStorageAvailable) {
+                // For signed-in users: upload to cloud storage
+                val result =
+                    storageWrapper.uploadAsset(
+                        userId = firebaseIdToken.user_id,
+                        projectId = project.id,
+                        file,
+                    )
+                result.mapBoth(
+                    success = {
+                        result.get()?.let { blobInfo ->
+                            _uploadResult.value = UploadResult.Success(blobInfo)
+                            project.assetHolder.images.add(blobInfo)
+                            localAssetSaver.saveAsset(
+                                firebaseIdToken.user_id,
+                                project.id,
+                                blobInfo,
+                            )
+                            saveProject()
+                        }
+                    },
+                    failure = {
+                        Logger.e("Failed to upload image asset to cloud storage", it)
+                        _uploadResult.value = UploadResult.Failure(it.message, it.cause)
+                    },
                 )
-            result.mapBoth(
-                success = {
-                    result.get()?.let { blobInfo ->
-                        _uploadResult.value = UploadResult.Success(blobInfo)
-                        project.assetHolder.images.add(blobInfo)
-                        localAssetSaver.saveAsset(
-                            firebaseIdToken.user_id,
-                            project.id,
-                            blobInfo,
+            } else {
+                // For anonymous users: save only locally
+                try {
+                    val blobInfo =
+                        localAssetSaver.saveAssetLocally(
+                            userId = firebaseIdToken.user_id,
+                            projectId = project.id,
+                            file = file,
                         )
-                        saveProject()
-                    }
-                },
-                failure = {
-                    _uploadResult.value = UploadResult.Failure(it.message, it.cause)
-                },
-            )
+                    project.assetHolder.images.add(blobInfo)
+                    saveProject()
+                    _uploadResult.value = UploadResult.Success(blobInfo)
+                    Logger.i("Saved image asset locally for anonymous user")
+                } catch (e: Exception) {
+                    Logger.e("Failed to save image asset locally", e)
+                    _uploadResult.value = UploadResult.Failure(e.message, e.cause)
+                }
+            }
         }
     }
 
     fun onUploadIconFile(file: PlatformFile) {
         viewModelScope.launch(ioDispatcher) {
             _uploadResult.value = UploadResult.Uploading
-            val result =
-                storageWrapper.uploadAsset(
-                    userId = firebaseIdToken.user_id,
-                    projectId = project.id,
-                    file,
-                )
-            result.mapBoth(
-                success = {
-                    result.get()?.let { blobInfo ->
-                        _uploadResult.value = UploadResult.Success(blobInfo)
-                        project.assetHolder.icons.add(blobInfo)
 
-                        localAssetSaver.saveAsset(
-                            firebaseIdToken.user_id,
-                            project.id,
-                            blobInfo,
+            if (isCloudStorageAvailable) {
+                // For signed-in users: upload to cloud storage
+                val result =
+                    storageWrapper.uploadAsset(
+                        userId = firebaseIdToken.user_id,
+                        projectId = project.id,
+                        file,
+                    )
+                result.mapBoth(
+                    success = {
+                        result.get()?.let { blobInfo ->
+                            _uploadResult.value = UploadResult.Success(blobInfo)
+                            project.assetHolder.icons.add(blobInfo)
+                            localAssetSaver.saveAsset(
+                                firebaseIdToken.user_id,
+                                project.id,
+                                blobInfo,
+                            )
+                            saveProject()
+                        }
+                    },
+                    failure = {
+                        Logger.e("Failed to upload icon asset to cloud storage", it)
+                        _uploadResult.value = UploadResult.Failure(it.message, it.cause)
+                    },
+                )
+            } else {
+                // For anonymous users: save only locally
+                try {
+                    val blobInfo =
+                        localAssetSaver.saveAssetLocally(
+                            userId = firebaseIdToken.user_id,
+                            projectId = project.id,
+                            file = file,
                         )
-                        saveProject()
-                    }
-                },
-                failure = {
-                    _uploadResult.value = UploadResult.Failure(it.message, it.cause)
-                },
-            )
+                    project.assetHolder.icons.add(blobInfo)
+                    saveProject()
+                    _uploadResult.value = UploadResult.Success(blobInfo)
+                    Logger.i("Saved icon asset locally for anonymous user")
+                } catch (e: Exception) {
+                    Logger.e("Failed to save icon asset locally", e)
+                    _uploadResult.value = UploadResult.Failure(e.message, e.cause)
+                }
+            }
         }
     }
 
     fun onDeleteIconAsset(blobInfoWrapper: BlobInfoWrapper) {
         viewModelScope.launch {
             _removeResult.value = RemoveResult.Removing(blobInfoWrapper)
-            val result = storageWrapper.deleteFile(fullPath = blobInfoWrapper.blobId.name)
-            result.mapBoth(
-                success = {
-                    _removeResult.value = RemoveResult.Success(blobInfoWrapper)
-                    project.assetHolder.icons.remove(blobInfoWrapper)
+
+            if (isCloudStorageAvailable) {
+                // For signed-in users: delete from cloud storage
+                val result = storageWrapper.deleteFile(fullPath = blobInfoWrapper.blobId.name)
+                result.mapBoth(
+                    success = {
+                        _removeResult.value = RemoveResult.Success(blobInfoWrapper)
+                        project.assetHolder.icons.remove(blobInfoWrapper)
+                        localAssetSaver.deleteAsset(
+                            userId = firebaseIdToken.user_id,
+                            projectId = project.id,
+                            blobInfoWrapper = blobInfoWrapper,
+                        )
+                        saveProject()
+                    },
+                    failure = {
+                        Logger.e("Failed to delete icon asset from cloud storage", it)
+                        _removeResult.value = RemoveResult.Failure(it.message, it.cause)
+                    },
+                )
+            } else {
+                // For anonymous users: delete only locally
+                try {
                     localAssetSaver.deleteAsset(
                         userId = firebaseIdToken.user_id,
                         projectId = project.id,
                         blobInfoWrapper = blobInfoWrapper,
                     )
+                    project.assetHolder.icons.remove(blobInfoWrapper)
                     saveProject()
-                },
-                failure = {
-                },
-            )
+                    _removeResult.value = RemoveResult.Success(blobInfoWrapper)
+                    Logger.i("Deleted icon asset locally for anonymous user")
+                } catch (e: Exception) {
+                    Logger.e("Failed to delete icon asset locally", e)
+                    _removeResult.value = RemoveResult.Failure(e.message, e.cause)
+                }
+            }
         }
     }
 

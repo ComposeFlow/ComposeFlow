@@ -98,8 +98,10 @@ import androidx.compose.ui.unit.dp
 import com.valentinilk.shimmer.shimmer
 import io.composeflow.Res
 import io.composeflow.ai.AiAssistantUiState
+import io.composeflow.ai_login_needed
 import io.composeflow.ai_open_assistant
 import io.composeflow.auth.LocalFirebaseIdToken
+import io.composeflow.auth.isAiEnabled
 import io.composeflow.back_to_screen
 import io.composeflow.borders_hide
 import io.composeflow.borders_show
@@ -1400,10 +1402,16 @@ fun CanvasTopToolbar(
         Row(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            OpenAiChatButton(
-                onToggleVisibilityOfAiChatDialog = onToggleVisibilityOfAiChatDialog,
-                modifier = Modifier.onboardingTarget(TargetArea.AiAssistant, onboardingManager),
-            )
+            if (isAiEnabled()) {
+                OpenAiChatButton(
+                    onToggleVisibilityOfAiChatDialog = onToggleVisibilityOfAiChatDialog,
+                    modifier = Modifier.onboardingTarget(TargetArea.AiAssistant, onboardingManager),
+                )
+            } else {
+                DisabledOpenAiChatButton(
+                    modifier = Modifier.onboardingTarget(TargetArea.AiAssistant, onboardingManager),
+                )
+            }
             Spacer(modifier = Modifier.weight(1f))
 
             Card(
@@ -1668,6 +1676,31 @@ private fun RowScope.OpenAiChatButton(
                         .clickable {
                             onToggleVisibilityOfAiChatDialog()
                         }.padding(4.dp)
+                        .size(24.dp),
+                imageVector = ComposeFlowIcons.NounAi,
+                contentDescription = openAiAssistant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowScope.DisabledOpenAiChatButton(modifier: Modifier = Modifier) {
+    Tooltip(stringResource(Res.string.ai_login_needed)) {
+        Card(
+            modifier =
+                modifier
+                    .height(32.dp)
+                    .align(Alignment.CenterVertically)
+                    .alpha(0.3f),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            shape = RoundedCornerShape(8.dp),
+        ) {
+            val openAiAssistant = stringResource(Res.string.ai_open_assistant)
+            Icon(
+                modifier =
+                    Modifier
+                        .padding(4.dp)
                         .size(24.dp),
                 imageVector = ComposeFlowIcons.NounAi,
                 contentDescription = openAiAssistant,
