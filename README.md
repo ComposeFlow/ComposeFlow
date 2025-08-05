@@ -51,6 +51,26 @@ these [instructions](https://github.com/JetBrains/compose-multiplatform-template
    - Add Firebase API key and Google Cloud Storage settings
    - Add OAuth2 credentials for Google integration
 
+### Sign-in Functionality (Optional)
+
+If you want to enable user sign-in functionality, add OAuth2 credentials to your `local.properties` file:
+
+```properties
+google.client.id=<your-oauth2-client-id>
+google.client.secret=<your-oauth2-client-secret>
+```
+
+To obtain these credentials:
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google+ API
+4. Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client IDs"
+5. Configure the OAuth consent screen if prompted
+6. Create credentials for "Desktop application"
+7. Copy the client ID and client secret to your `local.properties` file
+
+**Note**: The application will work without these credentials, but sign-in features will be disabled.
+
 ### JetBrain's Runtime
 
 You need to install the [JBR](https://github.com/JetBrains/JetBrainsRuntime) (JetBrain's Runtime) to
