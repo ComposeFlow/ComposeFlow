@@ -1,26 +1,27 @@
 # ComposeFlow Configuration Template
 # Copy this file to local.properties and configure the values below
 
-# Authentication service endpoint
-# auth.endpoint=https://your-auth-service.com/auth
-
-# LLM service endpoint (for AI features)
-# llm.endpoint=https://your-llm-service.com
+# Android SDK location (required for Windows users)
+# sdk.dir=/path/to/your/android/sdk
 
 # Firebase configuration
-# firebase.api.key=your_firebase_api_key_here
+# firebase.api.key=your_firebase_api_key
+
+# PostHog analytics (optional)
+# posthog.api.key=your_posthog_api_key
+
+# Sentry error tracking (optional)
+# sentry.authtoken=your_sentry_auth_token
 
 # Google Cloud Storage configuration
 # google.clouod.storage.project.id=your_gcs_project_id
 # google.clouod.storage.bucket.name=your_gcs_bucket_name
 
+# Authentication service endpoint
+# auth.endpoint=https://your-auth-service.com/auth
+
+# LLM service endpoint (for AI features)
+# llm.endpoint=http://localhost:8080
+
 # Billing service endpoint
 # billing.endpoint=https://your-billing-service.com/billing
-
-# Analytics configuration (optional)
-# sentry.dsn=your_sentry_dsn_here
-# posthog.api.key=your_posthog_api_key_here
-
-# OAuth2 credentials for Google integration
-# google.client.id=your_oauth2_client_id
-# google.client.secret=your_oauth2_client_secret
