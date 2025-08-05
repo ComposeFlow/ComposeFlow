@@ -1,0 +1,16 @@
+ComposeFlow
+Copyright 2025
+
+This product includes software developed by third parties:
+
+================================================================================
+
+kotlinx-serialization-typescript-generator
+Copyright (c) Adam Kobus
+Licensed under the Apache License, Version 2.0
+Source: https://github.com/adamko-dev/kotlinx-serialization-typescript-generator
+
+Portions of this software were derived from the kotlinx-serialization-typescript-generator
+project and are used in the core/kxs-ts-gen-core module.
+
+================================================================================
