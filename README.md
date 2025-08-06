@@ -21,6 +21,13 @@
 
 For detailed documentation and tutorials, visit: https://docs.composeflow.io/
 
+## Download
+
+Get ComposeFlow for your platform:
+
+- **Mac & Linux users**: [Download page](https://composeflow-artifacts.s3.amazonaws.com/conveyor/download.html)
+- **Windows users**: [Download from Microsoft Store](https://apps.microsoft.com/detail/9mxdx6mf2crq)
+
 ## Demo Videos
 
 Create an initial project from a prompt
