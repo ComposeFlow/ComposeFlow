@@ -95,7 +95,12 @@ class AuthRepository {
     companion object {
         private val dataStore: DataStore<Preferences> =
             ServiceLocator.getOrPut { getOrCreateDataStore() }
-        private val jsonSerializer: Json = Json { ignoreUnknownKeys = true }
+
+        private val jsonSerializer: Json =
+            Json {
+                ignoreUnknownKeys = true
+                serializersModule = firebaseIdTokenModule
+            }
         private val serializedFirebaseUserInfoKey = stringPreferencesKey("firebase_user_info")
         private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
         private val callbackPort = findAvailablePort()
@@ -111,7 +116,7 @@ class AuthRepository {
                     serverSocket.reuseAddress = true
                     serverSocket.bind(java.net.InetSocketAddress(port))
                     true
-                } catch (e: IOException) {
+                } catch (_: IOException) {
                     false
                 }
             }

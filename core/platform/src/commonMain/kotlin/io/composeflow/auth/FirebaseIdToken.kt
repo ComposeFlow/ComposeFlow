@@ -8,6 +8,17 @@ import io.composeflow.datastore.ANONYMOUSE_USER_ID
 import io.composeflow.isAiConfigured
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
+
+val firebaseIdTokenModule =
+    SerializersModule {
+        polymorphic(FirebaseIdToken::class) {
+            subclass(FirebaseIdToken.SignedInToken::class, FirebaseIdToken.SignedInToken.serializer())
+            subclass(FirebaseIdToken.Anonymouse::class, FirebaseIdToken.Anonymouse.serializer())
+            defaultDeserializer { FirebaseIdToken.SignedInToken.serializer() }
+        }
+    }
 
 @Serializable
 sealed interface FirebaseIdToken {
@@ -36,6 +47,7 @@ sealed interface FirebaseIdToken {
         override val rawToken: String? = null,
     ) : FirebaseIdToken
 
+    @Serializable
     data object Anonymouse : FirebaseIdToken {
         @Suppress("ktlint:standard:property-naming")
         override val user_id: String = ANONYMOUSE_USER_ID
@@ -49,8 +61,7 @@ val LocalFirebaseIdToken =
     }
 
 @Composable
-fun isAiEnabled(): Boolean =
-    LocalFirebaseIdToken.current != FirebaseIdToken.Anonymouse && isAiConfigured()
+fun isAiEnabled(): Boolean = LocalFirebaseIdToken.current != FirebaseIdToken.Anonymouse && isAiConfigured()
 
 @Composable
 fun ProvideFirebaseIdToken(
