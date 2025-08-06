@@ -49,8 +49,7 @@ Adjust the style visually with real time preview
 
 Get ComposeFlow for your platform:
 
-- **Mac & Linux users
-  **: [Download page](https://composeflow-artifacts.s3.amazonaws.com/conveyor/download.html)
+- **Mac & Linux users**: [Download page](https://composeflow-artifacts.s3.amazonaws.com/conveyor/download.html)
 - **Windows users**: [Download from Microsoft Store](https://apps.microsoft.com/detail/9mxdx6mf2crq)
 
 ## Build from source
