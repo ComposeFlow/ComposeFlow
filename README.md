@@ -31,11 +31,11 @@ For detailed documentation and tutorials, visit: https://docs.composeflow.io/
 
 Create an initial project from a prompt
 
-https://github.com/user-attachments/assets/4c59c4e6-e5d6-441d-a9c4-ce36b2b5e111
+https://github.com/user-attachments/assets/759356e9-95ce-4a78-9f58-2bb56b4d93d0
 
 Edit the project within the editor with AI agent
 
-https://github.com/user-attachments/assets/b09cfa9c-7612-4a2e-9a3a-cfad3f4b454f
+https://github.com/user-attachments/assets/75d4a367-b894-4455-967c-b5f8d3bd9164
 
 Preview the code side-by-side
 
