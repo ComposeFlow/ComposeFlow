@@ -171,9 +171,8 @@ class StringResourceEditorViewModel(
                                 //      https://github.com/ComposeFlow/ComposeFlow/issues/41
                                 stringResourceEditorOperator.updateStringResource(project, updatedResource)
                             }
-                            selectedResourceIds.remove(resource.id)
                         }
-
+                        selectedResourceIds.clear()
                         saveProject()
                         Logger.i("Successfully translated ${result.translations.size} strings")
                     }
