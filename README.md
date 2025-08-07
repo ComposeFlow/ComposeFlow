@@ -56,11 +56,6 @@ Get ComposeFlow for your platform:
 
 If you build the ComposeFlow editor from source follow these prerequisites
 
-### Setting up your development environment
-
-To set up the environment, please consult
-these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
-
 ### Prerequisites
 
 #### JetBrain's Runtime
