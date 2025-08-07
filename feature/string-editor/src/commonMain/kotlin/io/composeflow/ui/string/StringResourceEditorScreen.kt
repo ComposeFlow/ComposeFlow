@@ -72,8 +72,10 @@ import io.composeflow.Res
 import io.composeflow.action_add
 import io.composeflow.add_new_string_resource
 import io.composeflow.add_string_resource
+import io.composeflow.ai_login_needed
 import io.composeflow.apply_change
 import io.composeflow.auth.LocalFirebaseIdToken
+import io.composeflow.auth.isAiEnabled
 import io.composeflow.cancel
 import io.composeflow.default_locale_label
 import io.composeflow.delete_string_resource_confirmation
@@ -206,24 +208,20 @@ private fun StringResourceEditorContent(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.width(32.dp))
-                TextButton(
-                    onClick = { onTranslateStrings() },
-                    enabled = selectedResourceIds.isNotEmpty() && supportedLocales.any { it != defaultLocale } && !isTranslating,
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Translate,
-                        contentDescription = null,
-                        modifier = Modifier.size(20.dp),
+                if (isAiEnabled()) {
+                    TranslateStringsButton(
+                        onClick = { onTranslateStrings() },
+                        enabled = selectedResourceIds.isNotEmpty() && supportedLocales.any { it != defaultLocale } && !isTranslating,
+                        isTranslating = isTranslating,
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text =
-                            if (isTranslating) {
-                                stringResource(Res.string.translating_strings)
-                            } else {
-                                stringResource(Res.string.translate_strings)
-                            },
-                    )
+                } else {
+                    Tooltip(stringResource(Res.string.ai_login_needed)) {
+                        TranslateStringsButton(
+                            onClick = { },
+                            enabled = false,
+                            isTranslating = false,
+                        )
+                    }
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 TextButton(
@@ -397,6 +395,35 @@ private fun StringResourceEditorContent(
                 onAllDialogsClosed()
             },
             positiveText = stringResource(Res.string.remove),
+        )
+    }
+}
+
+@Composable
+private fun TranslateStringsButton(
+    onClick: () -> Unit,
+    enabled: Boolean,
+    isTranslating: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    TextButton(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier,
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Translate,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(4.dp))
+        Text(
+            text =
+                if (isTranslating) {
+                    stringResource(Res.string.translating_strings)
+                } else {
+                    stringResource(Res.string.translate_strings)
+                },
         )
     }
 }

@@ -18,8 +18,6 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class StringResourceEditorViewModel(
-    // TODO Disable translate strings button if token is for anonymous user.
-    //      https://github.com/ComposeFlow/ComposeFlow/issues/56
     private val firebaseIdToken: FirebaseIdToken,
     private val project: Project,
     private val projectRepository: ProjectRepository = ProjectRepository(firebaseIdToken),
