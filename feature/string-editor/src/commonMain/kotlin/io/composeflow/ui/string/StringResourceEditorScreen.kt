@@ -3,6 +3,9 @@ package io.composeflow.ui.string
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,6 +60,7 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -63,10 +68,15 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerIcon
+import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.action_add
@@ -111,6 +121,9 @@ import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.textfield.SmallOutlinedTextField
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
+import java.awt.Cursor
+
+private val DEFAULT_COLUMN_WIDTH = 200.dp
 
 @Composable
 fun StringResourceEditorScreen(
@@ -184,6 +197,19 @@ private fun StringResourceEditorContent(
 
     val defaultLocale by project.stringResourceHolder.defaultLocale
     val supportedLocales = project.stringResourceHolder.supportedLocales.sortedBy { it.ordinal }
+
+    var keyColumnWidth by remember { mutableStateOf(DEFAULT_COLUMN_WIDTH) }
+    var descriptionColumnWidth by remember { mutableStateOf(DEFAULT_COLUMN_WIDTH) }
+    val localeColumnWidths = remember { mutableStateMapOf<ResourceLocale, Dp>() }
+    LaunchedEffect(supportedLocales) {
+        supportedLocales.forEach { locale ->
+            if (locale !in localeColumnWidths) {
+                localeColumnWidths[locale] = DEFAULT_COLUMN_WIDTH
+            }
+        }
+        localeColumnWidths.keys.retainAll(supportedLocales.toSet())
+    }
+
     Column(
         modifier =
             modifier
@@ -271,6 +297,19 @@ private fun StringResourceEditorContent(
                     onClearResourceSelection()
                 }
             },
+            keyColumnWidth = keyColumnWidth,
+            descriptionColumnWidth = descriptionColumnWidth,
+            localeColumnWidths = localeColumnWidths,
+            onKeyColumnWidthChange = { delta ->
+                keyColumnWidth = (keyColumnWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
+            },
+            onDescriptionColumnWidthChange = { delta ->
+                descriptionColumnWidth = (descriptionColumnWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
+            },
+            onLocaleColumnWidthChange = { locale, delta ->
+                val currentWidth = localeColumnWidths[locale] ?: DEFAULT_COLUMN_WIDTH
+                localeColumnWidths[locale] = (currentWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
+            },
             horizontalScrollState = horizontalScrollState,
             modifier = Modifier.onSizeChanged { tableWidthPx = it.width },
         )
@@ -309,6 +348,9 @@ private fun StringResourceEditorContent(
                     onUpdateValue = { locale, value ->
                         onUpdateStringResourceValue(resource, locale, value)
                     },
+                    keyColumnWidth = keyColumnWidth,
+                    descriptionColumnWidth = descriptionColumnWidth,
+                    localeColumnWidths = localeColumnWidths,
                     horizontalScrollState = horizontalScrollState,
                 )
                 HorizontalDivider(modifier = Modifier.width(tableWidthDp))
@@ -436,6 +478,12 @@ private fun StringResourceTableHeaderRow(
     onRemoveLocale: (ResourceLocale) -> Unit,
     allSelected: Boolean,
     onSelectAll: (Boolean) -> Unit,
+    keyColumnWidth: Dp,
+    descriptionColumnWidth: Dp,
+    localeColumnWidths: Map<ResourceLocale, Dp>,
+    onKeyColumnWidthChange: (Dp) -> Unit,
+    onDescriptionColumnWidthChange: (Dp) -> Unit,
+    onLocaleColumnWidthChange: (ResourceLocale, Dp) -> Unit,
     horizontalScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
@@ -458,61 +506,69 @@ private fun StringResourceTableHeaderRow(
                 text = stringResource(Res.string.string_resource_key_tooltip),
             ) {
                 Box(
-                    modifier = Modifier.width(200.dp).fillMaxHeight(),
+                    modifier = Modifier.width(keyColumnWidth).fillMaxHeight(),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     Text(
                         text = stringResource(Res.string.string_resource_key),
                         color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(4.dp),
                     )
                 }
             }
-            VerticalDivider()
+            DraggableColumnDivider(
+                onDrag = onKeyColumnWidthChange,
+            )
             Tooltip(
                 text = stringResource(Res.string.string_resource_description_tooltip),
             ) {
                 Box(
-                    modifier = Modifier.width(200.dp).fillMaxHeight(),
+                    modifier = Modifier.width(descriptionColumnWidth).fillMaxHeight(),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     Text(
                         text = stringResource(Res.string.string_resource_description),
                         color = MaterialTheme.colorScheme.secondary,
                         style = MaterialTheme.typography.titleSmall,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(4.dp),
                     )
                 }
             }
-            VerticalDivider()
+            DraggableColumnDivider(
+                onDrag = onDescriptionColumnWidthChange,
+            )
 
             // Default locale column
+            val defaultLocaleWidth = localeColumnWidths[defaultLocale] ?: DEFAULT_COLUMN_WIDTH
             LocaleHeaderCell(
                 locale = defaultLocale,
                 isDefault = true,
                 onSetAsDefault = { },
                 onRemove = { onRemoveLocale(defaultLocale) },
-                modifier = Modifier.width(200.dp).fillMaxHeight(),
+                modifier = Modifier.width(defaultLocaleWidth).fillMaxHeight(),
             )
-            if (nonDefaultLocales.isNotEmpty()) {
-                VerticalDivider()
-            }
+            DraggableColumnDivider(
+                onDrag = { delta -> onLocaleColumnWidthChange(defaultLocale, delta) },
+                isVisible = nonDefaultLocales.isNotEmpty(),
+            )
         }
 
         // Scrollable locale columns (excluding default)
         Row(modifier = Modifier.horizontalScroll(horizontalScrollState)) {
             nonDefaultLocales.forEach { locale ->
+                val localeWidth = localeColumnWidths[locale] ?: DEFAULT_COLUMN_WIDTH
                 LocaleHeaderCell(
                     locale = locale,
                     isDefault = false,
                     onSetAsDefault = { onUpdateDefaultLocale(locale) },
                     onRemove = { onRemoveLocale(locale) },
-                    modifier = Modifier.width(200.dp).fillMaxHeight(),
+                    modifier = Modifier.width(localeWidth).fillMaxHeight(),
                 )
-                if (locale != nonDefaultLocales.last()) {
-                    VerticalDivider()
-                }
+                DraggableColumnDivider(
+                    onDrag = { delta -> onLocaleColumnWidthChange(locale, delta) },
+                    isVisible = locale != nonDefaultLocales.last(),
+                )
             }
         }
     }
@@ -528,6 +584,9 @@ private fun StringResourceTableDataRow(
     onUpdateKey: (String) -> Unit,
     onUpdateDescription: (String) -> Unit,
     onUpdateValue: (ResourceLocale, String) -> Unit,
+    keyColumnWidth: Dp,
+    descriptionColumnWidth: Dp,
+    localeColumnWidths: Map<ResourceLocale, Dp>,
     horizontalScrollState: ScrollState,
     modifier: Modifier = Modifier,
 ) {
@@ -550,19 +609,19 @@ private fun StringResourceTableDataRow(
             }
             VerticalDivider()
             Box(
-                modifier = Modifier.width(200.dp).fillMaxHeight(),
+                modifier = Modifier.width(keyColumnWidth).fillMaxHeight(),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 CellEditableText(
                     initialText = resource.key,
                     onValueChange = onUpdateKey,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.fillMaxWidth().padding(4.dp),
                 )
             }
-            VerticalDivider()
+            ColumnDivider()
             Box(
-                modifier = Modifier.width(200.dp).fillMaxHeight(),
+                modifier = Modifier.width(descriptionColumnWidth).fillMaxHeight(),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 CellEditableText(
@@ -572,47 +631,45 @@ private fun StringResourceTableDataRow(
                         MaterialTheme.typography.bodyLarge.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         ),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.fillMaxWidth().padding(4.dp),
                 )
             }
-            VerticalDivider()
+            ColumnDivider()
 
             // Default locale column
+            val defaultLocaleWidth = localeColumnWidths[defaultLocale] ?: DEFAULT_COLUMN_WIDTH
             Box(
-                modifier = Modifier.width(200.dp).fillMaxHeight(),
+                modifier = Modifier.width(defaultLocaleWidth).fillMaxHeight(),
                 contentAlignment = Alignment.CenterStart,
             ) {
                 CellEditableText(
                     initialText = resource.localizedValues[defaultLocale] ?: "",
                     onValueChange = { onUpdateValue(defaultLocale, it) },
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.fillMaxWidth().padding(4.dp),
                     enabled = true,
                 )
             }
-            if (nonDefaultLocales.isNotEmpty()) {
-                VerticalDivider()
-            }
+            ColumnDivider(isVisible = nonDefaultLocales.isNotEmpty())
         }
 
         // Scrollable locale columns (excluding default)
         Row(modifier = Modifier.horizontalScroll(horizontalScrollState)) {
             nonDefaultLocales.forEach { locale ->
+                val localeWidth = localeColumnWidths[locale] ?: DEFAULT_COLUMN_WIDTH
                 Box(
-                    modifier = Modifier.width(200.dp).fillMaxHeight(),
+                    modifier = Modifier.width(localeWidth).fillMaxHeight(),
                     contentAlignment = Alignment.CenterStart,
                 ) {
                     CellEditableText(
                         initialText = resource.localizedValues[locale] ?: "",
                         onValueChange = { onUpdateValue(locale, it) },
                         textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
                         enabled = false,
                     )
                 }
-                if (locale != nonDefaultLocales.last()) {
-                    VerticalDivider()
-                }
+                ColumnDivider(isVisible = locale != nonDefaultLocales.last())
             }
         }
     }
@@ -629,7 +686,7 @@ private fun LocaleHeaderCell(
     var showDropdown by remember { mutableStateOf(false) }
 
     Row(
-        modifier = modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+        modifier = modifier.padding(4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         locale.flagEmoji?.let { flag ->
@@ -975,6 +1032,82 @@ private fun EditSupportedLocalesDialog(
             }
         },
     )
+}
+
+@Composable
+private fun DraggableColumnDivider(
+    onDrag: (Dp) -> Unit,
+    modifier: Modifier = Modifier,
+    isVisible: Boolean = true,
+) {
+    var isHovered by remember { mutableStateOf(false) }
+    var isDragging by remember { mutableStateOf(false) }
+    val density = LocalDensity.current
+    val draggableState =
+        rememberDraggableState { deltaPx ->
+            with(density) {
+                onDrag(deltaPx.toDp())
+            }
+        }
+
+    Box(
+        modifier =
+            modifier
+                .width(8.dp)
+                .fillMaxHeight()
+                .pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+                .pointerInput(Unit) {
+                    awaitPointerEventScope {
+                        while (true) {
+                            val event = awaitPointerEvent()
+                            when (event.type) {
+                                PointerEventType.Enter -> isHovered = true
+                                PointerEventType.Exit -> isHovered = false
+                            }
+                        }
+                    }
+                }.draggable(
+                    state = draggableState,
+                    orientation = Orientation.Horizontal,
+                    onDragStarted = { isDragging = true },
+                    onDragStopped = { isDragging = false },
+                ).background(
+                    if (isHovered || isDragging) {
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                    } else {
+                        Color.Transparent
+                    },
+                ),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (isVisible) {
+            VerticalDivider(
+                modifier = Modifier.fillMaxHeight(),
+                thickness = 1.dp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun ColumnDivider(
+    modifier: Modifier = Modifier,
+    isVisible: Boolean = true,
+) {
+    Box(
+        modifier =
+            modifier
+                .width(8.dp)
+                .fillMaxHeight(),
+        contentAlignment = Alignment.Center,
+    ) {
+        if (isVisible) {
+            VerticalDivider(
+                modifier = Modifier.fillMaxHeight(),
+                thickness = 1.dp,
+            )
+        }
+    }
 }
 
 private fun Modifier.consumeTabKeyEventForFocus(focusManager: FocusManager): Modifier =
