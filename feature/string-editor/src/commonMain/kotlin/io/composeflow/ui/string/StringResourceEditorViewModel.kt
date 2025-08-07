@@ -149,7 +149,7 @@ class StringResourceEditorViewModel(
             try {
                 val result =
                     llmRepository.translateStrings(
-                        firebaseIdToken = firebaseIdToken.rawToken ?: throw IllegalStateException("No raw token available"),
+                        firebaseIdToken = firebaseIdToken.rawToken ?: throw IllegalStateException("Signed-in user has no raw token"),
                         stringResources = selectedResources,
                         defaultLocale = defaultLocale,
                         targetLocales = targetLocales,
