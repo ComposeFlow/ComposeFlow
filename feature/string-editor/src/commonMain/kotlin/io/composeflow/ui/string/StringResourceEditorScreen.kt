@@ -69,7 +69,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
@@ -115,13 +114,13 @@ import io.composeflow.translate_strings
 import io.composeflow.translating_strings
 import io.composeflow.ui.LocalOnAllDialogsClosed
 import io.composeflow.ui.LocalOnAnyDialogIsShown
+import io.composeflow.ui.PointerIconResizeHorizontal
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.modifier.backgroundContainerNeutral
 import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.textfield.SmallOutlinedTextField
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
-import java.awt.Cursor
 
 private val DEFAULT_COLUMN_WIDTH = 200.dp
 
@@ -1055,7 +1054,7 @@ private fun DraggableColumnDivider(
             modifier
                 .width(8.dp)
                 .fillMaxHeight()
-                .pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+                .pointerHoverIcon(PointerIconResizeHorizontal)
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
                         while (true) {

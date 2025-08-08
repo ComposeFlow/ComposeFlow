@@ -30,7 +30,6 @@ import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.input.pointer.pointerInput
@@ -71,7 +70,6 @@ import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
 import io.composeflow.ui.zoomablecontainer.calculateAdjustedBoundsInZoomableContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.awt.Cursor
 
 const val DEVICE_CANVAS_TEST_TAG = "DeviceCanvas"
 
@@ -528,9 +526,9 @@ private fun Modifier.dragHandlerAndTapGestures(
                 .then(dragModifier)
                 .then(
                     if (onRightDragHandler || isWidthResizing) {
-                        pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+                        pointerHoverIcon(PointerIconResizeHorizontal)
                     } else if (onBottomDragHandler || isHeightResizing) {
-                        pointerHoverIcon(PointerIcon(Cursor(Cursor.S_RESIZE_CURSOR)))
+                        pointerHoverIcon(PointerIconResizeVertical)
                     } else {
                         Modifier
                     },

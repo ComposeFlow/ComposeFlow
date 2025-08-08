@@ -19,7 +19,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
@@ -27,11 +26,11 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.composeflow.ui.PointerIconResizeHorizontal
 import org.jetbrains.jewel.foundation.theme.JewelTheme
 import org.jetbrains.jewel.ui.Orientation
 import org.jetbrains.jewel.ui.component.Divider
 import org.jetbrains.jewel.ui.component.HorizontalSplitLayout
-import java.awt.Cursor
 import kotlin.math.roundToInt
 
 @Immutable
@@ -174,7 +173,7 @@ fun HorizontalSplitLayoutWrapper(
                         interactionSource = dividerInteractionSource,
                         orientation = androidx.compose.foundation.gestures.Orientation.Horizontal,
                         state = rememberDraggableState { delta -> dividerX += delta.toInt() },
-                    ).pointerHoverIcon(PointerIcon(Cursor(Cursor.E_RESIZE_CURSOR)))
+                    ).pointerHoverIcon(PointerIconResizeHorizontal)
                     .layoutId("divider-handle"),
             )
         },
