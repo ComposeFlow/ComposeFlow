@@ -2,10 +2,10 @@ package io.composeflow.ui.inspector.codeviewer
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -50,30 +50,36 @@ fun CodeInspector(
                 codeTheme = codeTheme,
             )
         }
-    if (focusedNodes.isEmpty()) {
-    } else if (focusedNodes.size > 1) {
-    } else {
-        val composeNode = focusedNodes.first()
-        viewModel.setComposeNode(composeNode)
-        val uiState by viewModel.uiState.collectAsState()
+    when {
+        focusedNodes.isEmpty() -> {
+        }
 
-        when (val state = uiState) {
-            CodeInspectorUiState.Loading -> {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = modifier.fillMaxSize(),
-                ) {
-                    CircularProgressIndicator()
+        focusedNodes.size > 1 -> {
+        }
+
+        else -> {
+            val composeNode = focusedNodes.first()
+            viewModel.setComposeNode(composeNode)
+            val uiState by viewModel.uiState.collectAsState()
+
+            when (val state = uiState) {
+                CodeInspectorUiState.Loading -> {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = modifier.fillMaxSize(),
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
-            }
 
-            is CodeInspectorUiState.Success -> {
-                CodeViewer(
-                    parsedCode = state.parsedCode,
-                    onShowSnackbar = onShowSnackbar,
-                    modifier = modifier,
-                )
+                is CodeInspectorUiState.Success -> {
+                    CodeViewer(
+                        parsedCode = state.parsedCode,
+                        onShowSnackbar = onShowSnackbar,
+                        modifier = modifier,
+                    )
+                }
             }
         }
     }
@@ -87,43 +93,43 @@ private fun CodeViewer(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val clipboardManager = LocalClipboardManager.current
-    LazyColumn(
-        modifier =
-            modifier
-                .background(MaterialTheme.colorScheme.surface)
-                .padding(16.dp)
-                .fillMaxSize(),
-    ) {
-        item {
-            Row(
-                horizontalArrangement = Arrangement.End,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                val copiedCodeStr = stringResource(Res.string.copied_code)
-                ComposeFlowIconButton(
-                    onClick = {
-                        clipboardManager.setText(parsedCode)
-                        coroutineScope.launch {
-                            onShowSnackbar(copiedCodeStr, null)
-                        }
-                    },
-                    modifier = Modifier.hoverOverlay(),
-                ) {
-                    ComposeFlowIcon(
-                        imageVector = Icons.Outlined.ContentCopy,
-                        contentDescription = stringResource(Res.string.copy_code),
-                        tint = MaterialTheme.colorScheme.primary,
+    Box(Modifier.fillMaxSize()) {
+        LazyColumn(
+            contentPadding = PaddingValues(16.dp),
+            modifier =
+                modifier
+                    .background(MaterialTheme.colorScheme.surface)
+                    .fillMaxSize(),
+        ) {
+            item {
+                SelectionContainer {
+                    Text(
+                        text = parsedCode,
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
         }
-        item {
-            SelectionContainer {
-                Text(
-                    text = parsedCode,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
+
+        val copiedCodeStr = stringResource(Res.string.copied_code)
+        ComposeFlowIconButton(
+            onClick = {
+                clipboardManager.setText(parsedCode)
+                coroutineScope.launch {
+                    onShowSnackbar(copiedCodeStr, null)
+                }
+            },
+            modifier =
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+                    .hoverOverlay(),
+        ) {
+            ComposeFlowIcon(
+                imageVector = Icons.Outlined.ContentCopy,
+                contentDescription = stringResource(Res.string.copy_code),
+                tint = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }
