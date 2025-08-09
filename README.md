@@ -14,7 +14,7 @@ Web.
 
 - **Full App Generation**: Build mobile apps powered by Compose Multiplatform in minutes
 - **Visual App Builder**: Drag-and-drop interface for building complex UI layouts
-- **AI-Powered Code Generation**: Built-in Claude AI integration for intelligent code assistance
+- **AI-Powered Code Generation**: Built-in AI integration for intelligent code assistance
 - **Cross-Platform Support**: Generate apps for Desktop, Android, iOS, and Web platforms
 - **Real-time Preview**: See your UI changes instantly with live preview
 - **State Management**: Visual state management with automatic code generation
