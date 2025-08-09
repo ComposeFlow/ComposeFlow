@@ -363,6 +363,7 @@ fun UiBuilderScreen(
                             onSelectScreen = viewModel::onSelectScreen,
                             onScreenUpdated = viewModel::onScreenUpdated,
                             onDeleteScreen = viewModel::onDeleteScreen,
+                            onCopyScreen = viewModel::onCopyScreen,
                             onScreensSwapped = viewModel::onScreensSwapped,
                             onFocusedStatusUpdated = viewModel::onFocusedStatusUpdated,
                             onHoveredStatusUpdated = viewModel::onHoveredStatusUpdated,
@@ -439,7 +440,7 @@ fun UiBuilderScreen(
                                             (
                                                 editingProject.screenHolder.pendingDestination as?
                                                     NavigatableDestination.UiBuilderScreen
-                                            )?.inspectorTabDestination
+                                                )?.inspectorTabDestination
                                                 ?: selectedInspectorDestination,
                                         modifier =
                                             inspectorModifier
@@ -538,6 +539,7 @@ private fun LeftPane(
     onSelectScreen: (screen: Screen) -> Unit,
     onScreenUpdated: (screen: Screen) -> Unit,
     onDeleteScreen: (screen: Screen) -> Unit,
+    onCopyScreen: (screen: Screen) -> Unit,
     onScreensSwapped: (from: Int, to: Int) -> Unit,
     onFocusedStatusUpdated: (node: ComposeNode) -> Unit,
     onHoveredStatusUpdated: (node: ComposeNode, isHovered: Boolean) -> Unit,
@@ -642,6 +644,7 @@ private fun LeftPane(
                                 onSelectScreen = onSelectScreen,
                                 onScreenUpdated = onScreenUpdated,
                                 onDeleteScreen = onDeleteScreen,
+                                onCopyScreen = onCopyScreen,
                                 onScreensSwapped = onScreensSwapped,
                                 modifier = Modifier.weight(1f),
                             )

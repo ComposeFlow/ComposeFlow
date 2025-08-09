@@ -125,7 +125,8 @@ data class Component(
         getAllComposeNodes().forEach { it.isFocused.value = false }
     }
 
-    override fun getPackageName(project: Project): String = "${project.packageName}.components.$name".toPackageName()
+    override fun getPackageName(project: Project): String =
+        "${project.packageName}.components.$name".toPackageName()
 
     @Transient
     override val composableName: String = name.toKotlinFileName()
@@ -134,9 +135,11 @@ data class Component(
     override val viewModelFileName: String = name.capitalize(Locale.current) + "ViewModel"
 
     @Transient
-    override val viewModelName: String = name.replaceFirstChar { it.lowercase() } + "ViewModel"
+    override val viewModelName: String =
+        name.replaceFirstChar { it.lowercase() } + "ViewModel"
 
-    fun asMemberName(project: Project): MemberName = MemberName(getPackageName(project), composableName)
+    fun asMemberName(project: Project): MemberName =
+        MemberName(getPackageName(project), composableName)
 
     @Composable
     fun Thumbnail(
@@ -311,9 +314,8 @@ data class Component(
         if (!isCtrlOrMetaPressed) {
             componentRoot.value.clearIsFocusedRecursively()
         }
-        componentRoot.value.findDeepestChildAtOrNull(eventPosition)?.let {
-            it.setFocus(toggleValue = isCtrlOrMetaPressed)
-        }
+        componentRoot.value.findDeepestChildAtOrNull(eventPosition)
+            ?.setFocus(toggleValue = isCtrlOrMetaPressed)
     }
 
     override fun updateHoveredNode(eventPosition: Offset) {
@@ -323,7 +325,8 @@ data class Component(
         }
     }
 
-    override fun findDeepestChildAtOrNull(position: Offset): ComposeNode? = componentRoot.value.findDeepestChildAtOrNull(position)
+    override fun findDeepestChildAtOrNull(position: Offset): ComposeNode? =
+        componentRoot.value.findDeepestChildAtOrNull(position)
 
     override fun getAllComposeNodes(): List<ComposeNode> = componentRoot.value.allChildren()
 

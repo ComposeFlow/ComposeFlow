@@ -385,7 +385,8 @@ data class ComposeNode(
         updateChildParentRelationships()
     }
 
-    fun findFirstFocusedNodeOrNull(): ComposeNode? = allChildren().firstOrNull { it.isFocused.value }
+    fun findFirstFocusedNodeOrNull(): ComposeNode? =
+        allChildren().firstOrNull { it.isFocused.value }
 
     fun findFocusedNodes(): List<ComposeNode> = allChildren().filter { it.isFocused.value }
 
@@ -403,7 +404,8 @@ data class ComposeNode(
 
     fun clearIsHoveredRecursively() = doRecursively { node, _, _ -> node.isHovered.value = false }
 
-    fun setIsPartOfComponentRecursively(value: Boolean) = doRecursively { node, _, _ -> node.isPartOfComponent = value }
+    fun setIsPartOfComponentRecursively(value: Boolean) =
+        doRecursively { node, _, _ -> node.isPartOfComponent = value }
 
     /**
      * Check if any constraints are not violated against the parent [ComposeNode].
@@ -706,7 +708,7 @@ data class ComposeNode(
                 trait.value
                     .getPropertyContainers()
                     .map { it.assignableProperty } + dynamicItems.value
-            ).filter { it?.generateWrapWithComposableBlock(project, wrappedCode) != null }
+                ).filter { it?.generateWrapWithComposableBlock(project, wrappedCode) != null }
                 .fold(initial = wrappedCode) { acc, element ->
                     element?.generateWrapWithComposableBlock(project, acc) ?: acc
                 }
@@ -853,7 +855,8 @@ data class ComposeNode(
         }
     }
 
-    fun getCompanionStateOrNull(project: Project): ScreenState<*>? = trait.value.companionState(this)
+    fun getCompanionStateOrNull(project: Project): ScreenState<*>? =
+        trait.value.companionState(this)
 
     fun getCompanionStates(project: Project): List<ScreenState<*>> {
         val statesFromTrait =

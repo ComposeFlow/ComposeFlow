@@ -120,6 +120,8 @@ Go to Settings -> Firebase to connect</string>
     <string name="conditional_property">Conditional property</string>
     <string name="copy">Copy</string>
     <string name="copy_code">Copy code</string>
+    <string name="copy_screen">Copy screen</string>
+    <string name="modify_screen_name">Modify name</string>
     <string name="copied_code">Copied code</string>
     <string name="convert_to_component">Convert to Component</string>
     <string name="create_user_with">Create user with</string>">

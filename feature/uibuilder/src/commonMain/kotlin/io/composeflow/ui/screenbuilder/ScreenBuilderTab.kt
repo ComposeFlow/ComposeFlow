@@ -6,16 +6,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DragIndicator
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -44,6 +50,7 @@ import io.composeflow.Res
 import io.composeflow.add_screen
 import io.composeflow.appears_in_navigation
 import io.composeflow.cancel
+import io.composeflow.copy_screen
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Smartphone
 import io.composeflow.delete
@@ -51,6 +58,7 @@ import io.composeflow.icon_in_navigation
 import io.composeflow.label_in_navigation
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.Screen
+import io.composeflow.modify_screen_name
 import io.composeflow.screens
 import io.composeflow.show_on_navigation
 import io.composeflow.template.ScreenTemplatePair
@@ -82,6 +90,7 @@ fun ScreenBuilderTab(
     onSelectScreen: (screen: Screen) -> Unit,
     onScreenUpdated: (screen: Screen) -> Unit,
     onDeleteScreen: (screen: Screen) -> Unit,
+    onCopyScreen: (screen: Screen) -> Unit,
     onScreensSwapped: (from: Int, to: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -130,6 +139,7 @@ fun ScreenBuilderTab(
                         onDeleteClick = { screen ->
                             screenToBeDeleted = screen
                         },
+                        onCopyScreen = onCopyScreen,
                         onSelectScreen = onSelectScreen,
                         onScreenUpdated = onScreenUpdated,
                         modifier = rowModifier,
@@ -233,6 +243,7 @@ private fun ScreenInfoPanel(
     numOfScreens: Int,
     onSelectScreen: (Screen) -> Unit,
     onDeleteClick: (Screen) -> Unit,
+    onCopyScreen: (Screen) -> Unit,
     onScreenUpdated: (Screen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -247,6 +258,8 @@ private fun ScreenInfoPanel(
             },
             onSelectScreen = onSelectScreen,
             onDeleteClick = onDeleteClick,
+            onCopyScreen = onCopyScreen,
+            onScreenUpdated = onScreenUpdated,
             modifier = modifier,
         )
 
@@ -300,6 +313,8 @@ private fun ScreenRowHeader(
     onExpandClick: () -> Unit,
     onSelectScreen: (Screen) -> Unit,
     onDeleteClick: (Screen) -> Unit,
+    onCopyScreen: (Screen) -> Unit,
+    onScreenUpdated: (Screen) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -320,9 +335,12 @@ private fun ScreenRowHeader(
             },
         )
 
+        var menuExpanded by remember { mutableStateOf(false) }
+        var showNameEditDialog by remember { mutableStateOf(false) }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = modifier,
+            modifier = modifier.fillMaxWidth(),
         ) {
             Icon(
                 imageVector = ComposeFlowIcons.Smartphone,
@@ -336,31 +354,125 @@ private fun ScreenRowHeader(
 
             Text(
                 text = screen.name,
-                color = MaterialTheme.colorScheme.secondary,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(start = 8.dp),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.secondary
+                ),
+                modifier = Modifier.padding(start = 8.dp)
             )
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
 
-        ComposeFlowIcon(
-            imageVector = Icons.Outlined.DragIndicator,
-            tint = MaterialTheme.colorScheme.onSurface,
-            contentDescription = null,
-        )
-        if (numOfScreens > 1) {
+            ComposeFlowIcon(
+                imageVector = Icons.Outlined.DragIndicator,
+                tint = MaterialTheme.colorScheme.onSurface,
+                contentDescription = null,
+            )
+
             ComposeFlowIconButton(
                 onClick = {
-                    onDeleteClick(screen)
+                    menuExpanded = true
                 },
             ) {
                 ComposeFlowIcon(
-                    imageVector = Icons.Outlined.Delete,
-                    contentDescription = "Delete screen",
-                    tint = MaterialTheme.colorScheme.error,
+                    imageVector = Icons.Filled.MoreHoriz,
+                    contentDescription = "Screen options",
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
+        }
+
+        CursorDropdownMenu(
+            expanded = menuExpanded,
+            onDismissRequest = { menuExpanded = false }
+        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface,
+                tonalElevation = 3.dp,
+                shape = RoundedCornerShape(4.dp)
+            ) {
+                Column {
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = stringResource(Res.string.modify_screen_name),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.Edit,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = {
+                            showNameEditDialog = true
+                            menuExpanded = false
+                        }
+                    )
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = stringResource(Res.string.copy_screen),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                Icons.Outlined.ContentCopy,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        },
+                        onClick = {
+                            onCopyScreen(screen)
+                            menuExpanded = false
+                        }
+                    )
+
+                    if (numOfScreens > 1) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = stringResource(Res.string.delete),
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Outlined.Delete,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            },
+                            onClick = {
+                                onDeleteClick(screen)
+                                menuExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        // Name edit dialog
+        if (showNameEditDialog) {
+            ScreenNameDialog(
+                initialName = screen.name,
+                onCloseClick = {
+                    showNameEditDialog = false
+                },
+                onNameConfirmed = { newName ->
+                    if (newName.isNotBlank()) {
+                        val updatedScreen = screen.copy(name = newName)
+                        updatedScreen.label.value = newName
+                        onScreenUpdated(updatedScreen)
+                    }
+                    showNameEditDialog = false
+                }
+            )
         }
     }
 }
@@ -461,6 +573,7 @@ private fun ThemedScreenBuilderTabPreview(useDarkTheme: Boolean) {
             onSelectScreen = { },
             onScreenUpdated = { },
             onDeleteScreen = { },
+            onCopyScreen = { },
             onScreensSwapped = { _, _ -> },
         )
     }

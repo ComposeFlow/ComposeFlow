@@ -112,7 +112,8 @@ data class ScreenHolder(
         name: String,
         newScreen: Screen,
     ): Screen {
-        val newName = generateUniqueName(initial = name, existing = screens.map { it.name }.toSet())
+        val newName =
+            generateUniqueName(initial = name, existing = screens.map { it.name }.toSet())
         val screenToAdd =
             newScreen.restoreInstance().copy(
                 name = newName,
@@ -123,6 +124,15 @@ data class ScreenHolder(
         screenToAdd.rootNode.value.updateChildParentRelationships()
         screens.add(screenToAdd)
         return screenToAdd
+    }
+
+    fun updateScreen(
+        screen: Screen
+    ) {
+        val index = screens.indexOfFirst { it.id == screen.id }
+        if (index != -1) {
+            screens[index] = screen
+        }
     }
 
     fun deleteScreen(screen: Screen) {
@@ -186,7 +196,8 @@ data class ScreenHolder(
         currentEditable().updateHoveredNode(eventPosition)
     }
 
-    fun getAllComposeNodes(): List<ComposeNode> = screens.flatMap { it.getAllComposeNodes() } + currentEditable().getAllComposeNodes()
+    fun getAllComposeNodes(): List<ComposeNode> =
+        screens.flatMap { it.getAllComposeNodes() } + currentEditable().getAllComposeNodes()
 
     fun clearIsHovered() {
         screens.forEach {

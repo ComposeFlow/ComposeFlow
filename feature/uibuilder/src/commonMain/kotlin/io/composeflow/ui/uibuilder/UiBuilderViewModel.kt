@@ -896,6 +896,8 @@ class UiBuilderViewModel(
                 ),
         )
 
+        project.screenHolder.updateScreen(screen)
+
         saveProject(project)
     }
 
@@ -938,6 +940,45 @@ class UiBuilderViewModel(
         )
 
         project.screenHolder.deleteScreen(screen)
+        saveProject(project)
+    }
+
+    fun onCopyScreen(screen: Screen) {
+        // Track screen copy
+        try {
+            AnalyticsTracker.trackScreenCreated(
+                screenType = screen.label.value,
+                creationMethod = "copy",
+            )
+        } catch (_: Exception) {
+            // Analytics is optional, don't fail on errors
+        }
+
+        // Generate a unique name for the copied screen
+        val copiedName = generateUniqueName(
+            initial = screen.name,
+            existing = project.screenHolder.screens.map { it.name }.toSet(),
+        )
+
+        val copiedScreen = screen.copy(
+            id = Uuid.random().toString(),
+            name = copiedName,
+        )
+        copiedScreen.label.value = copiedName
+
+        recordOperation(
+            project = project,
+            userOperation =
+                UserOperation.ScreenAdded(
+                    screen = copiedScreen,
+                ),
+        )
+
+        val addedScreen = project.screenHolder.addScreen(
+            copiedName,
+            copiedScreen,
+        )
+        project.screenHolder.selectScreen(addedScreen)
         saveProject(project)
     }
 

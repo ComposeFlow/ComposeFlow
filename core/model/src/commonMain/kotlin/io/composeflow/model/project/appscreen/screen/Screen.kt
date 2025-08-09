@@ -105,6 +105,7 @@ typealias ScreenId = String
 @SerialName("Screen")
 data class Screen(
     override val id: String = Uuid.random().toString(),
+
     override val name: String,
     @Serializable(with = MutableStateSerializer::class)
     val rootNode: MutableState<ComposeNode> =
@@ -243,7 +244,8 @@ data class Screen(
     override val composableName: String = "${name.asClassName()}Screen".toKotlinFileName()
 
     @Transient
-    private val composeNavigationName: String = "${name.asClassName()}Navigation".toKotlinFileName()
+    private val composeNavigationName: String =
+        "${name.asClassName()}Navigation".toKotlinFileName()
 
     @Transient
     override val viewModelFileName: String =
@@ -259,7 +261,8 @@ data class Screen(
     @Transient
     val sceneName: String = name.asClassName().lowercase().toKotlinFileName()
 
-    override fun getPackageName(project: Project): String = "${project.packageName}.screens.$name".toPackageName()
+    override fun getPackageName(project: Project): String =
+        "${project.packageName}.screens.$name".toPackageName()
 
     override fun getStates(project: Project): List<ReadableState> {
         val projectStates = project.getStates(project)
@@ -813,7 +816,8 @@ data class Screen(
 
     override fun getContentRootNode(): ComposeNode = contentRootNode()
 
-    override fun findFocusedNodes(): List<ComposeNode> = getAllComposeNodes().filter { it.isFocused.value }
+    override fun findFocusedNodes(): List<ComposeNode> =
+        getAllComposeNodes().filter { it.isFocused.value }
 
     override fun clearIsHoveredRecursively() {
         getAllRootNodes().forEach { it?.clearIsHoveredRecursively() }

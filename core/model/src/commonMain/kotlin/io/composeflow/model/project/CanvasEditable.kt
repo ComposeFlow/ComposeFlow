@@ -117,7 +117,8 @@ interface CanvasEditable : StateHolder {
             it.allActionNodes()
         }
 
-    fun hasComposeNode(node: ComposeNode): Boolean = getAllComposeNodes().any { it.fallbackId == node.fallbackId }
+    fun hasComposeNode(node: ComposeNode): Boolean =
+        getAllComposeNodes().any { it.fallbackId == node.fallbackId }
 
     fun generateViewModelFileSpec(
         project: Project,
