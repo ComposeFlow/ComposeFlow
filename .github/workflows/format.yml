@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   spotlessApply:
-    runs-on: ubuntu-latest
+    runs-on:  warp-ubuntu-2204-x64-16x-spot
     timeout-minutes: 45
     permissions:
       contents: write # For commiting formatted files
