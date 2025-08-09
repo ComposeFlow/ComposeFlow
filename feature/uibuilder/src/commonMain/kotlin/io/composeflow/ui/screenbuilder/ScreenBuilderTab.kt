@@ -354,10 +354,11 @@ private fun ScreenRowHeader(
 
             Text(
                 text = screen.name,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.secondary
-                ),
-                modifier = Modifier.padding(start = 8.dp)
+                style =
+                    MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.secondary,
+                    ),
+                modifier = Modifier.padding(start = 8.dp),
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -383,53 +384,53 @@ private fun ScreenRowHeader(
 
         CursorDropdownMenu(
             expanded = menuExpanded,
-            onDismissRequest = { menuExpanded = false }
+            onDismissRequest = { menuExpanded = false },
         ) {
             Surface(
                 color = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface,
                 tonalElevation = 3.dp,
-                shape = RoundedCornerShape(4.dp)
+                shape = RoundedCornerShape(4.dp),
             ) {
                 Column {
                     DropdownMenuItem(
                         text = {
                             Text(
                                 text = stringResource(Res.string.modify_screen_name),
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         },
                         leadingIcon = {
                             Icon(
                                 Icons.Outlined.Edit,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = MaterialTheme.colorScheme.onSurface,
                             )
                         },
                         onClick = {
                             showNameEditDialog = true
                             menuExpanded = false
-                        }
+                        },
                     )
 
                     DropdownMenuItem(
                         text = {
                             Text(
                                 text = stringResource(Res.string.copy_screen),
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                         },
                         leadingIcon = {
                             Icon(
                                 Icons.Outlined.ContentCopy,
                                 contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface
+                                tint = MaterialTheme.colorScheme.onSurface,
                             )
                         },
                         onClick = {
                             onCopyScreen(screen)
                             menuExpanded = false
-                        }
+                        },
                     )
 
                     if (numOfScreens > 1) {
@@ -437,20 +438,20 @@ private fun ScreenRowHeader(
                             text = {
                                 Text(
                                     text = stringResource(Res.string.delete),
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                             },
                             leadingIcon = {
                                 Icon(
                                     Icons.Outlined.Delete,
                                     contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.error
+                                    tint = MaterialTheme.colorScheme.error,
                                 )
                             },
                             onClick = {
                                 onDeleteClick(screen)
                                 menuExpanded = false
-                            }
+                            },
                         )
                     }
                 }
@@ -471,7 +472,7 @@ private fun ScreenRowHeader(
                         onScreenUpdated(updatedScreen)
                     }
                     showNameEditDialog = false
-                }
+                },
             )
         }
     }

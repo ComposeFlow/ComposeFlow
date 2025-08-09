@@ -440,7 +440,7 @@ fun UiBuilderScreen(
                                             (
                                                 editingProject.screenHolder.pendingDestination as?
                                                     NavigatableDestination.UiBuilderScreen
-                                                )?.inspectorTabDestination
+                                            )?.inspectorTabDestination
                                                 ?: selectedInspectorDestination,
                                         modifier =
                                             inspectorModifier

@@ -126,9 +126,7 @@ data class ScreenHolder(
         return screenToAdd
     }
 
-    fun updateScreen(
-        screen: Screen
-    ) {
+    fun updateScreen(screen: Screen) {
         val index = screens.indexOfFirst { it.id == screen.id }
         if (index != -1) {
             screens[index] = screen
@@ -196,8 +194,7 @@ data class ScreenHolder(
         currentEditable().updateHoveredNode(eventPosition)
     }
 
-    fun getAllComposeNodes(): List<ComposeNode> =
-        screens.flatMap { it.getAllComposeNodes() } + currentEditable().getAllComposeNodes()
+    fun getAllComposeNodes(): List<ComposeNode> = screens.flatMap { it.getAllComposeNodes() } + currentEditable().getAllComposeNodes()
 
     fun clearIsHovered() {
         screens.forEach {

@@ -445,4 +445,61 @@ class UiBuilderViewModelTest {
         assertFalse("TextField should lose focus", textField.isFocused.value)
         assertFalse("Button should lose focus", button.isFocused.value)
     }
+
+    @Test
+    fun testOnScreenUpdated_updatesScreenInProject() {
+        // Get the initial screen
+        val originalScreen = project.screenHolder.screens.first()
+        val originalName = originalScreen.name
+
+        // Create an updated screen with a different name and label
+        val updatedScreen = originalScreen.copy(name = "UpdatedScreenName")
+        updatedScreen.label.value = "UpdatedScreenName"
+
+        // Call onScreenUpdated
+        viewModel.onScreenUpdated(updatedScreen)
+
+        // Verify the screen was updated in the project
+        val screenInProject = project.screenHolder.screens.find { it.id == updatedScreen.id }
+        assertEquals("UpdatedScreenName", screenInProject?.name)
+        assertEquals("UpdatedScreenName", screenInProject?.label?.value)
+
+        // Verify the screen name actually changed
+        assertNotEquals(originalName, screenInProject?.name)
+    }
+
+    @Test
+    fun testOnCopyScreen_createsNewScreenWithUniqueName() {
+        // Get the initial screen count and first screen
+        val initialScreenCount = project.screenHolder.screens.size
+        val originalScreen = project.screenHolder.screens.first()
+        val originalScreenId = originalScreen.id
+        val originalName = originalScreen.name
+
+        // Call onCopyScreen
+        viewModel.onCopyScreen(originalScreen)
+
+        // Verify a new screen was added
+        assertEquals(initialScreenCount + 1, project.screenHolder.screens.size)
+
+        // Find the copied screen (should be the last one added)
+        val copiedScreen = project.screenHolder.screens.last()
+
+        // Verify the copied screen has different ID but related name
+        assertNotEquals(originalScreenId, copiedScreen.id)
+        assertTrue(
+            "Copied screen name should start with original name",
+            copiedScreen.name.startsWith(originalName),
+        )
+
+        // Verify the copied screen has matching label
+        assertEquals(copiedScreen.name, copiedScreen.label.value)
+
+        // Verify the copied screen is now selected
+        assertEquals(copiedScreen.id, project.screenHolder.currentEditable().id)
+
+        // Verify original screen is still there and unchanged
+        val originalStillExists = project.screenHolder.screens.any { it.id == originalScreenId }
+        assertTrue("Original screen should still exist", originalStillExists)
+    }
 }

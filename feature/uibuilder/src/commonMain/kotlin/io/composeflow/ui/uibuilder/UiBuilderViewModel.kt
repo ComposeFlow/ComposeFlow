@@ -955,15 +955,20 @@ class UiBuilderViewModel(
         }
 
         // Generate a unique name for the copied screen
-        val copiedName = generateUniqueName(
-            initial = screen.name,
-            existing = project.screenHolder.screens.map { it.name }.toSet(),
-        )
+        val copiedName =
+            generateUniqueName(
+                initial = screen.name,
+                existing =
+                    project.screenHolder.screens
+                        .map { it.name }
+                        .toSet(),
+            )
 
-        val copiedScreen = screen.copy(
-            id = Uuid.random().toString(),
-            name = copiedName,
-        )
+        val copiedScreen =
+            screen.copy(
+                id = Uuid.random().toString(),
+                name = copiedName,
+            )
         copiedScreen.label.value = copiedName
 
         recordOperation(
@@ -974,10 +979,11 @@ class UiBuilderViewModel(
                 ),
         )
 
-        val addedScreen = project.screenHolder.addScreen(
-            copiedName,
-            copiedScreen,
-        )
+        val addedScreen =
+            project.screenHolder.addScreen(
+                copiedName,
+                copiedScreen,
+            )
         project.screenHolder.selectScreen(addedScreen)
         saveProject(project)
     }
