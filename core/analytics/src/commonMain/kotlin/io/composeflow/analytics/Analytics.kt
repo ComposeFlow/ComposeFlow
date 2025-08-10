@@ -5,7 +5,6 @@ package io.composeflow.analytics
  * Provides methods to track events, user properties, and screen views.
  */
 interface Analytics {
-
     /**
      *
      * Initialize the analytics client with the given API key.
