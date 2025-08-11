@@ -130,13 +130,25 @@ class StringResourceEditorViewModel(
         selectedResourceIds.clear()
     }
 
+    fun onTranslateNeedsUpdateStrings() {
+        val resourcesToTranslate = project.stringResourceHolder.stringResources.filter { it.needsTranslationUpdate }
+        if (resourcesToTranslate.isEmpty()) {
+            Logger.e("No resources need translation updates. Button should be disabled")
+            return
+        }
+        translateResourcesInternal(resourcesToTranslate)
+    }
+
     fun onTranslateStrings() {
         val selectedResources = project.stringResourceHolder.stringResources.filter { selectedResourceIds.contains(it.id) }
         if (selectedResources.isEmpty()) {
             Logger.e("No valid resources selected for translation. Translate button should be disabled")
             return
         }
+        translateResourcesInternal(selectedResources)
+    }
 
+    private fun translateResourcesInternal(resourcesToTranslate: List<StringResource>) {
         val defaultLocale = project.stringResourceHolder.defaultLocale.value
         val targetLocales = project.stringResourceHolder.supportedLocales.filter { it != defaultLocale }
         if (targetLocales.isEmpty()) {
@@ -150,13 +162,13 @@ class StringResourceEditorViewModel(
                 val result =
                     llmRepository.translateStrings(
                         firebaseIdToken = firebaseIdToken.rawToken ?: throw IllegalStateException("Signed-in user has no raw token"),
-                        stringResources = selectedResources,
+                        stringResources = resourcesToTranslate,
                         defaultLocale = defaultLocale,
                         targetLocales = targetLocales,
                     )
                 when (result) {
                     is TranslateStringsResult.Success -> {
-                        selectedResources.forEach { resource ->
+                        resourcesToTranslate.forEach { resource ->
                             val translationsForResource = result.translations[resource.key]
                             if (translationsForResource != null) {
                                 val updatedLocalizedValues = resource.localizedValues.toMutableStateMapEqualsOverride()

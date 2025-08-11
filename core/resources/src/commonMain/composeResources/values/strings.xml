@@ -533,8 +533,10 @@ instead of in the canvas.</string>
     <string name="string_resource_key_placeholder">Resource key</string>
     <string name="string_resource_key_tooltip">The unique identifier for this string resource, used to reference it in UI and other resources.</string>
     <string name="string_resources">String Resources</string>
-    <string name="translate_strings">Translate strings</string>
+    <string name="translate_selected_strings">Translate selected strings</string>
     <string name="translating_strings">Translating strings...</string>
+    <string name="update_translations">Update translations</string>
+    <string name="updating_translations">Updating translations...</string>
     <string name="needs_translation_update">This string may need translation update.</string>
 
     <!-- Locale display names -->
