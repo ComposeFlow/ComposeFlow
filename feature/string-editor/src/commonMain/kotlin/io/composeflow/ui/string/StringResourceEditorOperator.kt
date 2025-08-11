@@ -6,11 +6,11 @@ import io.composeflow.ksp.LlmTool
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.string.ResourceLocale
 import io.composeflow.model.project.string.StringResource
+import io.composeflow.model.project.string.isTranslatable
 import io.composeflow.serializer.decodeFromStringWithFallback
 import io.composeflow.serializer.encodeToString
 import io.composeflow.ui.EventResult
 import io.composeflow.util.generateUniqueName
-import kotlinx.serialization.encodeToString
 
 // TODO: Wire this class with ToolDispatcher to enable AI to edit string resources.
 //       https://github.com/ComposeFlow/ComposeFlow/issues/34
@@ -34,7 +34,12 @@ class StringResourceEditorOperator {
                         .map { it.key }
                         .toSet(),
                 )
-            val newResource = stringResource.copy(key = newKey)
+            val newResource =
+                stringResource.copy(
+                    key = newKey,
+                    // Set needsTranslationUpdate to true if there are multiple locales.
+                    needsTranslationUpdate = project.stringResourceHolder.isTranslatable,
+                )
             project.stringResourceHolder.stringResources.add(newResource)
         } catch (e: Exception) {
             Logger.e(e) { "Error adding string resource" }
@@ -104,7 +109,29 @@ class StringResourceEditorOperator {
                 return result
             }
 
-            project.stringResourceHolder.stringResources[existingResourceIndex] = stringResource
+            val existingResource = project.stringResourceHolder.stringResources[existingResourceIndex]
+            val defaultLocale = project.stringResourceHolder.defaultLocale.value
+
+            val needsTranslationUpdate =
+                if (project.stringResourceHolder.isTranslatable) {
+                    // If the flag is explicitly set to false (e.g., after translation), keep it false
+                    if (!stringResource.needsTranslationUpdate && existingResource.needsTranslationUpdate) {
+                        false
+                    } else {
+                        val descriptionChanged = existingResource.description != stringResource.description
+                        val defaultValueChanged =
+                            existingResource.localizedValues[defaultLocale] != stringResource.localizedValues[defaultLocale]
+
+                        // Set flag if content changed, or keep existing flag
+                        (descriptionChanged || defaultValueChanged) || existingResource.needsTranslationUpdate
+                    }
+                } else {
+                    // No translation update needed if there's only one locale
+                    false
+                }
+
+            val updatedResource = stringResource.copy(needsTranslationUpdate = needsTranslationUpdate)
+            project.stringResourceHolder.stringResources[existingResourceIndex] = updatedResource
         } catch (e: Exception) {
             Logger.e(e) { "Error updating string resource" }
             result.errorMessages.add("Failed to update string resource: ${e.message}")
@@ -146,16 +173,33 @@ class StringResourceEditorOperator {
                     listOf(defaultLocale) + newLocales
                 }
 
-            // Find locales to remove
+            // Find locales to add and remove
             val currentLocales = project.stringResourceHolder.supportedLocales.toSet()
             val newLocalesSet = localesWithDefault.toSet()
             val localesToRemove = currentLocales - newLocalesSet
+            val localesToAdd = newLocalesSet - currentLocales
 
             // Remove old locales from string resources
             if (localesToRemove.isNotEmpty()) {
                 project.stringResourceHolder.stringResources.forEach { resource ->
                     localesToRemove.forEach { locale ->
                         resource.localizedValues.remove(locale)
+                    }
+                }
+            }
+
+            // Update needsTranslationUpdate flags based on the locale changes
+            when {
+                // If new locales are being added, mark all string resources as needing translation
+                localesToAdd.isNotEmpty() -> {
+                    project.stringResourceHolder.stringResources.replaceAll { resource ->
+                        resource.copy(needsTranslationUpdate = true)
+                    }
+                }
+                // If only the default locale remains, clear the flags
+                localesWithDefault.size == 1 -> {
+                    project.stringResourceHolder.stringResources.replaceAll { resource ->
+                        resource.copy(needsTranslationUpdate = false)
                     }
                 }
             }
@@ -198,7 +242,16 @@ class StringResourceEditorOperator {
             if (!project.stringResourceHolder.supportedLocales.contains(locale)) {
                 project.stringResourceHolder.supportedLocales.add(locale)
             }
+            val previousLocale = project.stringResourceHolder.defaultLocale.value
             project.stringResourceHolder.defaultLocale.value = locale
+
+            // If the default locale has actually changed and there are multiple locales,
+            // set needsTranslationUpdate flag on all resources
+            if (previousLocale != locale && project.stringResourceHolder.isTranslatable) {
+                project.stringResourceHolder.stringResources.replaceAll { resource ->
+                    resource.copy(needsTranslationUpdate = true)
+                }
+            }
         } catch (e: Exception) {
             Logger.e(e) { "Error setting default locale" }
             result.errorMessages.add("Failed to set default locale: ${e.message}")

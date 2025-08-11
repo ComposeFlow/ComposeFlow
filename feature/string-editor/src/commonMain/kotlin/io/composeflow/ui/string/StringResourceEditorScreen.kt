@@ -32,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Sync
 import androidx.compose.material.icons.outlined.Translate
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
@@ -95,6 +96,7 @@ import io.composeflow.model.project.Project
 import io.composeflow.model.project.string.ResourceLocale
 import io.composeflow.model.project.string.StringResource
 import io.composeflow.more_options
+import io.composeflow.needs_translation_update
 import io.composeflow.no_locales_found_matching
 import io.composeflow.remove
 import io.composeflow.remove_locale
@@ -607,16 +609,27 @@ private fun StringResourceTableDataRow(
                 )
             }
             VerticalDivider()
-            Box(
-                modifier = Modifier.width(keyColumnWidth).fillMaxHeight(),
-                contentAlignment = Alignment.CenterStart,
+            Row(
+                modifier = Modifier.width(keyColumnWidth).fillMaxHeight().padding(4.dp),
             ) {
                 CellEditableText(
                     initialText = resource.key,
                     onValueChange = onUpdateKey,
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
-                    modifier = Modifier.fillMaxWidth().padding(4.dp),
+                    modifier = Modifier.align(Alignment.CenterVertically).weight(1f),
                 )
+                if (resource.needsTranslationUpdate) {
+                    Tooltip(
+                        text = stringResource(Res.string.needs_translation_update),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Sync,
+                            contentDescription = stringResource(Res.string.needs_translation_update),
+                            tint = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.size(12.dp),
+                        )
+                    }
+                }
             }
             ColumnDivider()
             Box(

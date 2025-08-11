@@ -166,7 +166,12 @@ class StringResourceEditorViewModel(
                                         updatedLocalizedValues[locale] = translation
                                     }
                                 }
-                                val updatedResource = resource.copy(localizedValues = updatedLocalizedValues)
+                                val updatedResource =
+                                    resource.copy(
+                                        localizedValues = updatedLocalizedValues,
+                                        // Clear the flag after successful translation
+                                        needsTranslationUpdate = false,
+                                    )
                                 // TODO Support bulk update of string resources
                                 //      https://github.com/ComposeFlow/ComposeFlow/issues/41
                                 stringResourceEditorOperator.updateStringResource(project, updatedResource)

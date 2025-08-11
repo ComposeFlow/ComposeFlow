@@ -18,6 +18,11 @@ data class StringResource(
     val description: String? = null,
     @Serializable(with = FallbackMutableStateMapSerializer::class)
     val localizedValues: MutableMap<ResourceLocale, String> = mutableStateMapEqualsOverrideOf(),
+    /** 
+     * Tracks whether the default locale value has been updated since the last translation.
+     * This helps identify which strings need re-translation.
+     */
+    val needsTranslationUpdate: Boolean = false,
 )
 
 @JvmName("stringResourceOfWithLocale")

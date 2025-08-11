@@ -112,3 +112,10 @@ fun StringResourceHolder.copyContents(other: StringResourceHolder) {
     supportedLocales.clear()
     supportedLocales.addAll(other.supportedLocales)
 }
+
+/**
+ * Returns true if the StringResourceHolder has multiple locales,
+ * indicating that string resources are translatable.
+ */
+val StringResourceHolder.isTranslatable: Boolean
+    get() = supportedLocales.any { it != defaultLocale.value }

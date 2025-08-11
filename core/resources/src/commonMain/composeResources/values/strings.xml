@@ -535,6 +535,7 @@ instead of in the canvas.</string>
     <string name="string_resources">String Resources</string>
     <string name="translate_strings">Translate strings</string>
     <string name="translating_strings">Translating strings...</string>
+    <string name="needs_translation_update">This string may need translation update.</string>
 
     <!-- Locale display names -->
     <string name="locale_name_af">Afrikaans</string>
