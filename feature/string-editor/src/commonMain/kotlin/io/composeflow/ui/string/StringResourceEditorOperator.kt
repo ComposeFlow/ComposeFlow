@@ -21,45 +21,62 @@ import io.composeflow.util.generateUniqueName
  * from the GUI in ComposeFlow.
  */
 class StringResourceEditorOperator {
-    fun addStringResource(
+    fun addStringResources(
         project: Project,
-        stringResource: StringResource,
+        stringResources: List<StringResource>,
     ): EventResult {
         val result = EventResult()
-        try {
-            val newKey =
-                generateUniqueName(
-                    stringResource.key,
-                    project.stringResourceHolder.stringResources
-                        .map { it.key }
-                        .toSet(),
-                )
-            val newResource =
-                stringResource.copy(
-                    key = newKey,
-                    // Set needsTranslationUpdate to true if there are multiple locales.
-                    needsTranslationUpdate = project.stringResourceHolder.isTranslatable,
-                )
-            project.stringResourceHolder.stringResources.add(newResource)
-        } catch (e: Exception) {
-            Logger.e(e) { "Error adding string resource" }
-            result.errorMessages.add("Failed to add string resource: ${e.message}")
+        if (stringResources.isEmpty()) {
+            return result
+        }
+        val existingKeys =
+            project.stringResourceHolder.stringResources
+                .map { it.key }
+                .toMutableSet()
+        stringResources.forEach { stringResource ->
+            try {
+                val newKey =
+                    generateUniqueName(
+                        stringResource.key,
+                        existingKeys,
+                    )
+                val newResource =
+                    stringResource.copy(
+                        key = newKey,
+                        needsTranslationUpdate = project.stringResourceHolder.isTranslatable,
+                    )
+                project.stringResourceHolder.stringResources.add(newResource)
+                existingKeys.add(newKey)
+            } catch (e: Exception) {
+                Logger.e(e) { "Error adding string resource: ${stringResource.key}" }
+                result.errorMessages.add("Failed to add string resource '${stringResource.key}': ${e.message}")
+            }
         }
         return result
     }
 
     @LlmTool(
-        name = "add_string_resource",
-        "Adds a new string resource to the project. String resources are used for internationalization and localization of text in the application.",
+        name = "add_string_resources",
+        "Adds one or more string resources to the project. String resources are used for internationalization and localization of text in the application.",
     )
-    fun onAddStringResource(
+    fun onAddStringResources(
         project: Project,
-        @LlmParam(description = "The YAML representation of the StringResource to be added. The key will be made unique if necessary.")
+        @LlmParam(
+            description =
+                "The YAML representation of StringResource(s) to be added. " +
+                    "Can be a single StringResource or a list of StringResources. Keys will be made unique if necessary.",
+        )
         stringResourceYaml: String,
     ): EventResult =
         try {
-            val stringResource = decodeFromStringWithFallback<StringResource>(stringResourceYaml)
-            addStringResource(project, stringResource)
+            // Try to parse as list first, fallback to single resource
+            val stringResources =
+                try {
+                    decodeFromStringWithFallback<List<StringResource>>(stringResourceYaml)
+                } catch (_: Exception) {
+                    listOf(decodeFromStringWithFallback<StringResource>(stringResourceYaml))
+                }
+            addStringResources(project, stringResources)
         } catch (e: Exception) {
             Logger.e(e) { "Error parsing string resource YAML" }
             EventResult().apply {
@@ -67,90 +84,131 @@ class StringResourceEditorOperator {
             }
         }
 
-    fun deleteStringResource(
+    fun deleteStringResources(
         project: Project,
-        stringResourceId: String,
+        stringResourceIds: List<String>,
     ): EventResult {
         val result = EventResult()
-        try {
+        if (stringResourceIds.isEmpty()) {
+            return result
+        }
+        val resourcesToDelete = mutableListOf<StringResource>()
+        stringResourceIds.forEach { stringResourceId ->
             val resource = project.stringResourceHolder.stringResources.find { it.id == stringResourceId }
             if (resource == null) {
                 result.errorMessages.add("String resource with ID $stringResourceId not found.")
-                return result
+            } else {
+                resourcesToDelete.add(resource)
             }
-            project.stringResourceHolder.stringResources.remove(resource)
-        } catch (e: Exception) {
-            Logger.e(e) { "Error deleting string resource" }
-            result.errorMessages.add("Failed to delete string resource: ${e.message}")
+        }
+        resourcesToDelete.forEach { resource ->
+            try {
+                project.stringResourceHolder.stringResources.remove(resource)
+            } catch (e: Exception) {
+                Logger.e(e) { "Error deleting string resource: ${resource.id}" }
+                result.errorMessages.add("Failed to delete string resource '${resource.key}': ${e.message}")
+            }
         }
         return result
     }
 
     @LlmTool(
-        name = "delete_string_resource",
-        description = "Removes a string resource from the project by its ID.",
+        name = "delete_string_resources",
+        description = "Removes one or more string resources from the project by their IDs.",
     )
-    fun onDeleteStringResource(
+    fun onDeleteStringResources(
         project: Project,
-        @LlmParam(description = "The ID of the string resource to be deleted.")
-        stringResourceId: String,
-    ): EventResult = deleteStringResource(project, stringResourceId)
+        @LlmParam(
+            description = "The ID(s) of the string resource(s) to be deleted. Can be a single ID string or a list of ID strings.",
+        )
+        stringResourceIds: String,
+    ): EventResult =
+        try {
+            // Try to parse as list first, fallback to single string
+            val ids =
+                try {
+                    decodeFromStringWithFallback<List<String>>(stringResourceIds)
+                } catch (_: Exception) {
+                    listOf(stringResourceIds)
+                }
+            deleteStringResources(project, ids)
+        } catch (e: Exception) {
+            Logger.e(e) { "Error parsing string resource IDs" }
+            EventResult().apply {
+                errorMessages.add("Failed to parse string resource IDs: ${e.message}")
+            }
+        }
 
-    fun updateStringResource(
+    fun updateStringResources(
         project: Project,
-        stringResource: StringResource,
+        stringResources: List<StringResource>,
     ): EventResult {
         val result = EventResult()
-        try {
-            val existingResourceIndex =
-                project.stringResourceHolder.stringResources.indexOfFirst { it.id == stringResource.id }
-            if (existingResourceIndex == -1) {
-                result.errorMessages.add("String resource with ID ${stringResource.id} not found.")
-                return result
-            }
-
-            val existingResource = project.stringResourceHolder.stringResources[existingResourceIndex]
-            val defaultLocale = project.stringResourceHolder.defaultLocale.value
-
-            val needsTranslationUpdate =
-                if (project.stringResourceHolder.isTranslatable) {
-                    // If the flag is explicitly set to false (e.g., after translation), keep it false
-                    if (!stringResource.needsTranslationUpdate && existingResource.needsTranslationUpdate) {
-                        false
-                    } else {
-                        val descriptionChanged = existingResource.description != stringResource.description
-                        val defaultValueChanged =
-                            existingResource.localizedValues[defaultLocale] != stringResource.localizedValues[defaultLocale]
-
-                        // Set flag if content changed, or keep existing flag
-                        (descriptionChanged || defaultValueChanged) || existingResource.needsTranslationUpdate
-                    }
-                } else {
-                    // No translation update needed if there's only one locale
-                    false
+        if (stringResources.isEmpty()) {
+            return result
+        }
+        val defaultLocale = project.stringResourceHolder.defaultLocale.value
+        stringResources.forEach { stringResource ->
+            try {
+                val existingResourceIndex =
+                    project.stringResourceHolder.stringResources.indexOfFirst { it.id == stringResource.id }
+                if (existingResourceIndex == -1) {
+                    result.errorMessages.add("String resource with ID ${stringResource.id} not found.")
+                    return@forEach
                 }
 
-            val updatedResource = stringResource.copy(needsTranslationUpdate = needsTranslationUpdate)
-            project.stringResourceHolder.stringResources[existingResourceIndex] = updatedResource
-        } catch (e: Exception) {
-            Logger.e(e) { "Error updating string resource" }
-            result.errorMessages.add("Failed to update string resource: ${e.message}")
+                val existingResource = project.stringResourceHolder.stringResources[existingResourceIndex]
+
+                val needsTranslationUpdate =
+                    if (project.stringResourceHolder.isTranslatable) {
+                        // If the flag is explicitly set to false (e.g., after translation), keep it false
+                        if (!stringResource.needsTranslationUpdate && existingResource.needsTranslationUpdate) {
+                            false
+                        } else {
+                            val descriptionChanged = existingResource.description != stringResource.description
+                            val defaultValueChanged =
+                                existingResource.localizedValues[defaultLocale] != stringResource.localizedValues[defaultLocale]
+
+                            // Set flag if content changed, or keep existing flag
+                            (descriptionChanged || defaultValueChanged) || existingResource.needsTranslationUpdate
+                        }
+                    } else {
+                        // No translation update needed if there's only one locale
+                        false
+                    }
+
+                val updatedResource = stringResource.copy(needsTranslationUpdate = needsTranslationUpdate)
+                project.stringResourceHolder.stringResources[existingResourceIndex] = updatedResource
+            } catch (e: Exception) {
+                Logger.e(e) { "Error updating string resource: ${stringResource.id}" }
+                result.errorMessages.add("Failed to update string resource '${stringResource.key}': ${e.message}")
+            }
         }
         return result
     }
 
     @LlmTool(
-        name = "update_string_resource",
-        description = "Updates an existing string resource in the project.",
+        name = "update_string_resources",
+        description = "Updates one or more existing string resources in the project.",
     )
-    fun onUpdateStringResource(
+    fun onUpdateStringResources(
         project: Project,
-        @LlmParam(description = "The YAML representation of the updated StringResource. Must include the ID of the resource to update.")
+        @LlmParam(
+            description =
+                "The YAML representation of the updated StringResource(s). " +
+                    "Can be a single StringResource or a list of StringResources. Must include the ID of each resource to update.",
+        )
         stringResourceYaml: String,
     ): EventResult =
         try {
-            val stringResource = decodeFromStringWithFallback<StringResource>(stringResourceYaml)
-            updateStringResource(project, stringResource)
+            // Try to parse as list first, fallback to single resource
+            val stringResources =
+                try {
+                    decodeFromStringWithFallback<List<StringResource>>(stringResourceYaml)
+                } catch (_: Exception) {
+                    listOf(decodeFromStringWithFallback<StringResource>(stringResourceYaml))
+                }
+            updateStringResources(project, stringResources)
         } catch (e: Exception) {
             Logger.e(e) { "Error parsing string resource YAML" }
             EventResult().apply {

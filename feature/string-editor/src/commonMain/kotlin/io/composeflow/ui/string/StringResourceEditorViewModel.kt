@@ -39,7 +39,7 @@ class StringResourceEditorViewModel(
                     description = description.ifBlank { null },
                     localizedValues = mutableMapOf(project.stringResourceHolder.defaultLocale.value to defaultValue),
                 )
-            val result = stringResourceEditorOperator.addStringResource(project, newResource)
+            val result = stringResourceEditorOperator.addStringResources(project, listOf(newResource))
             if (result.errorMessages.isEmpty()) {
                 saveProject()
             }
@@ -51,7 +51,7 @@ class StringResourceEditorViewModel(
         newKey: String,
     ) {
         val updatedResource = resource.copy(key = newKey)
-        val result = stringResourceEditorOperator.updateStringResource(project, updatedResource)
+        val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
         if (result.errorMessages.isEmpty()) {
             saveProject()
         }
@@ -62,7 +62,7 @@ class StringResourceEditorViewModel(
         newDescription: String,
     ) {
         val updatedResource = resource.copy(description = newDescription.ifBlank { null })
-        val result = stringResourceEditorOperator.updateStringResource(project, updatedResource)
+        val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
         if (result.errorMessages.isEmpty()) {
             saveProject()
         }
@@ -80,16 +80,17 @@ class StringResourceEditorViewModel(
                         this[locale] = value
                     },
             )
-        val result = stringResourceEditorOperator.updateStringResource(project, updatedResource)
+        val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
         if (result.errorMessages.isEmpty()) {
             saveProject()
         }
     }
 
-    fun onDeleteStringResource(resource: StringResource) {
-        val result = stringResourceEditorOperator.deleteStringResource(project, resource.id)
+    fun onDeleteStringResources(resources: List<StringResource>) {
+        val resourceIds = resources.map { it.id }
+        val result = stringResourceEditorOperator.deleteStringResources(project, resourceIds)
         if (result.errorMessages.isEmpty()) {
-            selectedResourceIds.remove(resource.id)
+            selectedResourceIds.removeAll(resourceIds)
             saveProject()
         }
     }
@@ -168,6 +169,7 @@ class StringResourceEditorViewModel(
                     )
                 when (result) {
                     is TranslateStringsResult.Success -> {
+                        val updatedResources = mutableListOf<StringResource>()
                         resourcesToTranslate.forEach { resource ->
                             val translationsForResource = result.translations[resource.key]
                             if (translationsForResource != null) {
@@ -184,10 +186,11 @@ class StringResourceEditorViewModel(
                                         // Clear the flag after successful translation
                                         needsTranslationUpdate = false,
                                     )
-                                // TODO Support bulk update of string resources
-                                //      https://github.com/ComposeFlow/ComposeFlow/issues/41
-                                stringResourceEditorOperator.updateStringResource(project, updatedResource)
+                                updatedResources.add(updatedResource)
                             }
+                        }
+                        if (updatedResources.isNotEmpty()) {
+                            stringResourceEditorOperator.updateStringResources(project, updatedResources)
                         }
                         selectedResourceIds.clear()
                         saveProject()

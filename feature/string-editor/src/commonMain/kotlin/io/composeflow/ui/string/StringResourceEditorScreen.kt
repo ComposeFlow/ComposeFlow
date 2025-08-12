@@ -150,7 +150,7 @@ fun StringResourceEditorScreen(
             onUpdateStringResourceKey = viewModel::onUpdateStringResourceKey,
             onUpdateStringResourceDescription = viewModel::onUpdateStringResourceDescription,
             onUpdateStringResourceValue = viewModel::onUpdateStringResourceValue,
-            onDeleteStringResource = viewModel::onDeleteStringResource,
+            onDeleteStringResources = viewModel::onDeleteStringResources,
             onUpdateSupportedLocales = viewModel::onUpdateSupportedLocales,
             onRemoveLocale = { locale ->
                 // When removing a single locale from the header menu, update the list without that locale
@@ -177,7 +177,7 @@ private fun StringResourceEditorContent(
     onUpdateStringResourceKey: (StringResource, String) -> Unit,
     onUpdateStringResourceDescription: (StringResource, String) -> Unit,
     onUpdateStringResourceValue: (StringResource, ResourceLocale, String) -> Unit,
-    onDeleteStringResource: (StringResource) -> Unit,
+    onDeleteStringResources: (List<StringResource>) -> Unit,
     onUpdateSupportedLocales: (List<ResourceLocale>) -> Unit,
     onRemoveLocale: (ResourceLocale) -> Unit,
     onUpdateDefaultLocale: (ResourceLocale) -> Unit,
@@ -451,9 +451,7 @@ private fun StringResourceEditorContent(
                     stringResource(Res.string.delete_string_resources_confirmation, selectedResources.size)
                 },
             onConfirmClick = {
-                selectedResources.forEach { resource ->
-                    onDeleteStringResource(resource)
-                }
+                onDeleteStringResources(selectedResources)
                 showDeleteMultipleDialog = false
                 onAllDialogsClosed()
             },
