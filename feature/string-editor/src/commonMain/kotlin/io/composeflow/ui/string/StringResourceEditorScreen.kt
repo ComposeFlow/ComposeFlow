@@ -258,7 +258,7 @@ private fun StringResourceEditorContent(
                             isTranslating = isTranslating,
                         )
                     } else {
-                        // Show disabled "Translate Strings" button when nothing to translate
+                        // Show disabled "Update Translations" button when nothing to translate
                         UpdateTranslationsButton(
                             onClick = { },
                             enabled = false,
