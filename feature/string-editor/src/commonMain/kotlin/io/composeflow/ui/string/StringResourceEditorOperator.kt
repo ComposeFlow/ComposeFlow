@@ -1,6 +1,17 @@
 package io.composeflow.ui.string
 
 import co.touchlab.kermit.Logger
+import io.composeflow.Res
+import io.composeflow.error_failed_to_add_string_resource
+import io.composeflow.error_failed_to_delete_string_resource
+import io.composeflow.error_failed_to_parse_locales_yaml
+import io.composeflow.error_failed_to_parse_string_resource_ids
+import io.composeflow.error_failed_to_parse_string_resources_yaml
+import io.composeflow.error_failed_to_set_default_locale
+import io.composeflow.error_failed_to_update_string_resource
+import io.composeflow.error_failed_to_update_supported_locales
+import io.composeflow.error_invalid_locale
+import io.composeflow.error_string_resource_not_found
 import io.composeflow.ksp.LlmParam
 import io.composeflow.ksp.LlmTool
 import io.composeflow.model.project.Project
@@ -12,6 +23,7 @@ import io.composeflow.serializer.encodeToString
 import io.composeflow.ui.EventResult
 import io.composeflow.util.generateUniqueName
 import io.composeflow.util.toComposeResourceName
+import org.jetbrains.compose.resources.getString
 
 // TODO: Wire this class with ToolDispatcher to enable AI to edit string resources.
 //       https://github.com/ComposeFlow/ComposeFlow/issues/34
@@ -22,7 +34,7 @@ import io.composeflow.util.toComposeResourceName
  * from the GUI in ComposeFlow.
  */
 class StringResourceEditorOperator {
-    fun addStringResources(
+    suspend fun addStringResources(
         project: Project,
         stringResources: List<StringResource>,
     ): EventResult {
@@ -50,7 +62,9 @@ class StringResourceEditorOperator {
                 existingKeys.add(newKey)
             } catch (e: Exception) {
                 Logger.e(e) { "Error adding string resource: ${stringResource.key}" }
-                result.errorMessages.add("Failed to add string resource '${stringResource.key}': ${e.message}")
+                result.errorMessages.add(
+                    getString(Res.string.error_failed_to_add_string_resource, stringResource.key, e.message ?: "Unknown error"),
+                )
             }
         }
         return result
@@ -60,7 +74,7 @@ class StringResourceEditorOperator {
         name = "add_string_resources",
         "Adds one or more string resources to the project. String resources are used for internationalization and localization of text in the application.",
     )
-    fun onAddStringResources(
+    suspend fun onAddStringResources(
         project: Project,
         @LlmParam(
             description =
@@ -79,13 +93,15 @@ class StringResourceEditorOperator {
                 }
             addStringResources(project, stringResources)
         } catch (e: Exception) {
-            Logger.e(e) { "Error parsing string resource YAML" }
+            Logger.e(e) { "Error parsing string resources YAML" }
             EventResult().apply {
-                errorMessages.add("Failed to parse string resource YAML: ${e.message}")
+                errorMessages.add(
+                    getString(Res.string.error_failed_to_parse_string_resources_yaml, e.message ?: "Unknown error"),
+                )
             }
         }
 
-    fun deleteStringResources(
+    suspend fun deleteStringResources(
         project: Project,
         stringResourceIds: List<String>,
     ): EventResult {
@@ -97,7 +113,9 @@ class StringResourceEditorOperator {
         stringResourceIds.forEach { stringResourceId ->
             val resource = project.stringResourceHolder.stringResources.find { it.id == stringResourceId }
             if (resource == null) {
-                result.errorMessages.add("String resource with ID $stringResourceId not found.")
+                result.errorMessages.add(
+                    getString(Res.string.error_string_resource_not_found, stringResourceId),
+                )
             } else {
                 resourcesToDelete.add(resource)
             }
@@ -107,7 +125,9 @@ class StringResourceEditorOperator {
                 project.stringResourceHolder.stringResources.remove(resource)
             } catch (e: Exception) {
                 Logger.e(e) { "Error deleting string resource: ${resource.id}" }
-                result.errorMessages.add("Failed to delete string resource '${resource.key}': ${e.message}")
+                result.errorMessages.add(
+                    getString(Res.string.error_failed_to_delete_string_resource, resource.key, e.message ?: "Unknown error"),
+                )
             }
         }
         return result
@@ -117,7 +137,7 @@ class StringResourceEditorOperator {
         name = "delete_string_resources",
         description = "Removes one or more string resources from the project by their IDs.",
     )
-    fun onDeleteStringResources(
+    suspend fun onDeleteStringResources(
         project: Project,
         @LlmParam(
             description = "The ID(s) of the string resource(s) to be deleted. Can be a single ID string or a list of ID strings.",
@@ -136,11 +156,13 @@ class StringResourceEditorOperator {
         } catch (e: Exception) {
             Logger.e(e) { "Error parsing string resource IDs" }
             EventResult().apply {
-                errorMessages.add("Failed to parse string resource IDs: ${e.message}")
+                errorMessages.add(
+                    getString(Res.string.error_failed_to_parse_string_resource_ids, e.message ?: "Unknown error"),
+                )
             }
         }
 
-    fun updateStringResources(
+    suspend fun updateStringResources(
         project: Project,
         stringResources: List<StringResource>,
     ): EventResult {
@@ -154,7 +176,9 @@ class StringResourceEditorOperator {
                 val existingResourceIndex =
                     project.stringResourceHolder.stringResources.indexOfFirst { it.id == stringResource.id }
                 if (existingResourceIndex == -1) {
-                    result.errorMessages.add("String resource with ID ${stringResource.id} not found.")
+                    result.errorMessages.add(
+                        getString(Res.string.error_string_resource_not_found, stringResource.id),
+                    )
                     return@forEach
                 }
 
@@ -182,7 +206,9 @@ class StringResourceEditorOperator {
                 project.stringResourceHolder.stringResources[existingResourceIndex] = updatedResource
             } catch (e: Exception) {
                 Logger.e(e) { "Error updating string resource: ${stringResource.id}" }
-                result.errorMessages.add("Failed to update string resource '${stringResource.key}': ${e.message}")
+                result.errorMessages.add(
+                    getString(Res.string.error_failed_to_update_string_resource, stringResource.key, e.message ?: "Unknown error"),
+                )
             }
         }
         return result
@@ -192,7 +218,7 @@ class StringResourceEditorOperator {
         name = "update_string_resources",
         description = "Updates one or more existing string resources in the project.",
     )
-    fun onUpdateStringResources(
+    suspend fun onUpdateStringResources(
         project: Project,
         @LlmParam(
             description =
@@ -213,11 +239,13 @@ class StringResourceEditorOperator {
         } catch (e: Exception) {
             Logger.e(e) { "Error parsing string resource YAML" }
             EventResult().apply {
-                errorMessages.add("Failed to parse string resource YAML: ${e.message}")
+                errorMessages.add(
+                    getString(Res.string.error_failed_to_parse_string_resources_yaml, e.message ?: "Unknown error"),
+                )
             }
         }
 
-    fun updateSupportedLocales(
+    suspend fun updateSupportedLocales(
         project: Project,
         newLocales: List<ResourceLocale>,
     ): EventResult {
@@ -268,7 +296,9 @@ class StringResourceEditorOperator {
             project.stringResourceHolder.supportedLocales.addAll(localesWithDefault)
         } catch (e: Exception) {
             Logger.e(e) { "Error replacing supported locales" }
-            result.errorMessages.add("Failed to update supported locales: ${e.message}")
+            result.errorMessages.add(
+                getString(Res.string.error_failed_to_update_supported_locales, e.message ?: "Unknown error"),
+            )
         }
         return result
     }
@@ -277,7 +307,7 @@ class StringResourceEditorOperator {
         name = "update_supported_locales",
         description = "Updates the entire list of supported locales with a new list. The default locale is always preserved.",
     )
-    fun onUpdateSupportedLocales(
+    suspend fun onUpdateSupportedLocales(
         project: Project,
         @LlmParam(description = "YAML representation of the new list of supported locales.")
         localesYaml: String,
@@ -288,11 +318,13 @@ class StringResourceEditorOperator {
         } catch (e: Exception) {
             Logger.e(e) { "Error parsing locales YAML" }
             EventResult().apply {
-                errorMessages.add("Failed to parse locales YAML: ${e.message}")
+                errorMessages.add(
+                    getString(Res.string.error_failed_to_parse_locales_yaml, e.message ?: "Unknown error"),
+                )
             }
         }
 
-    fun setDefaultLocale(
+    suspend fun setDefaultLocale(
         project: Project,
         locale: ResourceLocale,
     ): EventResult {
@@ -313,7 +345,9 @@ class StringResourceEditorOperator {
             }
         } catch (e: Exception) {
             Logger.e(e) { "Error setting default locale" }
-            result.errorMessages.add("Failed to set default locale: ${e.message}")
+            result.errorMessages.add(
+                getString(Res.string.error_failed_to_set_default_locale, e.message ?: "Unknown error"),
+            )
         }
         return result
     }
@@ -322,7 +356,7 @@ class StringResourceEditorOperator {
         name = "set_default_locale",
         description = "Sets the default locale for the project.",
     )
-    fun onSetDefaultLocale(
+    suspend fun onSetDefaultLocale(
         project: Project,
         @LlmParam(description = "The locale code to set as default (e.g., 'en-US', 'fr-FR', 'es-ES').")
         localeCode: String,
@@ -331,9 +365,7 @@ class StringResourceEditorOperator {
         return if (locale == null) {
             EventResult().apply {
                 errorMessages.add(
-                    "Invalid locale code: $localeCode. Use one of the supported locales: ${
-                        ResourceLocale.entries.joinToString(", ") { it.toString() }
-                    }.",
+                    getString(Res.string.error_invalid_locale, localeCode, ResourceLocale.entries.joinToString { it.toString() }),
                 )
             }
         } else {

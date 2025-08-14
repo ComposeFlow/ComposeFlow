@@ -589,4 +589,17 @@ instead of in the canvas.</string>
     <string name="locale_name_uk">Ukrainian</string>
     <string name="locale_name_vi">Vietnamese</string>
     <string name="locale_name_zu">Zulu</string>
+
+    <!-- String Resource Editor Error Messages -->
+    <string name="error_failed_to_add_string_resource">Failed to add string resource '%1$s': %2$s</string>
+    <string name="error_failed_to_parse_string_resources_yaml">Failed to parse string resources YAML: %1$s</string>
+    <string name="error_string_resource_not_found">String resource with ID %1$s not found.</string>
+    <string name="error_failed_to_delete_string_resource">Failed to delete string resource '%1$s': %2$s</string>
+    <string name="error_failed_to_parse_string_resource_ids">Failed to parse string resource IDs: %1$s</string>
+    <string name="error_failed_to_update_string_resource">Failed to update string resource '%1$s': %2$s</string>
+    <string name="error_failed_to_update_supported_locales">Failed to update supported locales: %1$s</string>
+    <string name="error_failed_to_parse_locales_yaml">Failed to parse locales YAML: %1$s</string>
+    <string name="error_failed_to_set_default_locale">Failed to set default locale: %1$s</string>
+    <string name="error_invalid_locale">Invalid locale code: %1$s. Use one of the supported locales: %2$s</string>
+    <string name="error_locale_not_found">Locale %1$s not found.</string>
 </resources>

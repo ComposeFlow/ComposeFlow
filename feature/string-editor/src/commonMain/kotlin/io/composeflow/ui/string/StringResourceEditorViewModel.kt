@@ -32,16 +32,18 @@ class StringResourceEditorViewModel(
         description: String,
         defaultValue: String,
     ) {
-        if (key.isNotBlank() && defaultValue.isNotBlank()) {
-            val newResource =
-                StringResource(
-                    key = key,
-                    description = description.ifBlank { null },
-                    localizedValues = mutableMapOf(project.stringResourceHolder.defaultLocale.value to defaultValue),
-                )
-            val result = stringResourceEditorOperator.addStringResources(project, listOf(newResource))
-            if (result.errorMessages.isEmpty()) {
-                saveProject()
+        viewModelScope.launch {
+            if (key.isNotBlank() && defaultValue.isNotBlank()) {
+                val newResource =
+                    StringResource(
+                        key = key,
+                        description = description.ifBlank { null },
+                        localizedValues = mutableMapOf(project.stringResourceHolder.defaultLocale.value to defaultValue),
+                    )
+                val result = stringResourceEditorOperator.addStringResources(project, listOf(newResource))
+                if (result.errorMessages.isEmpty()) {
+                    saveProject()
+                }
             }
         }
     }
@@ -50,10 +52,12 @@ class StringResourceEditorViewModel(
         resource: StringResource,
         newKey: String,
     ) {
-        val updatedResource = resource.copy(key = newKey)
-        val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
-        if (result.errorMessages.isEmpty()) {
-            saveProject()
+        viewModelScope.launch {
+            val updatedResource = resource.copy(key = newKey)
+            val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
+            if (result.errorMessages.isEmpty()) {
+                saveProject()
+            }
         }
     }
 
@@ -61,10 +65,12 @@ class StringResourceEditorViewModel(
         resource: StringResource,
         newDescription: String,
     ) {
-        val updatedResource = resource.copy(description = newDescription.ifBlank { null })
-        val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
-        if (result.errorMessages.isEmpty()) {
-            saveProject()
+        viewModelScope.launch {
+            val updatedResource = resource.copy(description = newDescription.ifBlank { null })
+            val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
+            if (result.errorMessages.isEmpty()) {
+                saveProject()
+            }
         }
     }
 
@@ -73,39 +79,47 @@ class StringResourceEditorViewModel(
         locale: ResourceLocale,
         value: String,
     ) {
-        val updatedResource =
-            resource.copy(
-                localizedValues =
-                    resource.localizedValues.toMutableStateMapEqualsOverride().apply {
-                        this[locale] = value
-                    },
-            )
-        val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
-        if (result.errorMessages.isEmpty()) {
-            saveProject()
+        viewModelScope.launch {
+            val updatedResource =
+                resource.copy(
+                    localizedValues =
+                        resource.localizedValues.toMutableStateMapEqualsOverride().apply {
+                            this[locale] = value
+                        },
+                )
+            val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
+            if (result.errorMessages.isEmpty()) {
+                saveProject()
+            }
         }
     }
 
     fun onDeleteStringResources(resources: List<StringResource>) {
-        val resourceIds = resources.map { it.id }
-        val result = stringResourceEditorOperator.deleteStringResources(project, resourceIds)
-        if (result.errorMessages.isEmpty()) {
-            selectedResourceIds.removeAll(resourceIds)
-            saveProject()
+        viewModelScope.launch {
+            val resourceIds = resources.map { it.id }
+            val result = stringResourceEditorOperator.deleteStringResources(project, resourceIds)
+            if (result.errorMessages.isEmpty()) {
+                selectedResourceIds.removeAll(resourceIds)
+                saveProject()
+            }
         }
     }
 
     fun onUpdateSupportedLocales(newLocales: List<ResourceLocale>) {
-        val result = stringResourceEditorOperator.updateSupportedLocales(project, newLocales)
-        if (result.errorMessages.isEmpty()) {
-            saveProject()
+        viewModelScope.launch {
+            val result = stringResourceEditorOperator.updateSupportedLocales(project, newLocales)
+            if (result.errorMessages.isEmpty()) {
+                saveProject()
+            }
         }
     }
 
     fun onUpdateDefaultLocale(locale: ResourceLocale) {
-        val result = stringResourceEditorOperator.setDefaultLocale(project, locale)
-        if (result.errorMessages.isEmpty()) {
-            saveProject()
+        viewModelScope.launch {
+            val result = stringResourceEditorOperator.setDefaultLocale(project, locale)
+            if (result.errorMessages.isEmpty()) {
+                saveProject()
+            }
         }
     }
 
