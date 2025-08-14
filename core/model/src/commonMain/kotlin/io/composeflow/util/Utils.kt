@@ -31,3 +31,20 @@ fun String.toKotlinFileName(): String =
     this
         .replace("-", "_")
         .replace(" ", "")
+
+fun String.toComposeResourceName(resourceType: String = "string"): String =
+    this
+        .lowercase()
+        .replace(' ', '_')
+        .replace('-', '_')
+        .replace('.', '_')
+        .filter { it in 'a'..'z' || it.isDigit() || it == '_' }
+        .ifEmpty { "${resourceType}_resource" }
+        .let {
+            if (it[0] !in 'a'..'z') {
+                // Ensure the first character is a lowercase letter
+                "${resourceType}_$it"
+            } else {
+                it
+            }
+        }

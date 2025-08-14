@@ -11,6 +11,7 @@ import io.composeflow.serializer.decodeFromStringWithFallback
 import io.composeflow.serializer.encodeToString
 import io.composeflow.ui.EventResult
 import io.composeflow.util.generateUniqueName
+import io.composeflow.util.toComposeResourceName
 
 // TODO: Wire this class with ToolDispatcher to enable AI to edit string resources.
 //       https://github.com/ComposeFlow/ComposeFlow/issues/34
@@ -37,7 +38,7 @@ class StringResourceEditorOperator {
             try {
                 val newKey =
                     generateUniqueName(
-                        stringResource.key,
+                        stringResource.key.toComposeResourceName(),
                         existingKeys,
                     )
                 val newResource =
