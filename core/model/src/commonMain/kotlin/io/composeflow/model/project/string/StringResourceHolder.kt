@@ -113,6 +113,11 @@ fun StringResourceHolder.copyContents(other: StringResourceHolder) {
     supportedLocales.addAll(other.supportedLocales)
 }
 
+fun StringResourceHolder.stringResourceDefaultValue(stringResourceId: String): String? {
+    val values = stringResources.find { it.id == stringResourceId }?.localizedValues
+    return values?.let { it[defaultLocale.value] ?: it.values.firstOrNull() }
+}
+
 /**
  * Returns true if the StringResourceHolder has multiple locales,
  * indicating that string resources are translatable.

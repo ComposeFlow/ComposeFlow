@@ -62,6 +62,7 @@ import io.composeflow.model.project.findLocalStateOrNull
 import io.composeflow.model.project.findParameterOrNull
 import io.composeflow.model.project.findParameterOrThrow
 import io.composeflow.model.project.firebase.CollectionId
+import io.composeflow.model.project.string.stringResourceDefaultValue
 import io.composeflow.model.state.AppState
 import io.composeflow.model.state.ReadableState
 import io.composeflow.model.state.ScreenState
@@ -379,6 +380,53 @@ sealed interface StringProperty : AssignableProperty {
         override fun valueExpression(project: Project) = "[JsonPath: $jsonPath]"
 
         override fun displayText(project: Project): String = jsonElement.selectString(jsonPath, replaceQuotation = true)
+    }
+
+    @Serializable
+    @SerialName("StringResourceValue")
+    data class StringResourceValue(
+        val stringResourceId: String,
+    ) : AssignablePropertyBase(),
+        StringProperty {
+        override fun valueExpression(project: Project): String =
+            project.stringResourceHolder.stringResourceDefaultValue(stringResourceId).orEmpty()
+
+        override fun generateCodeBlock(
+            project: Project,
+            context: GenerationContext,
+            writeType: ComposeFlowType,
+            dryRun: Boolean,
+        ): CodeBlock {
+            val stringResource = project.stringResourceHolder.stringResources.find { it.id == stringResourceId }
+            return if (stringResource != null && stringResource.key.isNotBlank()) {
+                CodeBlock.of(
+                    "%M(%M.string.%M)",
+                    MemberHolder.JetBrains.stringResource,
+                    MemberHolder.ComposeFlow.Res,
+                    MemberName(
+                        COMPOSEFLOW_PACKAGE,
+                        stringResource.key,
+                    ),
+                )
+            } else {
+                // Return empty string for invalid resources
+                CodeBlock.of("\"\"")
+            }
+        }
+
+        override fun displayText(project: Project): String {
+            val stringResource = project.stringResourceHolder.stringResources.find { it.id == stringResourceId }
+            return if (stringResource != null) {
+                val defaultValue = project.stringResourceHolder.stringResourceDefaultValue(stringResourceId).orEmpty()
+                "Res.string.${stringResource.key}: \"$defaultValue\""
+            } else {
+                INVALID_RESOURCE_TEXT
+            }
+        }
+
+        private companion object {
+            const val INVALID_RESOURCE_TEXT = "[Invalid Resource]"
+        }
     }
 
     @Composable

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ElectricalServices
+import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,7 +36,9 @@ import io.composeflow.ui.LocalOnAnyDialogIsShown
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
+import io.composeflow.ui.propertyeditor.stringresource.SelectStringResourceDialog
 import io.composeflow.ui.propertyeditor.variable.SetFromStateDialog
+import io.composeflow.use_string_resource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -57,7 +60,8 @@ fun AssignableEditableTextPropertyEditor(
     variableAssignable: Boolean = true,
     editable: Boolean = true,
 ) {
-    var dialogOpen by remember { mutableStateOf(false) }
+    var stateDialogOpen by remember { mutableStateOf(false) }
+    var stringResourceDialogOpen by remember { mutableStateOf(false) }
     val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
     val onAllDialogsClosed = LocalOnAllDialogsClosed.current
     val textFieldEnabled =
@@ -79,6 +83,8 @@ fun AssignableEditableTextPropertyEditor(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
+        // TODO Support directly editing the text of the string resource.
+        //      https://github.com/ComposeFlow/ComposeFlow/issues/77
         EditableTextProperty(
             enabled = textFieldEnabled,
             onValidValueChanged = {
@@ -114,24 +120,62 @@ fun AssignableEditableTextPropertyEditor(
             valueSetFromVariable = initialProperty !is IntrinsicProperty<*>,
         )
 
+        // String resource button
+        if (editable && acceptableType is ComposeFlowType.StringType) {
+            val useStringResource = stringResource(Res.string.use_string_resource)
+            Tooltip(useStringResource) {
+                ComposeFlowIconButton(
+                    onClick = {
+                        stringResourceDialogOpen = true
+                    },
+                    modifier = Modifier.padding(bottom = 12.dp),
+                ) {
+                    ComposeFlowIcon(
+                        imageVector = Icons.Outlined.TextFields,
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                        contentDescription = useStringResource,
+                    )
+                }
+            }
+        }
+
+        // State/variable button
         if (editable && variableAssignable) {
             val setFromVariable = stringResource(Res.string.set_from_state)
             Tooltip(setFromVariable) {
                 ComposeFlowIconButton(
                     onClick = {
-                        dialogOpen = true
+                        stateDialogOpen = true
                     },
                     modifier = Modifier.padding(bottom = 12.dp),
                 ) {
                     ComposeFlowIcon(
                         imageVector = Icons.Outlined.ElectricalServices,
                         tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                        contentDescription = stringResource(Res.string.set_from_state),
+                        contentDescription = setFromVariable,
                     )
                 }
             }
         }
-        if (dialogOpen) {
+
+        // String resource dialog
+        if (stringResourceDialogOpen) {
+            onAnyDialogIsShown()
+            SelectStringResourceDialog(
+                project = project,
+                initialProperty = initialProperty,
+                node = node,
+                onCloseClick = {
+                    stringResourceDialogOpen = false
+                    onAllDialogsClosed()
+                },
+                onValidPropertyChanged = onValidPropertyChanged,
+                onInitializeProperty = onInitializeProperty,
+            )
+        }
+
+        // State dialog
+        if (stateDialogOpen) {
             onAnyDialogIsShown()
             SetFromStateDialog(
                 project = project,
@@ -139,7 +183,7 @@ fun AssignableEditableTextPropertyEditor(
                 node = node,
                 acceptableType = acceptableType,
                 onCloseClick = {
-                    dialogOpen = false
+                    stateDialogOpen = false
                     onAllDialogsClosed()
                 },
                 onInitializeProperty = onInitializeProperty,
