@@ -18,7 +18,7 @@
 
  jobs:
    build:
-     runs-on: warp-ubuntu-2204-x64-16x-spot
+     runs-on: warp-ubuntu-2204-x64-16x
      timeout-minutes: 45
      steps:
        - uses: actions/checkout@v2
