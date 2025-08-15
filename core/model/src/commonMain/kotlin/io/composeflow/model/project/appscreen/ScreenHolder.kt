@@ -194,8 +194,7 @@ data class ScreenHolder(
         currentEditable().updateHoveredNode(eventPosition)
     }
 
-    fun getAllComposeNodes(): List<ComposeNode> =
-        screens.flatMap { it.getAllComposeNodes() } + currentEditable().getAllComposeNodes()
+    fun getAllComposeNodes(): List<ComposeNode> = screens.flatMap { it.getAllComposeNodes() } + currentEditable().getAllComposeNodes()
 
     fun clearIsHovered() {
         screens.forEach {
