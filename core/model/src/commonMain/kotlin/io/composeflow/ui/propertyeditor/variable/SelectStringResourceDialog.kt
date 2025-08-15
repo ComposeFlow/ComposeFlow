@@ -40,7 +40,6 @@ import io.composeflow.confirm
 import io.composeflow.initialize
 import io.composeflow.model.parameter.lazylist.LazyListChildParams
 import io.composeflow.model.project.Project
-import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.property.StringProperty
 import io.composeflow.model.property.mergeProperty
@@ -59,10 +58,11 @@ fun SelectStringResourceDialog(
     onInitializeProperty: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
-    val initialPropertyId = initialProperty?.let { (it as? StringProperty.StringResourceValue)?.stringResourceId }
+    val initialResourceId = initialProperty?.let { (it as? StringProperty.StringResourceValue)?.stringResourceId }
     var selectedResourceId by remember {
-        mutableStateOf(initialPropertyId)
+        mutableStateOf(initialResourceId)
     }
+    var selectionChanged by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
 
     PositionCustomizablePopup(
@@ -148,6 +148,7 @@ fun SelectStringResourceDialog(
                                                 } else {
                                                     stringResource.id
                                                 }
+                                            selectionChanged = true
                                         },
                                 colors =
                                     CardDefaults.cardColors(
@@ -257,7 +258,7 @@ fun SelectStringResourceDialog(
                             )
                             onCloseClick()
                         },
-                        enabled = selectedResourceId != initialPropertyId,
+                        enabled = selectionChanged,
                     ) {
                         Text(stringResource(Res.string.confirm))
                     }
