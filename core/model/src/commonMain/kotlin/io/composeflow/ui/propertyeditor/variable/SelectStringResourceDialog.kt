@@ -58,7 +58,7 @@ fun SelectStringResourceDialog(
     onInitializeProperty: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
-    val initialResourceId = initialProperty?.let { (it as? StringProperty.StringResourceValue)?.stringResourceId }
+    val initialResourceId = initialProperty?.let { (it as? StringProperty.ValueFromStringResource)?.stringResourceId }
     var selectedResourceId by remember {
         mutableStateOf(initialResourceId)
     }
@@ -245,7 +245,7 @@ fun SelectStringResourceDialog(
                         onClick = {
                             val newProperty =
                                 selectedResourceId?.let { resourceId ->
-                                    StringProperty.StringResourceValue(
+                                    StringProperty.ValueFromStringResource(
                                         stringResourceId = resourceId,
                                     )
                                 } ?: StringProperty.StringIntrinsicValue()

@@ -62,6 +62,7 @@ import io.composeflow.model.project.findLocalStateOrNull
 import io.composeflow.model.project.findParameterOrNull
 import io.composeflow.model.project.findParameterOrThrow
 import io.composeflow.model.project.firebase.CollectionId
+import io.composeflow.model.project.string.StringResourceId
 import io.composeflow.model.project.string.stringResourceDefaultValue
 import io.composeflow.model.state.AppState
 import io.composeflow.model.state.ReadableState
@@ -383,9 +384,9 @@ sealed interface StringProperty : AssignableProperty {
     }
 
     @Serializable
-    @SerialName("StringResourceValue")
-    data class StringResourceValue(
-        val stringResourceId: String,
+    @SerialName("ValueFromStringResource")
+    data class ValueFromStringResource(
+        val stringResourceId: StringResourceId,
     ) : AssignablePropertyBase(),
         StringProperty {
         override fun valueExpression(project: Project): String =
@@ -409,7 +410,6 @@ sealed interface StringProperty : AssignableProperty {
                     ),
                 )
             } else {
-                // Return empty string for invalid resources
                 CodeBlock.of("\"\"")
             }
         }
@@ -420,12 +420,8 @@ sealed interface StringProperty : AssignableProperty {
                 val defaultValue = project.stringResourceHolder.stringResourceDefaultValue(stringResourceId).orEmpty()
                 "Res.string.${stringResource.key}: \"$defaultValue\""
             } else {
-                INVALID_RESOURCE_TEXT
+                "[Invalid Resource]"
             }
-        }
-
-        private companion object {
-            const val INVALID_RESOURCE_TEXT = "[Invalid Resource]"
         }
     }
 
