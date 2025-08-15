@@ -1,4 +1,4 @@
-package io.composeflow.ui.propertyeditor.stringresource
+package io.composeflow.ui.propertyeditor.variable
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -54,8 +54,6 @@ import org.jetbrains.compose.resources.stringResource
 fun SelectStringResourceDialog(
     project: Project,
     initialProperty: AssignableProperty?,
-    @Suppress("UNUSED_PARAMETER")
-    node: ComposeNode,
     onCloseClick: () -> Unit,
     onValidPropertyChanged: (AssignableProperty, lazyListSource: LazyListChildParams?) -> Unit,
     onInitializeProperty: (() -> Unit)? = null,

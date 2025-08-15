@@ -36,7 +36,7 @@ import io.composeflow.ui.LocalOnAnyDialogIsShown
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
-import io.composeflow.ui.propertyeditor.stringresource.SelectStringResourceDialog
+import io.composeflow.ui.propertyeditor.variable.SelectStringResourceDialog
 import io.composeflow.ui.propertyeditor.variable.SetFromStateDialog
 import io.composeflow.use_string_resource
 import org.jetbrains.compose.resources.stringResource
@@ -164,7 +164,6 @@ fun AssignableEditableTextPropertyEditor(
             SelectStringResourceDialog(
                 project = project,
                 initialProperty = initialProperty,
-                node = node,
                 onCloseClick = {
                     stringResourceDialogOpen = false
                     onAllDialogsClosed()
