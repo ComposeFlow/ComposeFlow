@@ -27,7 +27,6 @@ import androidx.compose.foundation.onClick
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CursorDropdownMenu
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
@@ -46,6 +45,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -1012,6 +1012,12 @@ private fun EditSupportedLocalesDialog(
                                         isSelected -> MaterialTheme.colorScheme.primaryContainer
                                         else -> MaterialTheme.colorScheme.surface
                                     },
+                                contentColor =
+                                    when {
+                                        isDefault -> MaterialTheme.colorScheme.onSurfaceVariant
+                                        isSelected -> MaterialTheme.colorScheme.onPrimaryContainer
+                                        else -> MaterialTheme.colorScheme.onSurface
+                                    },
                                 shape = MaterialTheme.shapes.medium,
                             ) {
                                 Row(
@@ -1024,24 +1030,14 @@ private fun EditSupportedLocalesDialog(
                                     Text(
                                         text = locale.flagEmoji.orEmpty(),
                                         style = MaterialTheme.typography.headlineMedium,
-                                        color =
-                                            if (isDefault) {
-                                                LocalContentColor.current.copy(0.6f)
-                                            } else {
-                                                LocalContentColor.current
-                                            },
+                                        color = LocalContentColor.current.copy(alpha = if (isDefault) 0.6f else 1f),
                                         modifier = Modifier.width(44.dp),
                                     )
                                     Column {
                                         Text(
                                             text = stringResource(locale.displayNameResource),
                                             style = MaterialTheme.typography.bodyLarge,
-                                            color =
-                                                if (isDefault) {
-                                                    LocalContentColor.current.copy(0.6f)
-                                                } else {
-                                                    LocalContentColor.current
-                                                },
+                                            color = LocalContentColor.current.copy(alpha = if (isDefault) 0.6f else 1f),
                                         )
                                         Text(
                                             text = locale.languageCode,
