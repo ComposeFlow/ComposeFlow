@@ -131,8 +131,8 @@ actual object JdkDownloader {
 }
 
 // Extension function for desktop-specific URL building
-private fun DownloadableJdk.getActualDownloadUrl(): String {
-    return when (this) {
+private fun DownloadableJdk.getActualDownloadUrl(): String =
+    when (this) {
         is DownloadableJdk.OpenJdk17 -> {
             val baseUrl =
                 "https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17"
@@ -168,4 +168,3 @@ private fun DownloadableJdk.getActualDownloadUrl(): String {
             }
         }
     }
-}
