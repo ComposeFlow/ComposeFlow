@@ -103,16 +103,18 @@ class AuthRepository {
         init {
             callbackPort = OAuthServerImpl.findAvailablePort(startPort = 8090, endPort = 8110)
             oauthServer = OAuthServerImpl.create()
-            googleOAuth2 = GoogleOAuth2Client(
-                callbackPort = callbackPort,
-                KtorClientFactory.create(),
-            )
+            googleOAuth2 =
+                GoogleOAuth2Client(
+                    callbackPort = callbackPort,
+                    KtorClientFactory.create(),
+                )
 
             oauthServer.start(callbackPort) { token: TokenResponse ->
                 // Use runBlocking to wait for the authentication result
-                val authResult = runBlocking {
-                    googleOAuth2.signInWithGoogleIdToken(token)
-                }
+                val authResult =
+                    runBlocking {
+                        googleOAuth2.signInWithGoogleIdToken(token)
+                    }
 
                 authResult.mapBoth(
                     success = { firebaseIdToken: FirebaseIdToken ->

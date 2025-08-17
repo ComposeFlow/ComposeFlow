@@ -48,13 +48,13 @@ class LlmClient(
         }"""
             Logger.i("Json body: $jsonBody")
 
-
             withContext(dispatcher) {
-                val response = client.post(createProjectUrl) {
-                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    setBody(jsonBody)
-                }
+                val response =
+                    client.post(createProjectUrl) {
+                        header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                        setBody(jsonBody)
+                    }
 
                 run {
                     if (!response.status.isSuccess()) {
@@ -117,13 +117,13 @@ class LlmClient(
 
             Logger.i("Json body: $jsonBody")
 
-
             withContext(dispatcher) {
-                val response = client.post(generateUiUrl) {
-                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    setBody(jsonBody)
-                }
+                val response =
+                    client.post(generateUiUrl) {
+                        header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                        setBody(jsonBody)
+                    }
 
                 run {
                     if (!response.status.isSuccess()) {
@@ -186,13 +186,13 @@ class LlmClient(
 
             Logger.i("invokeHandleGeneralRequest Json body: $jsonBody")
 
-
             withContext(dispatcher) {
-                val response = client.post(handleRequestUrl) {
-                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    setBody(jsonBody)
-                }
+                val response =
+                    client.post(handleRequestUrl) {
+                        header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                        setBody(jsonBody)
+                    }
 
                 run {
                     if (!response.status.isSuccess()) {
@@ -253,13 +253,13 @@ class LlmClient(
             val jsonBody = Json.encodeToString(requestData)
             Logger.i("Translate strings request body: $jsonBody")
 
-
             withContext(dispatcher) {
-                val response = client.post(translateStringsUrl) {
-                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    setBody(jsonBody)
-                }
+                val response =
+                    client.post(translateStringsUrl) {
+                        header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                        setBody(jsonBody)
+                    }
 
                 run {
                     if (!response.status.isSuccess()) {

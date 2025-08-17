@@ -19,35 +19,39 @@ actual class OAuthServer {
     private var server: EmbeddedServer<*, *>? = null
     private val jsonSerializer = Json { ignoreUnknownKeys = true }
 
-    actual fun start(port: Int, onTokenReceived: (TokenResponse) -> String) {
-        server = embeddedServer(CIO, port = port) {
-            routing {
-                get("/callback") {
-                    val res = call.request.queryParameters["res"]
+    actual fun start(
+        port: Int,
+        onTokenReceived: (TokenResponse) -> String,
+    ) {
+        server =
+            embeddedServer(CIO, port = port) {
+                routing {
+                    get("/callback") {
+                        val res = call.request.queryParameters["res"]
 
-                    if (res != null) {
-                        try {
-                            val token = jsonSerializer.decodeFromString<TokenResponse>(res)
-                            val response = onTokenReceived(token)
-                            call.respondText(response, ContentType.Text.Html)
-                        } catch (e: Exception) {
-                            Logger.e("Error processing OAuth callback: ${e.message}", e)
+                        if (res != null) {
+                            try {
+                                val token = jsonSerializer.decodeFromString<TokenResponse>(res)
+                                val response = onTokenReceived(token)
+                                call.respondText(response, ContentType.Text.Html)
+                            } catch (e: Exception) {
+                                Logger.e("Error processing OAuth callback: ${e.message}", e)
+                                call.respondText(
+                                    "Internal server error: ${e.message}",
+                                    ContentType.Text.Html,
+                                    HttpStatusCode.InternalServerError,
+                                )
+                            }
+                        } else {
                             call.respondText(
-                                "Internal server error: ${e.message}",
+                                "Missing 'res' parameter.",
                                 ContentType.Text.Html,
-                                HttpStatusCode.InternalServerError
+                                HttpStatusCode.BadRequest,
                             )
                         }
-                    } else {
-                        call.respondText(
-                            "Missing 'res' parameter.",
-                            ContentType.Text.Html,
-                            HttpStatusCode.BadRequest
-                        )
                     }
                 }
-            }
-        }.start(wait = false)
+            }.start(wait = false)
     }
 
     actual fun stop() {
@@ -56,15 +60,17 @@ actual class OAuthServer {
     }
 
     actual companion object {
-        actual fun isPortAvailable(port: Int): Boolean {
-            return try {
+        actual fun isPortAvailable(port: Int): Boolean =
+            try {
                 ServerSocket(port).use { true }
             } catch (_: IOException) {
                 false
             }
-        }
 
-        actual fun findAvailablePort(startPort: Int, endPort: Int): Int {
+        actual fun findAvailablePort(
+            startPort: Int,
+            endPort: Int,
+        ): Int {
             var port = startPort
             val end = if (startPort > endPort) startPort else endPort
 

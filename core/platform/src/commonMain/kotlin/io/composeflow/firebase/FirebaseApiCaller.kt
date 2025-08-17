@@ -53,15 +53,16 @@ class FirebaseApiCaller(
                 val url =
                     "https://firebase.googleapis.com/v1beta1/projects/$firebaseProjectId/webApps/$appId/config"
 
-                val response = httpClient.get(url) {
-                    headers {
-                        append(
-                            HttpHeaders.Authorization,
-                            "Bearer ${refreshedTokenResponse?.access_token}"
-                        )
-                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                val response =
+                    httpClient.get(url) {
+                        headers {
+                            append(
+                                HttpHeaders.Authorization,
+                                "Bearer ${refreshedTokenResponse?.access_token}",
+                            )
+                            append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        }
                     }
-                }
 
                 if (!response.status.isSuccess()) {
                     val errorBody = response.bodyAsText()
@@ -182,15 +183,16 @@ class FirebaseApiCaller(
 
             val endPoint =
                 "https://identitytoolkit.googleapis.com/admin/v2/projects/${identifier.firebaseProjectId}/config"
-            val response = httpClient.get(endPoint) {
-                headers {
-                    append(
-                        HttpHeaders.Authorization,
-                        "Bearer ${refreshedTokenResponse?.access_token}"
-                    )
-                    append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            val response =
+                httpClient.get(endPoint) {
+                    headers {
+                        append(
+                            HttpHeaders.Authorization,
+                            "Bearer ${refreshedTokenResponse?.access_token}",
+                        )
+                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    }
                 }
-            }
 
             withContext(ioDispatcher) {
                 if (response.status.isSuccess()) {
@@ -213,32 +215,33 @@ class FirebaseApiCaller(
             val refreshedTokenResponse =
                 obtainAccessTokenWithRefreshToken(identifier.googleTokenResponse.refresh_token!!)
 
-            val response = withContext(dispatcher) {
-                if (requestBody !is EmptyRequest) {
-                    val requestBodyString =
-                        jsonSerializer.encodeToString(serializer<Request>(), requestBody)
-                    httpClient.post(endPoint) {
-                        headers {
-                            append(
-                                HttpHeaders.Authorization,
-                                "Bearer ${refreshedTokenResponse?.access_token}"
-                            )
-                            append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+            val response =
+                withContext(dispatcher) {
+                    if (requestBody !is EmptyRequest) {
+                        val requestBodyString =
+                            jsonSerializer.encodeToString(serializer<Request>(), requestBody)
+                        httpClient.post(endPoint) {
+                            headers {
+                                append(
+                                    HttpHeaders.Authorization,
+                                    "Bearer ${refreshedTokenResponse?.access_token}",
+                                )
+                                append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                            }
+                            setBody(requestBodyString)
                         }
-                        setBody(requestBodyString)
-                    }
-                } else {
-                    httpClient.get(endPoint) {
-                        headers {
-                            append(
-                                HttpHeaders.Authorization,
-                                "Bearer ${refreshedTokenResponse?.access_token}"
-                            )
-                            append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    } else {
+                        httpClient.get(endPoint) {
+                            headers {
+                                append(
+                                    HttpHeaders.Authorization,
+                                    "Bearer ${refreshedTokenResponse?.access_token}",
+                                )
+                                append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                            }
                         }
                     }
                 }
-            }
 
             if (!response.status.isSuccess()) {
                 val errorBody = response.bodyAsText()
@@ -265,12 +268,14 @@ class FirebaseApiCaller(
         val url = "${BuildConfig.AUTH_ENDPOINT}/google/token"
 
         return withContext(Dispatchers.Default) {
-            val response = httpClient.submitForm(
-                url = url,
-                formParameters = parameters {
-                    append("refresh_token", refreshToken)
-                }
-            )
+            val response =
+                httpClient.submitForm(
+                    url = url,
+                    formParameters =
+                        parameters {
+                            append("refresh_token", refreshToken)
+                        },
+                )
 
             val responseBody = response.bodyAsText()
             if (!response.status.isSuccess()) {
@@ -295,7 +300,7 @@ class FirebaseApiCaller(
             Float::class,
             Boolean::class,
             Char::class,
-                -> true
+            -> true
 
             else -> false
         }

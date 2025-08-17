@@ -13,13 +13,13 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.headers
+import io.ktor.util.decodeBase64Bytes
 import kotlinx.io.IOException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import io.ktor.util.decodeBase64Bytes
 
 data class GoogleOAuth2Client(
     val callbackPort: Int = 8090,
@@ -29,8 +29,7 @@ data class GoogleOAuth2Client(
     private val firebaseApiKey: String = BuildConfig.FIREBASE_API_KEY
     private val apiAuthEndpoint: String = "${BuildConfig.AUTH_ENDPOINT}/google"
 
-    fun buildAuthUrl(): String =
-        "$apiAuthEndpoint/login?redirectUrl=http://127.0.0.1:$callbackPort/callback"
+    fun buildAuthUrl(): String = "$apiAuthEndpoint/login?redirectUrl=http://127.0.0.1:$callbackPort/callback"
 
     fun buildFirebaseManagementGrantUrl(): String =
         "$apiAuthEndpoint/login?redirectUrl=http://127.0.0.1:$callbackPort/callback&scopeSet=firebase"
@@ -44,12 +43,13 @@ data class GoogleOAuth2Client(
                     refreshToken,
                 ) ?: throw IOException("Failed to obtain access token")
 
-            val requestBody = buildJsonObject {
-                put("postBody", "id_token=${tokenResponse.id_token}&providerId=google.com")
-                put("requestUri", "http://127.0.0.1")
-                put("returnIdpCredential", true)
-                put("returnSecureToken", true)
-            }.toString()
+            val requestBody =
+                buildJsonObject {
+                    put("postBody", "id_token=${tokenResponse.id_token}&providerId=google.com")
+                    put("requestUri", "http://127.0.0.1")
+                    put("returnIdpCredential", true)
+                    put("returnSecureToken", true)
+                }.toString()
 
             val response =
                 httpClient.post("https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=$firebaseApiKey") {
@@ -82,15 +82,16 @@ data class GoogleOAuth2Client(
 
     suspend fun signInWithGoogleIdToken(googleTokenResponse: TokenResponse): Result<FirebaseIdToken, Throwable> =
         runCatching {
-            val requestBody = buildJsonObject {
-                put(
-                    "postBody",
-                    "id_token=${googleTokenResponse.id_token}&providerId=google.com",
-                )
-                put("requestUri", "http://127.0.0.1")
-                put("returnIdpCredential", true)
-                put("returnSecureToken", true)
-            }.toString()
+            val requestBody =
+                buildJsonObject {
+                    put(
+                        "postBody",
+                        "id_token=${googleTokenResponse.id_token}&providerId=google.com",
+                    )
+                    put("requestUri", "http://127.0.0.1")
+                    put("returnIdpCredential", true)
+                    put("returnSecureToken", true)
+                }.toString()
 
             val response =
                 httpClient.post("https://identitytoolkit.googleapis.com/v1/accounts:signInWithIdp?key=$firebaseApiKey") {

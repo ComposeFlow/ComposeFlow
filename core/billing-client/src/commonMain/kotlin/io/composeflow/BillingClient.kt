@@ -58,11 +58,12 @@ class BillingClient(
                         }
                     }
 
-                val response = httpClient.post("$endpoint/createPricingTableLink") {
-                    header(HttpHeaders.Authorization, "Bearer $token")
-                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                    setBody("{}")
-                }
+                val response =
+                    httpClient.post("$endpoint/createPricingTableLink") {
+                        header(HttpHeaders.Authorization, "Bearer $token")
+                        header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        setBody("{}")
+                    }
 
                 val body = response.bodyAsText()
                 val jsonElement = Json.parseToJsonElement(body)

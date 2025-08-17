@@ -10,17 +10,17 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration.Companion.minutes
 
 object KtorClientFactory {
+    private val jsonConfig =
+        Json {
+            ignoreUnknownKeys = true
+            isLenient = true
+            encodeDefaults = true
+            prettyPrint = false
+            coerceInputValues = true
+        }
 
-    private val jsonConfig = Json {
-        ignoreUnknownKeys = true
-        isLenient = true
-        encodeDefaults = true
-        prettyPrint = false
-        coerceInputValues = true
-    }
-
-    fun create(): HttpClient {
-        return HttpClient {
+    fun create(): HttpClient =
+        HttpClient {
             install(ContentNegotiation) {
                 json(jsonConfig)
             }
@@ -28,18 +28,16 @@ object KtorClientFactory {
                 level = LogLevel.INFO
             }
         }
-    }
 
-    fun createWithoutLogging(): HttpClient {
-        return HttpClient {
+    fun createWithoutLogging(): HttpClient =
+        HttpClient {
             install(ContentNegotiation) {
                 json(jsonConfig)
             }
         }
-    }
 
-    fun createWithTimeout(): HttpClient {
-        return HttpClient {
+    fun createWithTimeout(): HttpClient =
+        HttpClient {
             install(ContentNegotiation) {
                 json(jsonConfig)
             }
@@ -52,5 +50,4 @@ object KtorClientFactory {
                 socketTimeoutMillis = 5.minutes.inWholeMilliseconds
             }
         }
-    }
 }
