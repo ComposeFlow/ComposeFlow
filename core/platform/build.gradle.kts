@@ -52,6 +52,9 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.common)
                 implementation(libs.ktor.client.cio)
+                implementation(libs.ktor.server.core)
+                implementation(libs.ktor.server.cio)
+                implementation(libs.ktor.server.content.negotiation)
             }
         }
 

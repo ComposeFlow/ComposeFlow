@@ -94,6 +94,9 @@ datastore-preferences-core = { group = "androidx.datastore", name = "datastore-p
 http4k-core = { group = "org.http4k", name = "http4k-core" }
 http4k-server-netty = { module = "org.http4k:http4k-server-netty" }
 ktor-core = { group = "io.ktor", name = "ktor-client-core", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-server-content-negotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
 ktor-client-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }

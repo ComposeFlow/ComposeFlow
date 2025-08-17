@@ -10,8 +10,9 @@ import io.composeflow.auth.google.GoogleOAuth2Client
 import io.composeflow.auth.google.TokenResponse
 import io.composeflow.di.ServiceLocator
 import io.composeflow.http.KtorClientFactory
-import io.composeflow.logger.logger
+import io.composeflow.platform.Uri
 import io.composeflow.platform.getOrCreateDataStore
+import io.composeflow.platform.toJavaUri
 import io.composeflow.ui.openInBrowser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,20 +21,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import org.http4k.core.Method
-import org.http4k.core.Request
-import org.http4k.core.Response
-import org.http4k.core.Status
-import org.http4k.routing.bind
-import org.http4k.routing.routes
-import org.http4k.server.Netty
-import org.http4k.server.asServer
-import java.io.IOException
-import java.net.ServerSocket
-import java.net.URI
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
+import io.composeflow.auth.OAuthServer as OAuthServerImpl
 
 class AuthRepository {
     @OptIn(ExperimentalTime::class)
@@ -80,11 +71,11 @@ class AuthRepository {
 
     fun startGoogleSignInFlow() {
         // Open the default web browser to the OAuth authorization URL
-        openInBrowser(URI(googleOAuth2.buildAuthUrl()))
+        openInBrowser(Uri(googleOAuth2.buildAuthUrl()).toJavaUri())
     }
 
     fun startFirebaseManagementGrantInFlow() {
-        openInBrowser(URI(googleOAuth2.buildFirebaseManagementGrantUrl()))
+        openInBrowser(Uri(googleOAuth2.buildFirebaseManagementGrantUrl()).toJavaUri())
     }
 
     suspend fun logOut() {
@@ -104,86 +95,42 @@ class AuthRepository {
             }
         private val serializedFirebaseUserInfoKey = stringPreferencesKey("firebase_user_info")
         private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
-        private val callbackPort = findAvailablePort()
-        private val googleOAuth2 =
-            GoogleOAuth2Client(
+        private lateinit var oauthServer: OAuthServerImpl
+        private lateinit var googleOAuth2: GoogleOAuth2Client
+        private var callbackPort: Int = 0
+
+        // Initialize the OAuth callback server
+        init {
+            callbackPort = OAuthServerImpl.findAvailablePort(startPort = 8090, endPort = 8110)
+            oauthServer = OAuthServerImpl.create()
+            googleOAuth2 = GoogleOAuth2Client(
                 callbackPort = callbackPort,
                 KtorClientFactory.create(),
             )
 
-        private fun isPortAvailable(port: Int): Boolean {
-            ServerSocket().use { serverSocket ->
-                return try {
-                    serverSocket.reuseAddress = true
-                    serverSocket.bind(java.net.InetSocketAddress(port))
-                    true
-                } catch (_: IOException) {
-                    false
-                }
-            }
-        }
-
-        private fun findAvailablePort(
-            startPort: Int = 8090,
-            endPort: Int = 8110,
-        ): Int {
-            var port = startPort
-            val end =
-                if (startPort > endPort) {
-                    startPort
-                } else {
-                    endPort
+            oauthServer.start(callbackPort) { token: TokenResponse ->
+                // Use runBlocking to wait for the authentication result
+                val authResult = runBlocking {
+                    googleOAuth2.signInWithGoogleIdToken(token)
                 }
 
-            while (port <= end) {
-                if (isPortAvailable(port)) {
-                    logger.info("port: $port is available for OAuth callback")
-                    return port
-                }
-                logger.info("port: $port isn't available for OAuth callback. Trying different port")
-                port += 1
-            }
-            error("Couldn't find available ports. Shutdown other applications that use :8080")
-        }
-
-        // The local server definition that receives the callback as part of OAuth2 flow.
-        // Defining this as a singleton to avoid duplicate ports are used
-        @Suppress("unused")
-        private val callbackServer =
-            routes(
-                "/callback" bind Method.GET to { request: Request ->
-                    val res = request.query("res")
-
-                    if (res != null) {
-                        val token = jsonSerializer.decodeFromString<TokenResponse>(res)
-
-                        // Use runBlocking to wait for the authentication result
-                        val authResult =
-                            runBlocking {
-                                googleOAuth2.signInWithGoogleIdToken(token)
+                authResult.mapBoth(
+                    success = { firebaseIdToken: FirebaseIdToken ->
+                        // Store the serialized FirebaseIdToken to DataStore
+                        scope.launch {
+                            dataStore.edit { preferences ->
+                                preferences[serializedFirebaseUserInfoKey] =
+                                    jsonSerializer.encodeToString(firebaseIdToken)
                             }
-
-                        authResult.mapBoth(
-                            success = { firebaseIdToken ->
-                                // Store the serialized FirebaseIdToken to DataStore
-                                scope.launch {
-                                    dataStore.edit { preferences ->
-                                        preferences[serializedFirebaseUserInfoKey] =
-                                            jsonSerializer.encodeToString(firebaseIdToken)
-                                    }
-                                }
-                                Response(Status.OK).body("Authorization successful, you can close this window.")
-                            },
-                            failure = { error ->
-                                Logger.e("Sign in failed: ${error.message}", error)
-                                Response(Status.INTERNAL_SERVER_ERROR)
-                                    .body("Internal server error. ${error.message}")
-                            },
-                        )
-                    } else {
-                        Response(Status.BAD_REQUEST).body("Missing 'res' parameter.")
-                    }
-                },
-            ).asServer(Netty(callbackPort)).start()
+                        }
+                        "Authorization successful, you can close this window."
+                    },
+                    failure = { error ->
+                        Logger.e("Sign in failed: ${error.message}", error)
+                        "Internal server error. ${error.message}"
+                    },
+                )
+            }
+        }
     }
 }
