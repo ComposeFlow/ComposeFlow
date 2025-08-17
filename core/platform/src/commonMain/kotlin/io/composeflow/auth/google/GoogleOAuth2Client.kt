@@ -19,7 +19,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import java.util.Base64
+import io.ktor.util.decodeBase64Bytes
 
 data class GoogleOAuth2Client(
     val callbackPort: Int = 8090,
@@ -117,7 +117,9 @@ data class GoogleOAuth2Client(
         val parts = idToken.split(".")
         // The UID is in the second part of the token, which is a base64 encoded JSON
         val payload = parts[1]
-        val decodedBytes = Base64.getUrlDecoder().decode(payload)
-        return String(decodedBytes)
+        // Add padding if needed for URL-safe base64 decoding
+        val paddedPayload = payload + "=".repeat((4 - payload.length % 4) % 4)
+        val decodedBytes = paddedPayload.decodeBase64Bytes()
+        return decodedBytes.decodeToString()
     }
 }

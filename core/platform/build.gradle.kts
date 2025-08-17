@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.ktor.client.negotiation)
             implementation(libs.ktor.kotlinx.json)
             implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.utils)
 
             implementation(libs.google.firebase.admin)
             implementation(libs.commons.compress)

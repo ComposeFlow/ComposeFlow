@@ -104,6 +104,7 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-jsonpath = "io.github.nomisrev:kotlinx-serialization-jsonpath:1.0.0"
 kotlin-result = "com.michael-bull.kotlin-result:kotlin-result:2.0.1"
+ktor-utils = "io.ktor:ktor-utils:3.2.3"
 kaml = "com.charleskorn.kaml:kaml:0.85.0"
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
