@@ -7,16 +7,20 @@ import com.github.michaelbull.result.runCatching
 import io.composeflow.BuildConfig
 import io.composeflow.ai.openrouter.OpenRouterResponseWrapper
 import io.composeflow.ai.openrouter.tools.ToolArgs
+import io.composeflow.http.KtorClientFactory
+import io.ktor.client.HttpClient
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.time.Duration
 
 val jsonSerializer =
     Json {
@@ -24,17 +28,12 @@ val jsonSerializer =
     }
 
 class LlmClient(
-    private val client: OkHttpClient =
-        OkHttpClient
-            .Builder()
-            .callTimeout(Duration.ofMinutes(5))
-            .readTimeout(Duration.ofMinutes(5))
-            .build(),
+    private val client: HttpClient = KtorClientFactory.create(),
 ) {
     suspend fun invokeCreateProject(
         firebaseIdToken: String,
         promptString: String,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
         retryCount: Int = 0,
     ): Result<CreateProjectAiResponse, Throwable> =
         runCatching {
@@ -42,34 +41,30 @@ class LlmClient(
                 Logger.e("Failed to generate response. Tried maximum number of attempts.")
                 throw IllegalStateException("Failed to generate response. Tried maximum number of attempts.")
             }
-            val url =
-                "${BuildConfig.LLM_ENDPOINT}/create_project"
-            val mediaType = "application/json".toMediaType()
+            val createProjectUrl = "${BuildConfig.LLM_ENDPOINT}/create_project"
             val escapedPromptString = Json.encodeToString(promptString)
             val jsonBody = """{
             "userRequest": $escapedPromptString
         }"""
             Logger.i("Json body: $jsonBody")
-            val requestBody = jsonBody.toRequestBody(mediaType)
 
-            val request =
-                Request
-                    .Builder()
-                    .url(url)
-                    .post(requestBody)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer $firebaseIdToken")
-                    .build()
 
             withContext(dispatcher) {
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        val errorBody = response.body.string()
-                        Logger.e("LLM API call failed. Code: ${response.code}, Body: $errorBody. Request: $requestBody")
-                        throw Exception("Unexpected code ${response.code}, $errorBody")
+                val response = client.post(createProjectUrl) {
+                    headers {
+                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                    }
+                    setBody(jsonBody)
+                }
+
+                run {
+                    if (!response.status.isSuccess()) {
+                        val errorBody = response.bodyAsText()
+                        Logger.e("LLM API call failed. Code: ${response.status.value}, Body: $errorBody. Request: $jsonBody")
+                        throw Exception("Unexpected code ${response.status.value}, $errorBody")
                     } else {
-                        val responseBodyString =
-                            response.body.string()
+                        val responseBodyString = response.bodyAsText()
                         try {
                             val aiResponseRawResponse =
                                 jsonSerializer.decodeFromString<OpenRouterResponseWrapper>(
@@ -101,7 +96,7 @@ class LlmClient(
     suspend fun invokeGenerateScreen(
         firebaseIdToken: String,
         promptString: String,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
         retryCount: Int = 0,
         projectContextString: String? = null,
     ): Result<AiResponse, Throwable> =
@@ -110,8 +105,7 @@ class LlmClient(
                 Logger.e("Failed to generate response. Tried maximum number of attempts.")
                 throw IllegalStateException("Failed to generate response. Tried maximum number of attempts.")
             }
-            val url = "${BuildConfig.LLM_ENDPOINT}/generate_ui"
-            val mediaType = "application/json".toMediaType()
+            val generateUiUrl = "${BuildConfig.LLM_ENDPOINT}/generate_ui"
             val escapedPromptString = Json.encodeToString(promptString)
             val jsonBody =
                 projectContextString?.let {
@@ -124,26 +118,24 @@ class LlmClient(
         }"""
 
             Logger.i("Json body: $jsonBody")
-            val requestBody = jsonBody.toRequestBody(mediaType)
 
-            val request =
-                Request
-                    .Builder()
-                    .url(url)
-                    .post(requestBody)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer $firebaseIdToken")
-                    .build()
 
             withContext(dispatcher) {
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        val errorBody = response.body.string()
-                        Logger.e("LLM API call failed. Code: ${response.code}, Body: $errorBody. Request: $requestBody")
-                        throw Exception("Unexpected code ${response.code}, $errorBody")
+                val response = client.post(generateUiUrl) {
+                    headers {
+                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                    }
+                    setBody(jsonBody)
+                }
+
+                run {
+                    if (!response.status.isSuccess()) {
+                        val errorBody = response.bodyAsText()
+                        Logger.e("LLM API call failed. Code: ${response.status.value}, Body: $errorBody. Request: $jsonBody")
+                        throw Exception("Unexpected code ${response.status.value}, $errorBody")
                     } else {
-                        val responseBodyString =
-                            response.body.string()
+                        val responseBodyString = response.bodyAsText()
 
                         // Log the raw response for debugging
                         Logger.i("Raw response body: $responseBodyString")
@@ -181,7 +173,7 @@ class LlmClient(
         promptString: String,
         projectContextString: String,
         previousToolArgs: List<ToolArgs> = emptyList(),
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
         retryCount: Int = 0,
     ): Result<OpenRouterResponseWrapper, Throwable> =
         runCatching {
@@ -189,8 +181,7 @@ class LlmClient(
                 Logger.e("Failed to generate response. Tried maximum number of attempts.")
                 throw IllegalStateException("Failed to generate response. Tried maximum number of attempts.")
             }
-            val url = "${BuildConfig.LLM_ENDPOINT}/handle_request"
-            val mediaType = "application/json".toMediaType()
+            val handleRequestUrl = "${BuildConfig.LLM_ENDPOINT}/handle_request"
             val jsonBody = """{
             "userRequest": ${Json.encodeToString(promptString)},
             "projectContext": ${Json.encodeToString(projectContextString)},
@@ -198,26 +189,24 @@ class LlmClient(
         }"""
 
             Logger.i("invokeHandleGeneralRequest Json body: $jsonBody")
-            val requestBody = jsonBody.toRequestBody(mediaType)
 
-            val request =
-                Request
-                    .Builder()
-                    .url(url)
-                    .post(requestBody)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer $firebaseIdToken")
-                    .build()
 
             withContext(dispatcher) {
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        val errorBody = response.body.string()
-                        Logger.e("LLM API call failed. Code: ${response.code}, Body: $errorBody. Request: $requestBody")
-                        throw Exception("Unexpected code ${response.code}, $errorBody")
+                val response = client.post(handleRequestUrl) {
+                    headers {
+                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                    }
+                    setBody(jsonBody)
+                }
+
+                run {
+                    if (!response.status.isSuccess()) {
+                        val errorBody = response.bodyAsText()
+                        Logger.e("LLM API call failed. Code: ${response.status.value}, Body: $errorBody. Request: $jsonBody")
+                        throw Exception("Unexpected code ${response.status.value}, $errorBody")
                     } else {
-                        val responseBodyString =
-                            response.body.string()
+                        val responseBodyString = response.bodyAsText()
 
                         // Log the raw response for debugging
                         Logger.i("Raw response body: $responseBodyString")
@@ -250,7 +239,7 @@ class LlmClient(
         stringResources: List<TranslateStringResource>,
         defaultLocale: String,
         targetLocales: List<String>,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
         retryCount: Int = 0,
     ): Result<TranslateStringsResponse, Throwable> =
         runCatching {
@@ -258,8 +247,7 @@ class LlmClient(
                 Logger.e("Failed to generate response. Tried maximum number of attempts.")
                 throw IllegalStateException("Failed to generate response. Tried maximum number of attempts.")
             }
-            val url = "${BuildConfig.LLM_ENDPOINT}/translate_strings"
-            val mediaType = "application/json".toMediaType()
+            val translateStringsUrl = "${BuildConfig.LLM_ENDPOINT}/translate_strings"
 
             val requestData =
                 TranslateStringsRequest(
@@ -270,25 +258,24 @@ class LlmClient(
 
             val jsonBody = Json.encodeToString(requestData)
             Logger.i("Translate strings request body: $jsonBody")
-            val requestBody = jsonBody.toRequestBody(mediaType)
 
-            val request =
-                Request
-                    .Builder()
-                    .url(url)
-                    .post(requestBody)
-                    .addHeader("Content-Type", "application/json")
-                    .addHeader("Authorization", "Bearer $firebaseIdToken")
-                    .build()
 
             withContext(dispatcher) {
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        val errorBody = response.body.string()
-                        Logger.e("LLM API call failed. Code: ${response.code}, Body: $errorBody. Request: $requestBody")
-                        throw Exception("Unexpected code ${response.code}, $errorBody")
+                val response = client.post(translateStringsUrl) {
+                    headers {
+                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
+                    }
+                    setBody(jsonBody)
+                }
+
+                run {
+                    if (!response.status.isSuccess()) {
+                        val errorBody = response.bodyAsText()
+                        Logger.e("LLM API call failed. Code: ${response.status.value}, Body: $errorBody. Request: $jsonBody")
+                        throw Exception("Unexpected code ${response.status.value}, $errorBody")
                     } else {
-                        val responseBodyString = response.body.string()
+                        val responseBodyString = response.bodyAsText()
 
                         // Log the raw response for debugging
                         Logger.i("Raw response body: $responseBodyString")
@@ -336,7 +323,7 @@ class LlmClient(
      */
     private fun extractContent(input: String): String {
         // First, try to find content wrapped in `json ... `
-        val jsonRegex = """`json[\s\n]*(.*?)[\s\n]*`""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val jsonRegex = """`json[\s\n]*(.*?)[\s\n]*`""".toRegex(RegexOption.MULTILINE)
         val jsonMatchResult = jsonRegex.find(input)
 
         if (jsonMatchResult != null) {
@@ -344,14 +331,14 @@ class LlmClient(
         }
 
         // 2. Try to match ```json... (without closing ```)
-        val jsonOpenOnlyRegex = """```json[\s\n]*(.*)""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val jsonOpenOnlyRegex = """```json[\s\n]*(.*)""".toRegex(RegexOption.MULTILINE)
         val jsonOpenOnlyMatch = jsonOpenOnlyRegex.find(input)
         if (jsonOpenOnlyMatch != null) {
             return jsonOpenOnlyMatch.groupValues[1].trim()
         }
 
         // 3. Try to match ```...``` (generic)
-        val genericCodeRegex = """```[\s\n]*(.*?)[\s\n]*```""".toRegex(RegexOption.DOT_MATCHES_ALL)
+        val genericCodeRegex = """```[\s\n]*(.*?)[\s\n]*```""".toRegex(RegexOption.MULTILINE)
         val genericCodeMatch = genericCodeRegex.find(input)
         if (genericCodeMatch != null) {
             return genericCodeMatch.groupValues[1].trim()

@@ -6,17 +6,23 @@ import com.github.michaelbull.result.runCatching
 import io.composeflow.BuildConfig
 import io.composeflow.auth.google.TokenResponse
 import io.composeflow.di.ServiceLocator
+import io.composeflow.http.KtorClientFactory
 import io.composeflow.json.jsonSerializer
+import io.ktor.client.request.forms.submitForm
+import io.ktor.client.request.get
+import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.isSuccess
+import io.ktor.http.parameters
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.serializer
-import okhttp3.FormBody
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
 import kotlin.reflect.KClass
 
 @Serializable
@@ -28,10 +34,10 @@ object EmptyRequest
  * (e.g. managing web apps in a Firebase project).
  */
 class FirebaseApiCaller(
-    private val okhttpClient: OkHttpClient = OkHttpClient(),
+    private val httpClient: io.ktor.client.HttpClient = KtorClientFactory.create(),
     private val ioDispatcher: CoroutineDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.IO
+            Dispatchers.Unconfined
         },
 ) {
     suspend fun getWebAppConfig(
@@ -47,26 +53,22 @@ class FirebaseApiCaller(
                 val url =
                     "https://firebase.googleapis.com/v1beta1/projects/$firebaseProjectId/webApps/$appId/config"
 
-                val request =
-                    Request
-                        .Builder()
-                        .url(url)
-                        .addHeader(
-                            "Authorization",
-                            "Bearer ${refreshedTokenResponse?.access_token}",
-                        ).addHeader("Content-Type", "application/json; charset=utf-8")
-                        .get()
-                        .build()
-
-                okhttpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        val errorBody = response.body.string()
-                        Logger.e("Get web Apps failed. Code: ${response.code}, Body: $errorBody")
-                        null
-                    } else {
-                        val responseBody = response.body.string()
-                        responseBody
+                val response = httpClient.get(url) {
+                    headers {
+                        append(
+                            HttpHeaders.Authorization,
+                            "Bearer ${refreshedTokenResponse?.access_token}"
+                        )
+                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                     }
+                }
+
+                if (!response.status.isSuccess()) {
+                    val errorBody = response.bodyAsText()
+                    Logger.e("Get web Apps failed. Code: ${response.status.value}, Body: $errorBody")
+                    null
+                } else {
+                    response.bodyAsText()
                 }
             }
         }
@@ -180,23 +182,23 @@ class FirebaseApiCaller(
 
             val endPoint =
                 "https://identitytoolkit.googleapis.com/admin/v2/projects/${identifier.firebaseProjectId}/config"
-            val requestBuilder =
-                Request
-                    .Builder()
-                    .url(endPoint)
-                    .addHeader("Authorization", "Bearer ${refreshedTokenResponse?.access_token}")
-                    .addHeader("Content-Type", "application/json; charset=utf-8")
+            val response = httpClient.get(endPoint) {
+                headers {
+                    append(
+                        HttpHeaders.Authorization,
+                        "Bearer ${refreshedTokenResponse?.access_token}"
+                    )
+                    append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                }
+            }
 
-            val request = requestBuilder.build()
             withContext(ioDispatcher) {
-                okhttpClient.newCall(request).execute().use { response ->
-                    if (response.isSuccessful) {
-                        true
-                    } else {
-                        val errorBody = response.body.string()
-                        Logger.e("Check identity Platform Enabled failed. Code: ${response.code}, Body: $errorBody")
-                        false
-                    }
+                if (response.status.isSuccess()) {
+                    true
+                } else {
+                    val errorBody = response.bodyAsText()
+                    Logger.e("Check identity Platform Enabled failed. Code: ${response.status.value}, Body: $errorBody")
+                    false
                 }
             }
         }
@@ -205,54 +207,56 @@ class FirebaseApiCaller(
         identifier: FirebaseAppIdentifier,
         requestBody: Request,
         endPoint: String,
-        dispatcher: CoroutineDispatcher = Dispatchers.IO,
+        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
     ): Result<Response?, Throwable> =
         runCatching {
             val refreshedTokenResponse =
                 obtainAccessTokenWithRefreshToken(identifier.googleTokenResponse.refresh_token!!)
 
-            val requestBuilder =
-                okhttp3.Request
-                    .Builder()
-                    .url(endPoint)
-                    .addHeader("Authorization", "Bearer ${refreshedTokenResponse?.access_token}")
-                    .addHeader("Content-Type", "application/json; charset=utf-8")
-            if (requestBody !is EmptyRequest) {
-                val requestBodyString =
-                    jsonSerializer.encodeToString(serializer<Request>(), requestBody)
-                val jsonMediaType = "application/json; charset=utf-8".toMediaType()
-                requestBuilder.post(requestBodyString.toRequestBody(jsonMediaType))
-            }
-
-            val request = requestBuilder.build()
-            withContext(dispatcher) {
-                okhttpClient.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        val errorBody = response.body.string()
-                        Logger.e("API call failed. Code: ${response.code}, Body: $errorBody. Endpoint: $endPoint, Request: $requestBody")
-                        errorBody.let {
-                            val operationResponse =
-                                jsonSerializer.decodeFromString<OperationResponse>(errorBody)
-                            operationResponse.error?.let { error ->
-                                throw Exception("Project ID: \"${identifier.firebaseProjectId}\": ${error.message}")
-                            }
-                        }
-                            ?: throw Exception(
-                                "Project ID: \"${identifier.firebaseProjectId}\": API call failed. $endPoint, body: $requestBody",
+            val response = withContext(dispatcher) {
+                if (requestBody !is EmptyRequest) {
+                    val requestBodyString =
+                        jsonSerializer.encodeToString(serializer<Request>(), requestBody)
+                    httpClient.post(endPoint) {
+                        headers {
+                            append(
+                                HttpHeaders.Authorization,
+                                "Bearer ${refreshedTokenResponse?.access_token}"
                             )
-                    } else {
-                        val responseBody = response.body.string()
-                        responseBody.let {
-                            if (isPrimitiveType(Response::class)) {
-                                responseBody as Response?
-                            } else {
-                                jsonSerializer.decodeFromString(
-                                    serializer<Response>(),
-                                    responseBody,
-                                )
-                            }
+                            append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                        }
+                        setBody(requestBodyString)
+                    }
+                } else {
+                    httpClient.get(endPoint) {
+                        headers {
+                            append(
+                                HttpHeaders.Authorization,
+                                "Bearer ${refreshedTokenResponse?.access_token}"
+                            )
+                            append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                         }
                     }
+                }
+            }
+
+            if (!response.status.isSuccess()) {
+                val errorBody = response.bodyAsText()
+                Logger.e("API call failed. Code: ${response.status.value}, Body: $errorBody. Endpoint: $endPoint, Request: $requestBody")
+                val operationResponse =
+                    jsonSerializer.decodeFromString<OperationResponse>(errorBody)
+                operationResponse.error?.let { error ->
+                    throw Exception("Project ID: \"${identifier.firebaseProjectId}\": ${error.message}")
+                }
+            } else {
+                val responseBody = response.bodyAsText()
+                if (isPrimitiveType(Response::class)) {
+                    responseBody as Response?
+                } else {
+                    jsonSerializer.decodeFromString(
+                        serializer<Response>(),
+                        responseBody,
+                    )
                 }
             }
         }
@@ -260,31 +264,23 @@ class FirebaseApiCaller(
     suspend fun obtainAccessTokenWithRefreshToken(refreshToken: String): TokenResponse? {
         val url = "${BuildConfig.AUTH_ENDPOINT}/google/token"
 
-        val requestBody =
-            FormBody
-                .Builder()
-                .add("refresh_token", refreshToken)
-                .build()
-
-        val request =
-            Request
-                .Builder()
-                .url(url)
-                .post(requestBody)
-                .build()
-
-        return withContext(Dispatchers.IO) {
-            okhttpClient.newCall(request).execute().use { response ->
-                val responseBody = response.body.string()
-                if (!response.isSuccessful) {
-                    Logger.e("Failed to obtain access token. HTTP code: ${response.code}")
-                    Logger.e("Response body: $responseBody")
-                    return@withContext null
+        return withContext(Dispatchers.Unconfined) {
+            val response = httpClient.submitForm(
+                url = url,
+                formParameters = parameters {
+                    append("refresh_token", refreshToken)
                 }
+            )
 
-                val tokenResponse = jsonSerializer.decodeFromString<TokenResponse>(responseBody)
-                tokenResponse
+            val responseBody = response.bodyAsText()
+            if (!response.status.isSuccess()) {
+                Logger.e("Failed to obtain access token. HTTP code: ${response.status.value}")
+                Logger.e("Response body: $responseBody")
+                return@withContext null
             }
+
+            val tokenResponse = jsonSerializer.decodeFromString<TokenResponse>(responseBody)
+            tokenResponse
         }
     }
 
@@ -299,7 +295,7 @@ class FirebaseApiCaller(
             Float::class,
             Boolean::class,
             Char::class,
-            -> true
+                -> true
 
             else -> false
         }

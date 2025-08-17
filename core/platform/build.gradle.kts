@@ -6,6 +6,10 @@ plugins {
 
 kotlin {
     jvm("desktop")
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -16,7 +20,11 @@ kotlin {
 
             api(project.dependencies.platform(libs.google.cloud.bom))
             api(libs.google.cloud.storage)
-            api(libs.okhttp)
+            // Replace OkHttp with Ktor for multiplatform support
+            implementation(libs.ktor.core)
+            implementation(libs.ktor.client.negotiation)
+            implementation(libs.ktor.kotlinx.json)
+            implementation(libs.ktor.client.logging)
 
             implementation(libs.google.firebase.admin)
             implementation(libs.commons.compress)
@@ -42,7 +50,12 @@ kotlin {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
                 implementation(compose.desktop.common)
+                implementation(libs.ktor.client.cio)
             }
+        }
+
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
         }
     }
 }

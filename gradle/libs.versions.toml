@@ -32,6 +32,7 @@ kotlinx-serialization = "1.9.0"
 # Intentionall keeping this version to run format that takes a String
 ktlint = "0.39.0"
 ktor = "3.2.2"
+ktorClientLogging = "3.2.3"
 logback = "1.5.18"
 multiplatform-settings = "1.3.0"
 okhttp = "5.1.0"
@@ -54,6 +55,7 @@ androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", versi
 # com.google
 kotlin-compile-testing = { module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "kotlinCompileTesting" }
 kotlin-compile-testing-ksp = { module = "com.github.tschuchortdev:kotlin-compile-testing-ksp", version.ref = "kotlinCompileTestingKsp" }
+ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktorClientLogging" }
 symbol-processing-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 testparameterinjector = { module = "com.google.testparameterinjector:test-parameter-injector", version.ref = "testparameterinjector" }
 

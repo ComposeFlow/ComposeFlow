@@ -9,6 +9,7 @@ import com.github.michaelbull.result.mapBoth
 import io.composeflow.auth.google.GoogleOAuth2Client
 import io.composeflow.auth.google.TokenResponse
 import io.composeflow.di.ServiceLocator
+import io.composeflow.http.KtorClientFactory
 import io.composeflow.logger.logger
 import io.composeflow.platform.getOrCreateDataStore
 import io.composeflow.ui.openInBrowser
@@ -17,8 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import okhttp3.OkHttpClient
 import org.http4k.core.Method
 import org.http4k.core.Request
 import org.http4k.core.Response
@@ -107,7 +108,7 @@ class AuthRepository {
         private val googleOAuth2 =
             GoogleOAuth2Client(
                 callbackPort = callbackPort,
-                OkHttpClient(),
+                KtorClientFactory.create(),
             )
 
         private fun isPortAvailable(port: Int): Boolean {
@@ -155,26 +156,30 @@ class AuthRepository {
 
                     if (res != null) {
                         val token = jsonSerializer.decodeFromString<TokenResponse>(res)
-                        googleOAuth2
-                            .signInWithGoogleIdToken(token)
-                            .mapBoth(
-                                success = { firebaseIdToken ->
-                                    scope.launch {
-                                        // Store the serialized FirebaseIdToken to DataStore, which is
-                                        // the source of truth of the authorized user
-                                        dataStore.edit { preferences ->
-                                            preferences[serializedFirebaseUserInfoKey] =
-                                                jsonSerializer.encodeToString(firebaseIdToken)
-                                        }
+
+                        // Use runBlocking to wait for the authentication result
+                        val authResult =
+                            runBlocking {
+                                googleOAuth2.signInWithGoogleIdToken(token)
+                            }
+
+                        authResult.mapBoth(
+                            success = { firebaseIdToken ->
+                                // Store the serialized FirebaseIdToken to DataStore
+                                scope.launch {
+                                    dataStore.edit { preferences ->
+                                        preferences[serializedFirebaseUserInfoKey] =
+                                            jsonSerializer.encodeToString(firebaseIdToken)
                                     }
-                                    Response(Status.OK).body("Authorization successful, you can close this window.")
-                                },
-                                failure = {
-                                    Response(
-                                        Status.INTERNAL_SERVER_ERROR,
-                                    ).body("Internal server error. ${it.message} ${it.stackTraceToString()}")
-                                },
-                            )
+                                }
+                                Response(Status.OK).body("Authorization successful, you can close this window.")
+                            },
+                            failure = { error ->
+                                Logger.e("Sign in failed: ${error.message}", error)
+                                Response(Status.INTERNAL_SERVER_ERROR)
+                                    .body("Internal server error. ${error.message}")
+                            },
+                        )
                     } else {
                         Response(Status.BAD_REQUEST).body("Missing 'res' parameter.")
                     }

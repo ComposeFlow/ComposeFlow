@@ -7,10 +7,10 @@ import io.composeflow.platform.getCacheDir
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okhttp3.ResponseBody
+import io.composeflow.http.KtorClientFactory
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.utils.io.*
 import okio.Buffer
 import okio.BufferedSink
 import okio.buffer
@@ -68,7 +68,7 @@ sealed interface DownloadableJdk {
 
 object JdkDownloader {
     // TODO: Maybe replace with DI
-    private val okHttpClient: OkHttpClient = OkHttpClient()
+    private val httpClient = KtorClientFactory.createWithoutLogging()
 
     suspend fun downloadAndExtract(
         downloadableJdk: DownloadableJdk = DownloadableJdk.OpenJdk17,
@@ -121,27 +121,28 @@ object JdkDownloader {
         withContext(dispatcher) {
             val url = downloadableJdk.getDownloadUrl()
 
-            val request: Request = Request.Builder().url(url).build()
-            val response: Response = okHttpClient.newCall(request).execute()
-            val body: ResponseBody = response.body ?: return@withContext
-            val contentLength = body.contentLength()
-            val source = body.source()
+            val response = httpClient.get(url)
+            val channel: ByteReadChannel = response.bodyAsChannel()
+            val contentLength = response.headers["Content-Length"]?.toLongOrNull()
 
             val sink: BufferedSink = destFile.sink().buffer()
             val sinkBuffer: Buffer = sink.buffer
 
             var totalBytesRead: Long = 0
             val bufferSize = 8 * 1024
-            var bytesRead: Long
-            while ((source.read(sinkBuffer, bufferSize.toLong()).also { bytesRead = it }) != -1L) {
+            val buffer = ByteArray(bufferSize)
+
+            while (!channel.isClosedForRead) {
+                val bytesRead = channel.readAvailable(buffer, 0, bufferSize)
+                if (bytesRead == -1) break
+                sinkBuffer.write(buffer, 0, bytesRead)
                 sink.emit()
                 totalBytesRead += bytesRead
-//                val progress = ((totalBytesRead * 100) / contentLength).toInt()
+//                val progress = contentLength?.let { ((totalBytesRead * 100) / it).toInt() }
 //                publishProgress(progress)
             }
             sink.flush()
             sink.close()
-            source.close()
         }
     }
 
