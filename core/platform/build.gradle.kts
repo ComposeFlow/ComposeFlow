@@ -29,18 +29,15 @@ kotlin {
 
             implementation(libs.google.firebase.admin)
             implementation(libs.commons.compress)
-            implementation(libs.datastore.core.okio)
-            implementation(libs.datastore.preferences.core)
             implementation(libs.filekit.compose)
             implementation(libs.kermit)
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.result)
             implementation(libs.kotlinx.atomicfu)
-            implementation(libs.datastore.preferences.core)
             implementation(libs.kotlinx.serialization.json)
         }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(kotlin("test-junit"))
         }
 
@@ -52,6 +49,7 @@ kotlin {
                 implementation(libs.ktor.server.core)
                 implementation(libs.ktor.server.cio)
                 implementation(libs.ktor.server.content.negotiation)
+                implementation(libs.datastore.preferences.core)
             }
         }
 

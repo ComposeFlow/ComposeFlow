@@ -1,5 +1,11 @@
 package io.composeflow.logger
 
-import org.slf4j.LoggerFactory
+expect val logger: Logger
 
-val logger = LoggerFactory.getLogger("slf4j-logger")
+interface Logger {
+    fun debug(message: String)
+    fun info(message: String)
+    fun warn(message: String)
+    fun error(message: String)
+    fun error(message: String, throwable: Throwable)
+}

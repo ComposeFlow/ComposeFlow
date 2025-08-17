@@ -7,7 +7,6 @@ import io.composeflow.http.KtorClientFactory
 import io.composeflow.platform.getCacheDir
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
-import io.ktor.client.utils.EmptyContent.getProperty
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readAvailable
 import kotlinx.coroutines.CoroutineDispatcher
@@ -137,7 +136,7 @@ private fun DownloadableJdk.getActualDownloadUrl(): String =
             val baseUrl =
                 "https://download.java.net/java/GA/jdk17/0d483333a00540d886896bac774ff48b/35/GPL/openjdk-17"
 
-            val osName = getProperty("os.name").lowercase()
+            val osName = System.getProperty("os.name").lowercase()
             val os: String =
                 when {
                     osName.contains("windows") -> "windows"
@@ -146,7 +145,7 @@ private fun DownloadableJdk.getActualDownloadUrl(): String =
                     else -> throw UnsupportedOperationException("Unsupported Operating System: $osName")
                 }
 
-            val osArch = getProperty("os.arch").lowercase()
+            val osArch = System.getProperty("os.arch").lowercase()
             val arch: String =
                 when {
                     osArch in listOf("amd64", "x86_64") -> "x64"

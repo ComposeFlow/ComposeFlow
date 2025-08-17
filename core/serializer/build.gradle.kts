@@ -13,13 +13,13 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(libs.kotlinx.serialization.json)
-            implementation(libs.datastore.core.okio)
-            implementation(libs.datastore.preferences.core)
             implementation(libs.kaml)
             implementation(libs.kotlin.datetime)
+        }
+        jvmMain.dependencies {
             implementation(libs.kotlinx.serialization.jsonpath)
         }
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(kotlin("test-junit"))
         }
         all {
