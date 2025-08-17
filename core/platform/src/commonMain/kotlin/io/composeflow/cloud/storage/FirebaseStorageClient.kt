@@ -17,7 +17,10 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.readRawBytes
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.URLBuilder
+import io.ktor.http.encodeURLPath
 import io.ktor.http.headers
+import io.ktor.http.takeFrom
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
@@ -89,16 +92,18 @@ class FirebaseStorageClient(
             withContext(ioDispatcher) {
                 // TODO: Consider a case when the token expires
                 val token = getAuthToken()
-                val urlString = buildString {
-                    append("https://")
-                    append(host)
-                    append("/")
-                    append(version)
-                    append("/")
-                    append(location.bucketOnlyServerUrl())
-                }
+                val url = URLBuilder().apply {
+                    protocol = io.ktor.http.URLProtocol.HTTPS
+                    host = this@FirebaseStorageClient.host
+                    pathSegments = buildList {
+                        add(version)
+                        add("b")
+                        add(location.bucket)
+                        add("o")
+                    }
+                }.build()
 
-                val response = httpClient.get(urlString) {
+                val response = httpClient.get(url) {
                     parameter("prefix", if (location.isRoot()) "" else location.path)
                     parameter("delimiter", "/")
                     if (pageToken != null) {
@@ -161,9 +166,19 @@ class FirebaseStorageClient(
         val metadata = mutableMapOf<String, String>()
         withContext(ioDispatcher) {
             val token = getAuthToken()
-            val urlString = "https://$host/$version/b/${location.bucket}/o/${location.path}"
+            val url = URLBuilder().apply {
+                protocol = io.ktor.http.URLProtocol.HTTPS
+                host = this@FirebaseStorageClient.host
+                pathSegments = buildList {
+                    add(version)
+                    add("b")
+                    add(location.bucket)
+                    add("o")
+                    add(location.path)
+                }
+            }.build()
 
-            val response = httpClient.get(urlString) {
+            val response = httpClient.get(url) {
                 headers {
                     append(HttpHeaders.Authorization, "Firebase $token")
                     append("X-Firebase-Storage-Version", clientVersion)
@@ -193,9 +208,19 @@ class FirebaseStorageClient(
         var res: BlobInfoWrapper? = null
         withContext(ioDispatcher) {
             val token = getAuthToken()
-            val urlString = "https://$host/$version/b/${location.bucket}/o/${location.path}"
+            val url = URLBuilder().apply {
+                protocol = io.ktor.http.URLProtocol.HTTPS
+                host = this@FirebaseStorageClient.host
+                pathSegments = buildList {
+                    add(version)
+                    add("b")
+                    add(location.bucket)
+                    add("o")
+                    add(location.path)
+                }
+            }.build()
 
-            val response = httpClient.get(urlString) {
+            val response = httpClient.get(url) {
                 parameter("alt", "media")
                 headers {
                     append(HttpHeaders.Authorization, "Firebase $token")
@@ -216,7 +241,7 @@ class FirebaseStorageClient(
                                 ),
                             fileName = location.filename(),
                             folderName = location.folderName(),
-                            mediaLink = urlString,
+                            mediaLink = url.toString(),
                             size = metadata["size"]?.toLong() ?: 0,
                             contentBytes = it,
                             createTime =
@@ -246,7 +271,17 @@ class FirebaseStorageClient(
 
         withContext(ioDispatcher) {
             val token = getAuthToken()
-            val urlString = "https://$host/$version/b/${location.bucket}/o/${location.path}"
+            val url = URLBuilder().apply {
+                protocol = io.ktor.http.URLProtocol.HTTPS
+                host = this@FirebaseStorageClient.host
+                pathSegments = buildList {
+                    add(version)
+                    add("b")
+                    add(location.bucket)
+                    add("o")
+                    add(location.path)
+                }
+            }.build()
 
             val uploadMetadata =
                 UploadMetadata(
@@ -256,7 +291,7 @@ class FirebaseStorageClient(
                 )
 
             val response = httpClient.submitFormWithBinaryData(
-                url = urlString,
+                url = url.toString(),
                 formData = formData {
                     append("metadata", Json.encodeToString(uploadMetadata))
                     append("file", contentByes, Headers.build {
@@ -298,7 +333,7 @@ class FirebaseStorageClient(
                             ),
                         fileName = location.filename(),
                         folderName = location.folderName(),
-                        mediaLink = urlString,
+                        mediaLink = url.toString(),
                         size =
                             jsonElement.jsonObject["size"]
                                 ?.jsonPrimitive
@@ -324,9 +359,19 @@ class FirebaseStorageClient(
     suspend fun delete(location: Location) {
         withContext(ioDispatcher) {
             val token = getAuthToken()
-            val urlString = "https://$host/$version/b/${location.bucket}/o/${location.path}"
+            val url = URLBuilder().apply {
+                protocol = io.ktor.http.URLProtocol.HTTPS
+                host = this@FirebaseStorageClient.host
+                pathSegments = buildList {
+                    add(version)
+                    add("b")
+                    add(location.bucket)
+                    add("o")
+                    add(location.path)
+                }
+            }.build()
 
-            val response = httpClient.delete(urlString) {
+            val response = httpClient.delete(url) {
                 headers {
                     append(HttpHeaders.Authorization, "Firebase $token")
                     append("X-Firebase-Storage-Version", clientVersion)

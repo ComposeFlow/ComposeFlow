@@ -1,6 +1,6 @@
 package io.composeflow.cloud.storage
 
-import org.http4k.urlEncoded
+import io.ktor.http.encodeURLPath
 
 class Location(
     val bucket: String,
@@ -8,7 +8,7 @@ class Location(
 ) {
     fun isRoot(): Boolean = path.isEmpty()
 
-    fun bucketOnlyServerUrl(): String = "b/${bucket.urlEncoded()}/o"
+    fun bucketOnlyServerUrl(): String = "b/${bucket.encodeURLPath()}/o"
 
     fun filename(): String {
         val split = path.split("/")

@@ -56,7 +56,6 @@ tasks {
                     "logback-core",
                     "google-cloud",
                     "gradle-tooling",
-                    "http4k",
                     "material-kolor",
                     "reorderable",
                     "roborazzi",

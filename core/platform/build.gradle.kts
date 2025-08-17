@@ -36,11 +36,8 @@ kotlin {
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.result)
             implementation(libs.kotlinx.atomicfu)
-            implementation(project.dependencies.platform("org.http4k:http4k-bom:5.9.0.0"))
             implementation(libs.datastore.preferences.core)
             implementation(libs.kotlinx.serialization.json)
-            implementation(libs.http4k.core)
-            implementation(libs.http4k.server.netty)
         }
 
         commonTest.dependencies {
