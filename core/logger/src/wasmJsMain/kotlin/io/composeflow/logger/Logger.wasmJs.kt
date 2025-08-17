@@ -20,6 +20,22 @@ private class NoOpLogger : Logger {
     override fun error(message: String, throwable: Throwable) {
         // No-op on WASM
     }
+    
+    override fun debug(message: String, vararg args: Any?) {
+        // No-op on WASM
+    }
+
+    override fun info(message: String, vararg args: Any?) {
+        // No-op on WASM
+    }
+
+    override fun warn(message: String, vararg args: Any?) {
+        // No-op on WASM
+    }
+
+    override fun error(message: String, vararg args: Any?) {
+        // No-op on WASM
+    }
 }
 
 actual val logger: Logger = NoOpLogger()

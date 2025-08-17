@@ -1,6 +1,5 @@
 package io.composeflow.util
 
-import org.jetbrains.annotations.VisibleForTesting
 import kotlin.uuid.Uuid
 
 fun replaceInvalidUuid(yamlContent: String): String {
@@ -16,13 +15,11 @@ fun replaceInvalidUuid(yamlContent: String): String {
     return result
 }
 
-@VisibleForTesting
 internal fun extractIds(yamlContent: String): List<String> {
     val regex = """\s*(?:id|.+?Id):\s*"([^"]+)""".toRegex(RegexOption.MULTILINE)
     return regex.findAll(yamlContent).map { it.groupValues[1] }.toList()
 }
 
-@VisibleForTesting
 internal fun formatToUuid(inputString: String): String {
     try {
         // Attempt to parse the input as a UUID directly. If it's already a valid UUID, just return it.

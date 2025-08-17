@@ -10,6 +10,7 @@ import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import io.composeflow.font.FontFamilyWrapper
 import io.composeflow.font.FontWeightWrapper
+import io.composeflow.font.generateFontFamilyFunSpec
 import io.composeflow.formatter.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.model.enumwrapper.TextStyleWrapper
@@ -54,9 +55,10 @@ data class FontHolder(
 
     fun generateFontFile(): FileSpec {
         val fileBuilder = FileSpec.builder(packageName = "${COMPOSEFLOW_PACKAGE}.common", "Font")
-        fileBuilder.addFunction(primaryFontFamily.generateFontFamilyFunSpec())
+        // TODO: Temporarily casting it as FunSpec for multiplatform compatibility
+        fileBuilder.addFunction(primaryFontFamily.generateFontFamilyFunSpec() as FunSpec)
         if (primaryFontFamily != secondaryFontFamily) {
-            fileBuilder.addFunction(secondaryFontFamily.generateFontFamilyFunSpec())
+            fileBuilder.addFunction(secondaryFontFamily.generateFontFamilyFunSpec() as FunSpec)
         }
 
         val typographyFunSpecBuilder =
