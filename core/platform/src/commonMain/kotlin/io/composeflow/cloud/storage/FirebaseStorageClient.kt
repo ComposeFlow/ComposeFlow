@@ -12,6 +12,7 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.readRawBytes
@@ -45,7 +46,7 @@ class FirebaseStorageClient(
     private val httpClient: HttpClient = KtorClientFactory.create(),
     private val ioDispatcher: CoroutineDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.Unconfined
+            Dispatchers.Default
         },
 ) {
     private suspend fun getAuthToken(): String {
@@ -102,17 +103,17 @@ class FirebaseStorageClient(
                         add("o")
                     }
                 }.build()
-
+                
+                val authHeader = "Firebase $token"
+                
                 val response = httpClient.get(url) {
                     parameter("prefix", if (location.isRoot()) "" else location.path)
                     parameter("delimiter", "/")
                     if (pageToken != null) {
                         parameter("pageToken", pageToken)
                     }
-                    headers {
-                        append(HttpHeaders.Authorization, "Firebase $token")
-                        append("X-Firebase-Storage-Version", clientVersion)
-                    }
+                    header(HttpHeaders.Authorization, authHeader)
+                    header("X-Firebase-Storage-Version", clientVersion)
                 }
 
                 val responseBody = response.bodyAsText()
@@ -179,10 +180,8 @@ class FirebaseStorageClient(
             }.build()
 
             val response = httpClient.get(url) {
-                headers {
-                    append(HttpHeaders.Authorization, "Firebase $token")
-                    append("X-Firebase-Storage-Version", clientVersion)
-                }
+                header(HttpHeaders.Authorization, "Firebase $token")
+                header("X-Firebase-Storage-Version", clientVersion)
             }
 
             val body = response.bodyAsText()
@@ -222,10 +221,8 @@ class FirebaseStorageClient(
 
             val response = httpClient.get(url) {
                 parameter("alt", "media")
-                headers {
-                    append(HttpHeaders.Authorization, "Firebase $token")
-                    append("X-Firebase-Storage-Version", clientVersion)
-                }
+                header(HttpHeaders.Authorization, "Firebase $token")
+                header("X-Firebase-Storage-Version", clientVersion)
             }
 
             if (response.status.value == 200) {
@@ -300,11 +297,9 @@ class FirebaseStorageClient(
                     })
                 }
             ) {
-                headers {
-                    append("X-Goog-Upload-Protocol", "multipart")
-                    append(HttpHeaders.Authorization, "Firebase $token")
-                    append("X-Firebase-Storage-Version", clientVersion)
-                }
+                header("X-Goog-Upload-Protocol", "multipart")
+                header(HttpHeaders.Authorization, "Firebase $token")
+                header("X-Firebase-Storage-Version", clientVersion)
             }
 
             val body = response.bodyAsText()
@@ -372,10 +367,8 @@ class FirebaseStorageClient(
             }.build()
 
             val response = httpClient.delete(url) {
-                headers {
-                    append(HttpHeaders.Authorization, "Firebase $token")
-                    append("X-Firebase-Storage-Version", clientVersion)
-                }
+                header(HttpHeaders.Authorization, "Firebase $token")
+                header("X-Firebase-Storage-Version", clientVersion)
             }
 
             if (response.status.value != 204) {

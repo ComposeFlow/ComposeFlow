@@ -94,7 +94,7 @@ class AuthRepository {
                 serializersModule = firebaseIdTokenModule
             }
         private val serializedFirebaseUserInfoKey = stringPreferencesKey("firebase_user_info")
-        private val scope: CoroutineScope = CoroutineScope(Dispatchers.Unconfined)
+        private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
         private lateinit var oauthServer: OAuthServerImpl
         private lateinit var googleOAuth2: GoogleOAuth2Client
         private var callbackPort: Int = 0

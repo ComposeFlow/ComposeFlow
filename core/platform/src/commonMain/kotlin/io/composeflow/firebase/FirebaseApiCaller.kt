@@ -37,7 +37,7 @@ class FirebaseApiCaller(
     private val httpClient: io.ktor.client.HttpClient = KtorClientFactory.create(),
     private val ioDispatcher: CoroutineDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.Unconfined
+            Dispatchers.Default
         },
 ) {
     suspend fun getWebAppConfig(
@@ -207,7 +207,7 @@ class FirebaseApiCaller(
         identifier: FirebaseAppIdentifier,
         requestBody: Request,
         endPoint: String,
-        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
     ): Result<Response?, Throwable> =
         runCatching {
             val refreshedTokenResponse =
@@ -264,7 +264,7 @@ class FirebaseApiCaller(
     suspend fun obtainAccessTokenWithRefreshToken(refreshToken: String): TokenResponse? {
         val url = "${BuildConfig.AUTH_ENDPOINT}/google/token"
 
-        return withContext(Dispatchers.Unconfined) {
+        return withContext(Dispatchers.Default) {
             val response = httpClient.submitForm(
                 url = url,
                 formParameters = parameters {

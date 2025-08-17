@@ -33,7 +33,7 @@ class LlmClient(
     suspend fun invokeCreateProject(
         firebaseIdToken: String,
         promptString: String,
-        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
         retryCount: Int = 0,
     ): Result<CreateProjectAiResponse, Throwable> =
         runCatching {
@@ -96,7 +96,7 @@ class LlmClient(
     suspend fun invokeGenerateScreen(
         firebaseIdToken: String,
         promptString: String,
-        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
         retryCount: Int = 0,
         projectContextString: String? = null,
     ): Result<AiResponse, Throwable> =
@@ -173,7 +173,7 @@ class LlmClient(
         promptString: String,
         projectContextString: String,
         previousToolArgs: List<ToolArgs> = emptyList(),
-        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
         retryCount: Int = 0,
     ): Result<OpenRouterResponseWrapper, Throwable> =
         runCatching {
@@ -239,7 +239,7 @@ class LlmClient(
         stringResources: List<TranslateStringResource>,
         defaultLocale: String,
         targetLocales: List<String>,
-        dispatcher: CoroutineDispatcher = Dispatchers.Unconfined,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default,
         retryCount: Int = 0,
     ): Result<TranslateStringsResponse, Throwable> =
         runCatching {
