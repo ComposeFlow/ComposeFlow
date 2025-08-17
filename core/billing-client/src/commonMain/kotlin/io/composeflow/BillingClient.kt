@@ -7,12 +7,12 @@ import io.composeflow.auth.AuthRepository
 import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.di.ServiceLocator
 import io.composeflow.http.KtorClientFactory
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.headers
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.last
@@ -27,7 +27,7 @@ class BillingClient(
     private val httpClient: io.ktor.client.HttpClient = KtorClientFactory.create(),
     private val ioDispatcher: CoroutineDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.IO
+            Dispatchers.Default
         },
     private val endpoint: String = BuildConfig.BILLING_ENDPOINT,
 ) {
@@ -59,10 +59,8 @@ class BillingClient(
                     }
 
                 val response = httpClient.post("$endpoint/createPricingTableLink") {
-                    headers {
-                        append(HttpHeaders.Authorization, "Bearer $token")
-                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                    }
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                     setBody("{}")
                 }
 

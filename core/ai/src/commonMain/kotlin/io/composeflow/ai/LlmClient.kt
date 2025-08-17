@@ -9,7 +9,7 @@ import io.composeflow.ai.openrouter.OpenRouterResponseWrapper
 import io.composeflow.ai.openrouter.tools.ToolArgs
 import io.composeflow.http.KtorClientFactory
 import io.ktor.client.HttpClient
-import io.ktor.client.request.headers
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -28,7 +28,7 @@ val jsonSerializer =
     }
 
 class LlmClient(
-    private val client: HttpClient = KtorClientFactory.create(),
+    private val client: HttpClient = KtorClientFactory.createWithTimeout(),
 ) {
     suspend fun invokeCreateProject(
         firebaseIdToken: String,
@@ -51,10 +51,8 @@ class LlmClient(
 
             withContext(dispatcher) {
                 val response = client.post(createProjectUrl) {
-                    headers {
-                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    }
+                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
                     setBody(jsonBody)
                 }
 
@@ -122,10 +120,8 @@ class LlmClient(
 
             withContext(dispatcher) {
                 val response = client.post(generateUiUrl) {
-                    headers {
-                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    }
+                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
                     setBody(jsonBody)
                 }
 
@@ -193,10 +189,8 @@ class LlmClient(
 
             withContext(dispatcher) {
                 val response = client.post(handleRequestUrl) {
-                    headers {
-                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    }
+                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
                     setBody(jsonBody)
                 }
 
@@ -262,10 +256,8 @@ class LlmClient(
 
             withContext(dispatcher) {
                 val response = client.post(translateStringsUrl) {
-                    headers {
-                        append(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-                        append(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
-                    }
+                    header(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    header(HttpHeaders.Authorization, "Bearer $firebaseIdToken")
                     setBody(jsonBody)
                 }
 
