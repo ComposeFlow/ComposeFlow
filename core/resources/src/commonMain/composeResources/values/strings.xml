@@ -518,6 +518,7 @@ instead of in the canvas.</string>
     <!-- String Resource Editor -->
     <string name="action_add">Add</string>
     <string name="add_new_string_resource">Add New String Resource</string>
+    <string name="add_new_string_resource_for_i18n">Add new string resource for internationalization</string>
     <string name="add_string_resource">+ Add String Resource</string>
     <string name="default_locale_label"> (default)</string>
     <string name="delete_string_resource_confirmation">Are you sure you want to delete the string resource "%1$s"?</string>

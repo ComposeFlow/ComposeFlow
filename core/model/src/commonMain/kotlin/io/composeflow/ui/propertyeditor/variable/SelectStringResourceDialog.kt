@@ -41,7 +41,7 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
-import io.composeflow.add_new_string_resource
+import io.composeflow.add_new_string_resource_for_i18n
 import io.composeflow.cancel
 import io.composeflow.confirm
 import io.composeflow.initialize
@@ -318,7 +318,7 @@ private fun AddNewStringResourceCard(
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = stringResource(Res.string.add_new_string_resource),
+                    text = stringResource(Res.string.add_new_string_resource_for_i18n),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
