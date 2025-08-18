@@ -5,10 +5,10 @@ import io.composeflow.cloud.storage.GoogleCloudStorageWrapper
 import io.composeflow.di.ServiceLocator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.time.delay
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import java.time.Duration
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.ExperimentalTime
 
 object CloudProjectSaverRunner {
@@ -16,7 +16,7 @@ object CloudProjectSaverRunner {
     var projectId: String? = null
     private val ioDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.IO
+            Dispatchers.Default
         }
 
     private val cloudProjectSaver =
@@ -30,7 +30,7 @@ object CloudProjectSaverRunner {
         withContext(ioDispatcher) {
             while (isActive) {
                 syncProjectYaml()
-                delay(Duration.ofMinutes(3))
+                delay(3.minutes)
             }
         }
     }

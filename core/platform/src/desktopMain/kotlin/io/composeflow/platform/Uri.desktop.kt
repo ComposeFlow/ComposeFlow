@@ -7,3 +7,8 @@ actual class Uri actual constructor(
 
     actual override fun toString(): String = uri
 }
+
+/**
+ * Desktop-specific extension to convert to Java URI
+ */
+fun Uri.toJavaUri(): java.net.URI = java.net.URI(this.uri)

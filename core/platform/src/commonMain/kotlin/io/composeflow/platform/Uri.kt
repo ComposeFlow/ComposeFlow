@@ -11,4 +11,3 @@ expect class Uri(
     override fun toString(): String
 }
 
-fun Uri.toJavaUri(): java.net.URI = java.net.URI(this.uri)

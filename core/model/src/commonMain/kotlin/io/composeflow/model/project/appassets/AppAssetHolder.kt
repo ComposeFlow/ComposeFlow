@@ -168,5 +168,8 @@ data class AppAssetHolder(
 }
 
 fun AppAssetHolder.copyContents(other: AppAssetHolder) {
-    splashScreenInfoHolder.copyContents(other.splashScreenInfoHolder)
+    // Defensive copying to handle potential serialization-related initialization issues
+    if (this.splashScreenInfoHolder != null && other.splashScreenInfoHolder != null) {
+        this.splashScreenInfoHolder.copyContents(other.splashScreenInfoHolder)
+    }
 }
