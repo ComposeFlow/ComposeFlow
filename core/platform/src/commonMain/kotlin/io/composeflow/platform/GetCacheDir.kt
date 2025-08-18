@@ -1,15 +1,23 @@
 package io.composeflow.platform
 
 import io.composeflow.cloud.storage.BlobInfoWrapper
-import java.io.File
 
-expect fun getCacheDir(): File
+expect class PlatformFile {
+    fun resolve(path: String): PlatformFile
+    fun mkdirs(): Boolean
+    fun exists(): Boolean
+    fun deleteRecursively(): Boolean
+    fun listFiles(): List<PlatformFile>?
+    val name: String
+}
+
+expect fun getCacheDir(): PlatformFile
 
 fun getAssetCacheFileFor(
     userId: String,
     projectId: String,
     blobInfoWrapper: BlobInfoWrapper,
-): File {
+): PlatformFile {
     val asset =
         getCacheDir()
             .resolve("projects")

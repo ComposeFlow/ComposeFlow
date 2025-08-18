@@ -2,11 +2,10 @@ package io.composeflow.cloud.storage
 
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
-import java.time.OffsetDateTime
 import kotlin.time.Instant
 
 @OptIn(kotlin.time.ExperimentalTime::class)
-fun OffsetDateTime.toKotlinxInstant(): Instant = Instant.fromEpochSeconds(this.toEpochSecond(), this.nano.toLong())
+expect fun Any.toKotlinxInstant(): Instant
 
 @OptIn(kotlin.time.ExperimentalTime::class)
 fun Instant.asDateString(timeZone: TimeZone? = null): String {

@@ -71,11 +71,11 @@ actual class AuthRepository {
 
     actual fun startGoogleSignInFlow() {
         // Open the default web browser to the OAuth authorization URL
-        openInBrowser(Uri(googleOAuth2.buildAuthUrl()).toJavaUri())
+        openInBrowser(googleOAuth2.buildAuthUrl())
     }
 
     actual fun startFirebaseManagementGrantInFlow() {
-        openInBrowser(Uri(googleOAuth2.buildFirebaseManagementGrantUrl()).toJavaUri())
+        openInBrowser(googleOAuth2.buildFirebaseManagementGrantUrl())
     }
 
     actual suspend fun logOut() {
