@@ -20,11 +20,17 @@ private const val UNZIP_TOTAL_MAX_SIZE: Long = 1024L * 1024L * 1024L * 5L // 5Gi
 private const val UNZIP_BUFFER_SIZE: Int = 1024 * 1024 // 1MiB
 
 actual class ZipWrapper {
-    actual fun unzip(sourceFile: PlatformFile, destDirectory: PlatformFile) {
+    actual fun unzip(
+        sourceFile: PlatformFile,
+        destDirectory: PlatformFile,
+    ) {
         sourceFile.toFile().inputStream().unzip(destDirectory.toFile().toPath())
     }
-    
-    actual fun zipDirectory(input: PlatformFile, output: PlatformFile) {
+
+    actual fun zipDirectory(
+        input: PlatformFile,
+        output: PlatformFile,
+    ) {
         zipDirectory(input.toFile(), output.toFile())
     }
 }

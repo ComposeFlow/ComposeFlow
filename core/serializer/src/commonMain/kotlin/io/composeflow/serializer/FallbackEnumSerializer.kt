@@ -1,9 +1,6 @@
 package io.composeflow.serializer
 
-import co.touchlab.kermit.Logger
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.descriptors.PrimitiveKind.STRING
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -13,7 +10,12 @@ expect class FallbackEnumSerializerInternal<T : Enum<T>>(
     enumClass: KClass<T>,
 ) : KSerializer<T> {
     override val descriptor: SerialDescriptor
-    override fun serialize(encoder: Encoder, value: T)
+
+    override fun serialize(
+        encoder: Encoder,
+        value: T,
+    )
+
     override fun deserialize(decoder: Decoder): T
 }
 

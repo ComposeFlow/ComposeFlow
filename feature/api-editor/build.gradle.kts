@@ -6,7 +6,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    jvm("desktop")
+    jvm()
 
     sourceSets {
         commonMain.dependencies {
@@ -44,7 +44,7 @@ kotlin {
             implementation(libs.jewel.int.ui.standalone)
         }
 
-        named("desktopMain") {
+        named("jvmMain") {
             dependencies {
                 implementation(compose.desktop.common)
             }

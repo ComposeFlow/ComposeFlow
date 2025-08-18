@@ -2,15 +2,23 @@ package io.composeflow.platform
 
 import java.io.File
 
-actual class PlatformFile(private val file: File) {
+actual class PlatformFile(
+    private val file: File,
+) {
     actual fun resolve(path: String): PlatformFile = PlatformFile(file.resolve(path))
+
     actual fun mkdirs(): Boolean = file.mkdirs()
+
     actual fun exists(): Boolean = file.exists()
+
     actual fun deleteRecursively(): Boolean = file.deleteRecursively()
+
     actual fun listFiles(): List<PlatformFile>? = file.listFiles()?.map { PlatformFile(it) }
+
     actual val name: String get() = file.name
-    
+
     fun toFile(): File = file
+
     fun toPath() = file.toPath()
 }
 
@@ -36,9 +44,11 @@ internal val currentOperatingSystem: OperatingSystem
     }
 
 actual fun getCacheDir(): PlatformFile =
-    PlatformFile(when (currentOperatingSystem) {
-        OperatingSystem.Windows -> File(System.getenv("AppData"), "compose_flow/cache")
-        OperatingSystem.Linux -> File(System.getProperty("user.home"), ".cache/compose_flow")
-        OperatingSystem.MacOS -> File(System.getProperty("user.home"), "Library/Caches/compose_flow")
-        else -> throw IllegalStateException("Unsupported operating system")
-    })
+    PlatformFile(
+        when (currentOperatingSystem) {
+            OperatingSystem.Windows -> File(System.getenv("AppData"), "compose_flow/cache")
+            OperatingSystem.Linux -> File(System.getProperty("user.home"), ".cache/compose_flow")
+            OperatingSystem.MacOS -> File(System.getProperty("user.home"), "Library/Caches/compose_flow")
+            else -> throw IllegalStateException("Unsupported operating system")
+        },
+    )

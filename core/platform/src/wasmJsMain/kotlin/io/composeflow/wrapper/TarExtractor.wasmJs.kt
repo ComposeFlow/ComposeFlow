@@ -6,7 +6,5 @@ actual class TarExtractor {
     actual fun extractTarGz(
         tarGzFile: PlatformFile,
         destinationDirectory: PlatformFile,
-    ) {
-        throw UnsupportedOperationException("Tar extraction not available on WASM")
-    }
+    ): Unit = throw UnsupportedOperationException("Tar extraction not available on WASM")
 }

@@ -1,19 +1,12 @@
 package io.composeflow.ui.utils
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import io.composeflow.cloud.storage.BlobInfoWrapper
-import io.composeflow.platform.getAssetCacheFileFor
 
 @Composable
 expect fun BlobInfoWrapper.asIconComposable(

@@ -2,13 +2,11 @@
 
 package io.composeflow.repository
 
-import io.composeflow.datastore.PlatformDataStore
 import com.github.michaelbull.result.Result
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
 import com.github.michaelbull.result.runCatching
 import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.datastore.LocalFirstProjectSaver
+import io.composeflow.datastore.PlatformDataStore
 import io.composeflow.datastore.ProjectSaver
 import io.composeflow.di.ServiceLocator
 import io.composeflow.model.project.Project
@@ -19,7 +17,8 @@ import io.composeflow.serializer.encodeToString
 import io.composeflow.util.toKotlinFileName
 import io.composeflow.util.toPackageName
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 
 class ProjectRepository(
     private val firebaseIdToken: FirebaseIdToken,
@@ -27,19 +26,19 @@ class ProjectRepository(
     private val dataStore: PlatformDataStore = ServiceLocator.getOrPut { getOrCreateDataStore() },
 ) {
     private val editingProjectKey = "editing_project"
-    
-    // Internal state flow for reactive behavior
-    private val _editingProjectFlow = MutableStateFlow<Project?>(null)
 
-    val editingProject: Flow<Project> = _editingProjectFlow.filterNotNull()
-    
+    // Internal state flow for reactive behavior
+    private val editingProjectFlow = MutableStateFlow<Project?>(null)
+
+    val editingProject: Flow<Project> = editingProjectFlow.filterNotNull()
+
     private suspend fun loadEditingProject(): Project {
         val projectJson = dataStore.getString(editingProjectKey)
         val project = projectJson?.let { decodeFromStringWithFallback<Project>(it) } ?: Project()
-        _editingProjectFlow.value = project
+        editingProjectFlow.value = project
         return project
     }
-    
+
     init {
         // Load editing project on initialization
         kotlinx.coroutines.runBlocking {
@@ -99,7 +98,7 @@ class ProjectRepository(
         // Save the project to DataStore, too so that Flow
         dataStore.putString(editingProjectKey, encodeToString(project))
         // Update cached project
-        _editingProjectFlow.value = project
+        editingProjectFlow.value = project
     }
 
     suspend fun loadProjectIdList(): List<String> = projectSaver.loadProjectIdList(userId = firebaseIdToken.user_id)

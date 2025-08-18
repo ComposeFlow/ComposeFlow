@@ -32,33 +32,34 @@ class SettingsRepository(
     private val showBordersKey = "show_borders"
     private val versionAskedToUpdateKey = "version_asked_to_update"
     private val onboardingCompletedKey = "onboarding_completed"
-    
-    // Internal state flows for reactive behavior
-    private val _settingsFlow = MutableStateFlow<ComposeBuilderSettings?>(null)
-    private val _hasShownOnboardingFlow = MutableStateFlow<Boolean?>(null)
 
-    val settings: Flow<ComposeBuilderSettings> = _settingsFlow.filterNotNull()
-    
+    // Internal state flows for reactive behavior
+    private val settingsFlow = MutableStateFlow<ComposeBuilderSettings?>(null)
+    private val hasShownOnboardingFlow = MutableStateFlow<Boolean?>(null)
+
+    val settings: Flow<ComposeBuilderSettings> = settingsFlow.filterNotNull()
+
     private suspend fun loadSettings(): ComposeBuilderSettings {
         val composeBuilderTheme = dataStore.getInt(darkThemeKey) ?: DarkThemeSetting.Dark.ordinal
         val appTheme = dataStore.getInt(appDarkThemeKey) ?: DarkThemeSetting.System.ordinal
         val showBorders = dataStore.getBoolean(showBordersKey) ?: false
         val javaHomeJson = dataStore.getString(javaHomeKey)
         val versionAskedToUpdate = dataStore.getString(versionAskedToUpdateKey)
-        
-        val javaHome = javaHomeJson?.let {
-            jsonSerializer.decodeFromString<PathSetting>(it)
-        } ?: javaHomePathFromEnvVar
-        
+
+        val javaHome =
+            javaHomeJson?.let {
+                jsonSerializer.decodeFromString<PathSetting>(it)
+            } ?: javaHomePathFromEnvVar
+
         return ComposeBuilderSettings(
             composeBuilderDarkThemeSetting = DarkThemeSetting.fromOrdinal(composeBuilderTheme),
             appDarkThemeSetting = DarkThemeSetting.fromOrdinal(appTheme),
             showBordersInCanvas = showBorders,
             javaHome = javaHome,
             versionAskedToUpdate = versionAskedToUpdate,
-        ).also { _settingsFlow.value = it }
+        ).also { settingsFlow.value = it }
     }
-    
+
     init {
         // Load settings on initialization
         scope.launch {
@@ -116,11 +117,11 @@ class SettingsRepository(
         }
     }
 
-    val hasShownOnboarding: Flow<Boolean> = _hasShownOnboardingFlow.filterNotNull()
-    
+    val hasShownOnboarding: Flow<Boolean> = hasShownOnboardingFlow.filterNotNull()
+
     private suspend fun loadOnboardingStatus(): Boolean {
         val status = dataStore.getBoolean(onboardingCompletedKey) ?: false
-        _hasShownOnboardingFlow.value = status
+        hasShownOnboardingFlow.value = status
         return status
     }
 

@@ -63,7 +63,8 @@ actual class GoogleCloudStorageWrapper {
             return@runCatching res.toList()
         }
 
-    actual suspend fun downloadAsset(blobInfoWrapper: BlobInfoWrapper): Result<BlobInfoWrapper?, Throwable> = getFile(blobInfoWrapper.blobId.name)
+    actual suspend fun downloadAsset(blobInfoWrapper: BlobInfoWrapper): Result<BlobInfoWrapper?, Throwable> =
+        getFile(blobInfoWrapper.blobId.name)
 
     actual suspend fun getFile(fullPath: String): Result<BlobInfoWrapper, Throwable> =
         runCatching {

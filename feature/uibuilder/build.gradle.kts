@@ -8,7 +8,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    jvm("desktop")
+    jvm()
 
     sourceSets {
         commonMain.dependencies {
@@ -55,7 +55,7 @@ kotlin {
 
         // Configure KSP for LLM tools
         dependencies {
-            add("kspDesktop", project(":ksp-llm-tools"))
+            add("kspJvm", project(":ksp-llm-tools"))
         }
 
         // Configure KSP options
@@ -63,7 +63,7 @@ kotlin {
             // Set output directory for LLM tool JSON files
             arg("llmToolsOutputDir", "${project.buildDir}/generated/llm-tools")
         }
-        named("desktopMain") {
+        named("jvmMain") {
             dependencies {
                 implementation(compose.desktop.common)
             }

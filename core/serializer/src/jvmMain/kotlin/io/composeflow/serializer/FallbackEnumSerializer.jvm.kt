@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package io.composeflow.serializer
 
 import co.touchlab.kermit.Logger

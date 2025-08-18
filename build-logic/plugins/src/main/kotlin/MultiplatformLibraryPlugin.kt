@@ -18,6 +18,17 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
 
             val kotlinMultiplatformExtension = extensions.getByType<KotlinMultiplatformExtension>()
             with(kotlinMultiplatformExtension) {
+                // Add compiler flag to suppress expect/actual classes warning
+                targets.all {
+                    compilations.all {
+                        compileTaskProvider.configure {
+                            compilerOptions {
+                                freeCompilerArgs.add("-Xexpect-actual-classes")
+                            }
+                        }
+                    }
+                }
+                
                 with(sourceSets) {
                     getByName("commonMain").apply {
                         dependencies {

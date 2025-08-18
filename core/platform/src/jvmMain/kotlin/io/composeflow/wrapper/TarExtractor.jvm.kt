@@ -16,7 +16,7 @@ actual class TarExtractor {
     ) {
         val tarFile = tarGzFile.toFile()
         val destFile = destinationDirectory.toFile()
-        
+
         File(tarFile.absolutePath).inputStream().use { fileInputStream ->
             GzipCompressorInputStream(fileInputStream).use { gzipInputStream ->
                 TarArchiveInputStream(gzipInputStream).use { tarInputStream ->

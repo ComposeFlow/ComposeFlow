@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import io.composeflow.CurrentOs
 import io.composeflow.currentOs
 import io.composeflow.http.KtorClientFactory
+import io.composeflow.platform.PlatformFile
 import io.composeflow.platform.getCacheDir
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsChannel
@@ -17,8 +18,6 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import java.io.File
-import io.composeflow.platform.PlatformFile
-import kotlin.io.path.inputStream
 
 actual object JdkDownloader {
     // TODO: Maybe replace with DI

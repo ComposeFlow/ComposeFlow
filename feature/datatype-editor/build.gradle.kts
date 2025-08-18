@@ -7,7 +7,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    jvm("desktop")
+    jvm()
 
     sourceSets {
         commonMain.dependencies {
@@ -32,7 +32,7 @@ kotlin {
 
         // Configure KSP for LLM tools
         dependencies {
-            add("kspDesktop", project(":ksp-llm-tools"))
+            add("kspJvm", project(":ksp-llm-tools"))
         }
 
         // Configure KSP options

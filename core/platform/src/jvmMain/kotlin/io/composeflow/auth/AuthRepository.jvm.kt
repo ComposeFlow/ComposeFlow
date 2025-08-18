@@ -10,9 +10,7 @@ import io.composeflow.auth.google.GoogleOAuth2Client
 import io.composeflow.auth.google.TokenResponse
 import io.composeflow.di.ServiceLocator
 import io.composeflow.http.KtorClientFactory
-import io.composeflow.platform.Uri
 import io.composeflow.platform.getOrCreateActualDataStore
-import io.composeflow.platform.toJavaUri
 import io.composeflow.ui.openInBrowser
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

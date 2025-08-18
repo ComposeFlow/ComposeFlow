@@ -4,10 +4,15 @@ import io.composeflow.cloud.storage.BlobInfoWrapper
 
 expect class PlatformFile {
     fun resolve(path: String): PlatformFile
+
     fun mkdirs(): Boolean
+
     fun exists(): Boolean
+
     fun deleteRecursively(): Boolean
+
     fun listFiles(): List<PlatformFile>?
+
     val name: String
 }
 

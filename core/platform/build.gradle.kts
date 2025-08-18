@@ -5,7 +5,7 @@ plugins {
 }
 
 kotlin {
-    jvm("desktop")
+    jvm()
     @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         browser()
@@ -41,7 +41,7 @@ kotlin {
             implementation(kotlin("test-junit"))
         }
 
-        named("desktopMain") {
+        named("jvmMain") {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
                 implementation(compose.desktop.common)

@@ -1,3 +1,5 @@
+@file:Suppress("ktlint:standard:filename")
+
 package io.composeflow.serializer
 
 import co.touchlab.kermit.Logger
@@ -32,7 +34,7 @@ actual class FallbackEnumSerializerInternal<T : Enum<T>> actual constructor(
     actual override fun deserialize(decoder: Decoder): T {
         val stringValue = decoder.decodeString().trim()
         Logger.w("FallbackEnumSerializerInternal.deserialize called on WASM - enum deserialization not fully supported")
-        
+
         // On WASM, we can't easily access enum constants without reflection
         // This is a limitation that would need to be handled differently
         throw UnsupportedOperationException("Enum deserialization not supported on WASM target")

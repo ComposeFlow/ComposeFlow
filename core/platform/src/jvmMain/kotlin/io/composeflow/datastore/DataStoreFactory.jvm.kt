@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import okio.Path.Companion.toPath
 
-actual object Factory {
+actual object DataStoreFactory {
     private lateinit var dataStore: DataStore<Preferences>
 
     private val lock = SynchronizedObject()
@@ -26,7 +26,7 @@ actual object Factory {
      */
     actual fun getOrCreateDataStore(producePath: () -> String): PlatformDataStore =
         synchronized(lock) {
-            if (Factory::dataStore.isInitialized) {
+            if (DataStoreFactory::dataStore.isInitialized) {
                 DataStoreWrapper(dataStore)
             } else {
                 PreferenceDataStoreFactory
@@ -40,14 +40,14 @@ actual object Factory {
                     .let { DataStoreWrapper(it) }
             }
         }
-    
+
     /**
      * Gets the underlying DataStore instance for desktop-specific usage.
      * This ensures we don't create multiple DataStore instances for the same file.
      */
     internal fun getOrCreateActualDataStore(producePath: () -> String): DataStore<Preferences> =
         synchronized(lock) {
-            if (Factory::dataStore.isInitialized) {
+            if (DataStoreFactory::dataStore.isInitialized) {
                 dataStore
             } else {
                 PreferenceDataStoreFactory
@@ -62,64 +62,85 @@ actual object Factory {
         }
 }
 
-private class DataStoreWrapper(private val dataStore: DataStore<Preferences>) : PlatformDataStore {
-    override suspend fun putString(key: String, value: String) {
+private class DataStoreWrapper(
+    private val dataStore: DataStore<Preferences>,
+) : PlatformDataStore {
+    override suspend fun putString(
+        key: String,
+        value: String,
+    ) {
         dataStore.updateData { preferences ->
-            preferences.toMutablePreferences().apply {
-                set(stringPreferencesKey(key), value)
-            }.toPreferences()
+            preferences
+                .toMutablePreferences()
+                .apply {
+                    set(stringPreferencesKey(key), value)
+                }.toPreferences()
         }
     }
 
-    override suspend fun getString(key: String): String? {
-        return dataStore.data.map { preferences ->
-            preferences[stringPreferencesKey(key)]
-        }.first()
-    }
+    override suspend fun getString(key: String): String? =
+        dataStore.data
+            .map { preferences ->
+                preferences[stringPreferencesKey(key)]
+            }.first()
 
-    override suspend fun putBoolean(key: String, value: Boolean) {
+    override suspend fun putBoolean(
+        key: String,
+        value: Boolean,
+    ) {
         dataStore.updateData { preferences ->
-            preferences.toMutablePreferences().apply {
-                set(booleanPreferencesKey(key), value)
-            }.toPreferences()
+            preferences
+                .toMutablePreferences()
+                .apply {
+                    set(booleanPreferencesKey(key), value)
+                }.toPreferences()
         }
     }
 
-    override suspend fun getBoolean(key: String): Boolean? {
-        return dataStore.data.map { preferences ->
-            preferences[booleanPreferencesKey(key)]
-        }.first()
-    }
+    override suspend fun getBoolean(key: String): Boolean? =
+        dataStore.data
+            .map { preferences ->
+                preferences[booleanPreferencesKey(key)]
+            }.first()
 
-    override suspend fun putInt(key: String, value: Int) {
+    override suspend fun putInt(
+        key: String,
+        value: Int,
+    ) {
         dataStore.updateData { preferences ->
-            preferences.toMutablePreferences().apply {
-                set(intPreferencesKey(key), value)
-            }.toPreferences()
+            preferences
+                .toMutablePreferences()
+                .apply {
+                    set(intPreferencesKey(key), value)
+                }.toPreferences()
         }
     }
 
-    override suspend fun getInt(key: String): Int? {
-        return dataStore.data.map { preferences ->
-            preferences[intPreferencesKey(key)]
-        }.first()
-    }
+    override suspend fun getInt(key: String): Int? =
+        dataStore.data
+            .map { preferences ->
+                preferences[intPreferencesKey(key)]
+            }.first()
 
     override suspend fun remove(key: String) {
         dataStore.updateData { preferences ->
-            preferences.toMutablePreferences().apply {
-                remove(stringPreferencesKey(key))
-                remove(booleanPreferencesKey(key))
-                remove(intPreferencesKey(key))
-            }.toPreferences()
+            preferences
+                .toMutablePreferences()
+                .apply {
+                    remove(stringPreferencesKey(key))
+                    remove(booleanPreferencesKey(key))
+                    remove(intPreferencesKey(key))
+                }.toPreferences()
         }
     }
 
     override suspend fun clear() {
-        dataStore.updateData { preferences -> 
-            preferences.toMutablePreferences().apply {
-                clear()
-            }.toPreferences()
+        dataStore.updateData { preferences ->
+            preferences
+                .toMutablePreferences()
+                .apply {
+                    clear()
+                }.toPreferences()
         }
     }
 }

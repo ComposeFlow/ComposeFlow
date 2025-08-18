@@ -496,7 +496,7 @@ class LlmRepository(
             is ToolArgs.ListDataTypesArgs,
             is ToolArgs.ListCustomEnumsArgs,
             is ToolArgs.ListScreensArgs,
-                -> {
+            -> {
                 // These have minimal content but potentially large results
                 estimatedSize += 50
             }

@@ -231,12 +231,12 @@ private fun FirebaseProjectIdEditor(
                                 (
                                     firebaseProjectIdInEdit.isNotEmpty() &&
                                         firebaseProjectIdInEdit != firebaseAppInfo.firebaseProjectId
-                                    ) ||
+                                ) ||
                                     (
                                         firebaseProjectIdInEdit.isNotEmpty() &&
                                             firebaseAppInfo.getConnectedStatus() == FirebaseConnectedStatus.PartiallyConnected
-                                        )
-                                ),
+                                    )
+                            ),
                 ) {
                     Row {
                         ComposeFlowIcon(
@@ -472,10 +472,8 @@ private fun FirebaseAuthContent(
             TextButton(
                 onClick = {
                     openInBrowser(
-
                         "${FIREBASE_CONSOLE_URL}project/${firebaseAppInfo.firebaseProjectId}/authentication",
-
-                        )
+                    )
                 },
                 modifier = Modifier.hoverIconClickable(),
             ) {
