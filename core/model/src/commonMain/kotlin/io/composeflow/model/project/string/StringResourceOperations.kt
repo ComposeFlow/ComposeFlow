@@ -1,11 +1,11 @@
 package io.composeflow.model.project.string
 
+import androidx.annotation.VisibleForTesting
 import io.composeflow.override.toMutableStateMapEqualsOverride
 import io.composeflow.util.generateUniqueName
 import io.composeflow.util.toComposeResourceName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.jetbrains.annotations.VisibleForTesting
 
 // Extension functions for StringResourceHolder that provide business logic operations
 // for managing string resources.
