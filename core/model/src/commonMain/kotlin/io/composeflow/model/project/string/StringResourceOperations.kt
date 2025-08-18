@@ -108,6 +108,24 @@ sealed interface DeleteStringResourceError {
 }
 
 /**
+ * Updates the default locale value of a string resource.
+ * @param resourceId ID of the string resource to update
+ * @param newDefaultLocaleValue New value for the default locale
+ * @return List of errors that occurred during the operation
+ */
+fun StringResourceHolder.updateStringResourceDefaultLocaleValue(
+    resourceId: String,
+    newDefaultLocaleValue: String,
+): List<UpdateStringResourceError> {
+    val update =
+        StringResourceUpdate(
+            id = resourceId,
+            localizedValuesToSet = mapOf(this.defaultLocale.value to newDefaultLocaleValue),
+        )
+    return this.updateStringResources(listOf(update))
+}
+
+/**
  * Updates existing string resources.
  * @param updates List of string resource updates to apply
  * @return List of errors that occurred during the operation

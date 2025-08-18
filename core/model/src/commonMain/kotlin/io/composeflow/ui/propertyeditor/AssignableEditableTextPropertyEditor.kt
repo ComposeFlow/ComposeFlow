@@ -19,6 +19,7 @@ import io.composeflow.editor.validator.ValidateResult
 import io.composeflow.model.parameter.lazylist.LazyListChildParams
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
+import io.composeflow.model.project.string.updateStringResourceDefaultLocaleValue
 import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.property.FloatProperty
 import io.composeflow.model.property.FunctionScopeParameterProperty
@@ -64,8 +65,9 @@ fun AssignableEditableTextPropertyEditor(
     var stringResourceDialogOpen by remember { mutableStateOf(false) }
     val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
     val onAllDialogsClosed = LocalOnAllDialogsClosed.current
-    val textFieldEnabled =
-        editable && (initialProperty is IntrinsicProperty<*> || initialProperty == null)
+    val propertyValueEditable =
+        initialProperty is IntrinsicProperty<*> || initialProperty is StringProperty.ValueFromStringResource
+    val textFieldEnabled = editable && (propertyValueEditable || initialProperty == null)
 
     val resolvedLeadingIcon =
         if (leadingIcon != null) {
@@ -83,8 +85,6 @@ fun AssignableEditableTextPropertyEditor(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
     ) {
-        // TODO Support directly editing the text of the string resource.
-        //      https://github.com/ComposeFlow/ComposeFlow/issues/77
         EditableTextProperty(
             enabled = textFieldEnabled,
             onValidValueChanged = {

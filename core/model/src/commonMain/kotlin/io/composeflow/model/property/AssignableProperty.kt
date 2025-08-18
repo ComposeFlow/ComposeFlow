@@ -64,6 +64,8 @@ import io.composeflow.model.project.findParameterOrThrow
 import io.composeflow.model.project.firebase.CollectionId
 import io.composeflow.model.project.string.StringResourceId
 import io.composeflow.model.project.string.stringResourceDefaultValue
+import io.composeflow.model.project.string.updateStringResourceDefaultLocaleValue
+import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.state.AppState
 import io.composeflow.model.state.ReadableState
 import io.composeflow.model.state.ScreenState
@@ -279,6 +281,14 @@ fun AssignableProperty?.mergeProperty(
     ) {
         newProperty.propertyTransformers.addAll(this.propertyTransformers)
         newProperty
+    } else if (this is StringProperty.ValueFromStringResource &&
+        newProperty is StringProperty.StringIntrinsicValue
+    ) {
+        project.stringResourceHolder.updateStringResourceDefaultLocaleValue(
+            resourceId = stringResourceId,
+            newDefaultLocaleValue = newProperty.value,
+        )
+        this
     } else {
         newProperty
     }
@@ -414,15 +424,11 @@ sealed interface StringProperty : AssignableProperty {
             }
         }
 
-        override fun displayText(project: Project): String {
-            val stringResource = project.stringResourceHolder.stringResources.find { it.id == stringResourceId }
-            return if (stringResource != null) {
-                val defaultValue = project.stringResourceHolder.stringResourceDefaultValue(stringResourceId).orEmpty()
-                "Res.string.${stringResource.key}: \"$defaultValue\""
-            } else {
-                "[Invalid Resource]"
-            }
-        }
+        override fun displayText(project: Project): String =
+            project.stringResourceHolder.stringResourceDefaultValue(stringResourceId).orEmpty()
+
+        override fun isDependent(sourceId: String): Boolean =
+            stringResourceId == sourceId || super<AssignablePropertyBase>.isDependent(sourceId)
     }
 
     @Composable
