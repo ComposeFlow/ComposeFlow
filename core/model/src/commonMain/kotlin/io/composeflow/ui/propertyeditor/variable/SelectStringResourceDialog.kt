@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -28,18 +32,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
+import io.composeflow.add_new_string_resource
 import io.composeflow.cancel
 import io.composeflow.confirm
 import io.composeflow.initialize
 import io.composeflow.model.parameter.lazylist.LazyListChildParams
 import io.composeflow.model.project.Project
+import io.composeflow.model.project.string.StringResource
+import io.composeflow.model.project.string.addStringResources
 import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.property.StringProperty
 import io.composeflow.model.property.mergeProperty
@@ -58,6 +67,7 @@ fun SelectStringResourceDialog(
     onInitializeProperty: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
+    val initialStringValue = (initialProperty as? StringProperty.StringIntrinsicValue)?.value?.takeIf { it.isNotEmpty() }
     val initialResourceId = initialProperty?.let { (it as? StringProperty.ValueFromStringResource)?.stringResourceId }
     var selectedResourceId by remember {
         mutableStateOf(initialResourceId)
@@ -111,7 +121,7 @@ fun SelectStringResourceDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // String resources list
-                if (project.stringResourceHolder.stringResources.isNotEmpty()) {
+                if (project.stringResourceHolder.stringResources.isNotEmpty() || initialStringValue != null) {
                     val filteredResources =
                         if (searchQuery.isBlank()) {
                             project.stringResourceHolder.stringResources
@@ -130,67 +140,61 @@ fun SelectStringResourceDialog(
                                 .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
+                        if (initialStringValue != null && searchQuery.isBlank()) {
+                            item {
+                                val interactionSource = remember { MutableInteractionSource() }
+                                val isHovered by interactionSource.collectIsHoveredAsState()
+
+                                AddNewStringResourceCard(
+                                    initialStringValue = initialStringValue,
+                                    isHovered = isHovered,
+                                    onClick = {
+                                        val newResource =
+                                            StringResource(
+                                                key = "", // Infer key from the initial string value
+                                                localizedValues =
+                                                    mutableMapOf(
+                                                        project.stringResourceHolder.defaultLocale.value to
+                                                            initialStringValue,
+                                                    ),
+                                            )
+                                        val errors = project.stringResourceHolder.addStringResources(listOf(newResource))
+                                        if (errors.isEmpty()) {
+                                            onValidPropertyChanged(
+                                                initialProperty.mergeProperty(
+                                                    project = project,
+                                                    newProperty =
+                                                        StringProperty.ValueFromStringResource(
+                                                            stringResourceId = newResource.id,
+                                                        ),
+                                                ),
+                                                null,
+                                            )
+                                            onCloseClick()
+                                        }
+                                    },
+                                    modifier = Modifier.hoverable(interactionSource = interactionSource, enabled = true),
+                                )
+                            }
+                        }
+
                         items(filteredResources) { stringResource ->
                             val defaultValue = stringResource.localizedValues[project.stringResourceHolder.defaultLocale.value].orEmpty()
                             val isSelected = selectedResourceId == stringResource.id
                             val interactionSource = remember { MutableInteractionSource() }
                             val isHovered by interactionSource.collectIsHoveredAsState()
 
-                            Card(
-                                modifier =
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .hoverable(interactionSource = interactionSource, enabled = true)
-                                        .clickable {
-                                            selectedResourceId =
-                                                if (isSelected) {
-                                                    null
-                                                } else {
-                                                    stringResource.id
-                                                }
-                                            selectionChanged = true
-                                        },
-                                colors =
-                                    CardDefaults.cardColors(
-                                        containerColor =
-                                            when {
-                                                isSelected -> MaterialTheme.colorScheme.primaryContainer
-                                                isHovered -> MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
-                                                else -> MaterialTheme.colorScheme.surface
-                                            },
-                                    ),
-                                border =
-                                    when {
-                                        isSelected -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
-                                        else -> null
-                                    },
-                            ) {
-                                Column(
-                                    modifier = Modifier.padding(12.dp),
-                                ) {
-                                    Text(
-                                        text = defaultValue,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color =
-                                            if (isSelected) {
-                                                MaterialTheme.colorScheme.onPrimaryContainer
-                                            } else {
-                                                MaterialTheme.colorScheme.onSurface
-                                            },
-                                    )
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                    Text(
-                                        text = stringResource.key,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color =
-                                            if (isSelected) {
-                                                MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                                            } else {
-                                                MaterialTheme.colorScheme.onSurfaceVariant
-                                            },
-                                    )
-                                }
-                            }
+                            StringResourceCard(
+                                stringResource = stringResource,
+                                defaultValue = defaultValue,
+                                isSelected = isSelected,
+                                isHovered = isHovered,
+                                onClick = {
+                                    selectedResourceId = if (isSelected) null else stringResource.id
+                                    selectionChanged = true
+                                },
+                                modifier = Modifier.hoverable(interactionSource = interactionSource, enabled = true),
+                            )
                         }
                     }
                 } else {
@@ -198,7 +202,7 @@ fun SelectStringResourceDialog(
                         text = stringResource(Res.string.no_string_resources_available),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        modifier = Modifier.weight(1f).padding(vertical = 8.dp),
                     )
                 }
 
@@ -264,6 +268,119 @@ fun SelectStringResourceDialog(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun AddNewStringResourceCard(
+    initialStringValue: String,
+    isHovered: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    when {
+                        isHovered -> MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                        else -> MaterialTheme.colorScheme.surface
+                    },
+            ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(0.5f)),
+    ) {
+        Row(
+            modifier = Modifier.padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.dp),
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(
+                modifier = Modifier.weight(1f),
+            ) {
+                Text(
+                    text = initialStringValue,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(Res.string.add_new_string_resource),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun StringResourceCard(
+    stringResource: StringResource,
+    defaultValue: String,
+    isSelected: Boolean,
+    isHovered: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable { onClick() },
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    when {
+                        isSelected -> MaterialTheme.colorScheme.primaryContainer
+                        isHovered -> MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                        else -> MaterialTheme.colorScheme.surface
+                    },
+            ),
+        border =
+            when {
+                isSelected -> BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
+                else -> null
+            },
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+        ) {
+            Text(
+                text = defaultValue,
+                style = MaterialTheme.typography.bodyMedium,
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.onSurface
+                    },
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = stringResource.key,
+                style = MaterialTheme.typography.bodySmall,
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+            )
         }
     }
 }

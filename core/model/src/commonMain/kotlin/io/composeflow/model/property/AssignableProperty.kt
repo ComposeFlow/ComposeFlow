@@ -65,7 +65,6 @@ import io.composeflow.model.project.firebase.CollectionId
 import io.composeflow.model.project.string.StringResourceId
 import io.composeflow.model.project.string.stringResourceDefaultValue
 import io.composeflow.model.project.string.updateStringResourceDefaultLocaleValue
-import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.state.AppState
 import io.composeflow.model.state.ReadableState
 import io.composeflow.model.state.ScreenState
