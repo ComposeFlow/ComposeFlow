@@ -31,8 +31,7 @@ private class WasmDataStore : PlatformDataStore {
 
     override suspend fun getString(key: String): String? = storage[key] as? String
 
-    override fun observeString(key: String): Flow<String?> =
-        storageFlow.map { it[key] as? String }
+    override fun observeString(key: String): Flow<String?> = storageFlow.map { it[key] as? String }
 
     override suspend fun putBoolean(
         key: String,

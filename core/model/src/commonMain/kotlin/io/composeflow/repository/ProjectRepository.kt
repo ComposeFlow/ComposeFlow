@@ -26,12 +26,14 @@ class ProjectRepository(
 ) {
     private val editingProjectKey = "editing_project"
 
-    val editingProject: Flow<Project> = dataStore.observeString(editingProjectKey)
-        .map { projectJson ->
-            projectJson?.let { 
-                decodeFromStringWithFallback<Project>(it) 
-            } ?: Project()
-        }
+    val editingProject: Flow<Project> =
+        dataStore
+            .observeString(editingProjectKey)
+            .map { projectJson ->
+                projectJson?.let {
+                    decodeFromStringWithFallback<Project>(it)
+                } ?: Project()
+            }
 
     suspend fun createProject(
         projectName: String,
