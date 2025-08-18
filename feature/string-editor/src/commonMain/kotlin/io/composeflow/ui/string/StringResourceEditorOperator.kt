@@ -15,14 +15,21 @@ import io.composeflow.error_string_resource_not_found
 import io.composeflow.ksp.LlmParam
 import io.composeflow.ksp.LlmTool
 import io.composeflow.model.project.Project
+import io.composeflow.model.project.string.AddStringResourceError
+import io.composeflow.model.project.string.DeleteStringResourceError
 import io.composeflow.model.project.string.ResourceLocale
+import io.composeflow.model.project.string.SetDefaultLocaleError
 import io.composeflow.model.project.string.StringResource
-import io.composeflow.model.project.string.isTranslatable
+import io.composeflow.model.project.string.UpdateStringResourceError
+import io.composeflow.model.project.string.UpdateSupportedLocalesError
+import io.composeflow.model.project.string.addStringResources
+import io.composeflow.model.project.string.deleteStringResources
+import io.composeflow.model.project.string.setDefaultLocale
+import io.composeflow.model.project.string.updateStringResources
+import io.composeflow.model.project.string.updateSupportedLocales
 import io.composeflow.serializer.decodeFromStringWithFallback
 import io.composeflow.serializer.encodeToString
 import io.composeflow.ui.EventResult
-import io.composeflow.util.generateUniqueName
-import io.composeflow.util.toComposeResourceName
 import org.jetbrains.compose.resources.getString
 
 // TODO: Wire this class with ToolDispatcher to enable AI to edit string resources.
@@ -39,33 +46,15 @@ class StringResourceEditorOperator {
         stringResources: List<StringResource>,
     ): EventResult {
         val result = EventResult()
-        if (stringResources.isEmpty()) {
-            return result
-        }
-        val existingKeys =
-            project.stringResourceHolder.stringResources
-                .map { it.key }
-                .toMutableSet()
-        stringResources.forEach { stringResource ->
-            try {
-                val newKey =
-                    generateUniqueName(
-                        stringResource.key.toComposeResourceName(),
-                        existingKeys,
-                    )
-                val newResource =
-                    stringResource.copy(
-                        key = newKey,
-                        needsTranslationUpdate = project.stringResourceHolder.isTranslatable,
-                    )
-                project.stringResourceHolder.stringResources.add(newResource)
-                existingKeys.add(newKey)
-            } catch (e: Exception) {
-                Logger.e(e) { "Error adding string resource: ${stringResource.key}" }
-                result.errorMessages.add(
-                    getString(Res.string.error_failed_to_add_string_resource, stringResource.key, e.message ?: "Unknown error"),
-                )
-            }
+        val errors = project.stringResourceHolder.addStringResources(stringResources)
+        errors.forEach { error ->
+            val errorMessage =
+                when (error) {
+                    is AddStringResourceError.GeneralError ->
+                        getString(Res.string.error_failed_to_add_string_resource, error.resourceKey, error.message)
+                }
+            Logger.e { errorMessage }
+            result.errorMessages.add(errorMessage)
         }
         return result
     }
@@ -106,29 +95,17 @@ class StringResourceEditorOperator {
         stringResourceIds: List<String>,
     ): EventResult {
         val result = EventResult()
-        if (stringResourceIds.isEmpty()) {
-            return result
-        }
-        val resourcesToDelete = mutableListOf<StringResource>()
-        stringResourceIds.forEach { stringResourceId ->
-            val resource = project.stringResourceHolder.stringResources.find { it.id == stringResourceId }
-            if (resource == null) {
-                result.errorMessages.add(
-                    getString(Res.string.error_string_resource_not_found, stringResourceId),
-                )
-            } else {
-                resourcesToDelete.add(resource)
-            }
-        }
-        resourcesToDelete.forEach { resource ->
-            try {
-                project.stringResourceHolder.stringResources.remove(resource)
-            } catch (e: Exception) {
-                Logger.e(e) { "Error deleting string resource: ${resource.id}" }
-                result.errorMessages.add(
-                    getString(Res.string.error_failed_to_delete_string_resource, resource.key, e.message ?: "Unknown error"),
-                )
-            }
+        val errors = project.stringResourceHolder.deleteStringResources(stringResourceIds)
+        errors.forEach { error ->
+            val errorMessage =
+                when (error) {
+                    is DeleteStringResourceError.ResourceIdNotFound ->
+                        getString(Res.string.error_string_resource_not_found, error.resourceId)
+                    is DeleteStringResourceError.GeneralError ->
+                        getString(Res.string.error_failed_to_delete_string_resource, error.resourceKey, error.message)
+                }
+            Logger.e { errorMessage }
+            result.errorMessages.add(errorMessage)
         }
         return result
     }
@@ -167,49 +144,17 @@ class StringResourceEditorOperator {
         stringResources: List<StringResource>,
     ): EventResult {
         val result = EventResult()
-        if (stringResources.isEmpty()) {
-            return result
-        }
-        val defaultLocale = project.stringResourceHolder.defaultLocale.value
-        stringResources.forEach { stringResource ->
-            try {
-                val existingResourceIndex =
-                    project.stringResourceHolder.stringResources.indexOfFirst { it.id == stringResource.id }
-                if (existingResourceIndex == -1) {
-                    result.errorMessages.add(
-                        getString(Res.string.error_string_resource_not_found, stringResource.id),
-                    )
-                    return@forEach
+        val errors = project.stringResourceHolder.updateStringResources(stringResources)
+        errors.forEach { error ->
+            val errorMessage =
+                when (error) {
+                    is UpdateStringResourceError.ResourceIdNotFound ->
+                        getString(Res.string.error_string_resource_not_found, error.resourceId)
+                    is UpdateStringResourceError.GeneralError ->
+                        getString(Res.string.error_failed_to_update_string_resource, error.resourceKey, error.message)
                 }
-
-                val existingResource = project.stringResourceHolder.stringResources[existingResourceIndex]
-
-                val needsTranslationUpdate =
-                    if (project.stringResourceHolder.isTranslatable) {
-                        // If the flag is explicitly set to false (e.g., after translation), keep it false
-                        if (!stringResource.needsTranslationUpdate && existingResource.needsTranslationUpdate) {
-                            false
-                        } else {
-                            val descriptionChanged = existingResource.description != stringResource.description
-                            val defaultValueChanged =
-                                existingResource.localizedValues[defaultLocale] != stringResource.localizedValues[defaultLocale]
-
-                            // Set flag if content changed, or keep existing flag
-                            (descriptionChanged || defaultValueChanged) || existingResource.needsTranslationUpdate
-                        }
-                    } else {
-                        // No translation update needed if there's only one locale
-                        false
-                    }
-
-                val updatedResource = stringResource.copy(needsTranslationUpdate = needsTranslationUpdate)
-                project.stringResourceHolder.stringResources[existingResourceIndex] = updatedResource
-            } catch (e: Exception) {
-                Logger.e(e) { "Error updating string resource: ${stringResource.id}" }
-                result.errorMessages.add(
-                    getString(Res.string.error_failed_to_update_string_resource, stringResource.key, e.message ?: "Unknown error"),
-                )
-            }
+            Logger.e { errorMessage }
+            result.errorMessages.add(errorMessage)
         }
         return result
     }
@@ -250,55 +195,15 @@ class StringResourceEditorOperator {
         newLocales: List<ResourceLocale>,
     ): EventResult {
         val result = EventResult()
-        try {
-            val defaultLocale = project.stringResourceHolder.defaultLocale.value
-            // Ensure default locale is always included
-            val localesWithDefault =
-                if (newLocales.contains(defaultLocale)) {
-                    newLocales
-                } else {
-                    listOf(defaultLocale) + newLocales
+        val errors = project.stringResourceHolder.updateSupportedLocales(newLocales)
+        errors.forEach { error ->
+            val errorMessage =
+                when (error) {
+                    is UpdateSupportedLocalesError.GeneralError ->
+                        getString(Res.string.error_failed_to_update_supported_locales, error.message)
                 }
-
-            // Find locales to add and remove
-            val currentLocales = project.stringResourceHolder.supportedLocales.toSet()
-            val newLocalesSet = localesWithDefault.toSet()
-            val localesToRemove = currentLocales - newLocalesSet
-            val localesToAdd = newLocalesSet - currentLocales
-
-            // Remove old locales from string resources
-            if (localesToRemove.isNotEmpty()) {
-                project.stringResourceHolder.stringResources.forEach { resource ->
-                    localesToRemove.forEach { locale ->
-                        resource.localizedValues.remove(locale)
-                    }
-                }
-            }
-
-            // Update needsTranslationUpdate flags based on the locale changes
-            when {
-                // If new locales are being added, mark all string resources as needing translation
-                localesToAdd.isNotEmpty() -> {
-                    project.stringResourceHolder.stringResources.replaceAll { resource ->
-                        resource.copy(needsTranslationUpdate = true)
-                    }
-                }
-                // If only the default locale remains, clear the flags
-                localesWithDefault.size == 1 -> {
-                    project.stringResourceHolder.stringResources.replaceAll { resource ->
-                        resource.copy(needsTranslationUpdate = false)
-                    }
-                }
-            }
-
-            // Replace the supported locales list
-            project.stringResourceHolder.supportedLocales.clear()
-            project.stringResourceHolder.supportedLocales.addAll(localesWithDefault)
-        } catch (e: Exception) {
-            Logger.e(e) { "Error replacing supported locales" }
-            result.errorMessages.add(
-                getString(Res.string.error_failed_to_update_supported_locales, e.message ?: "Unknown error"),
-            )
+            Logger.e { errorMessage }
+            result.errorMessages.add(errorMessage)
         }
         return result
     }
@@ -329,25 +234,15 @@ class StringResourceEditorOperator {
         locale: ResourceLocale,
     ): EventResult {
         val result = EventResult()
-        try {
-            if (!project.stringResourceHolder.supportedLocales.contains(locale)) {
-                project.stringResourceHolder.supportedLocales.add(locale)
-            }
-            val previousLocale = project.stringResourceHolder.defaultLocale.value
-            project.stringResourceHolder.defaultLocale.value = locale
-
-            // If the default locale has actually changed and there are multiple locales,
-            // set needsTranslationUpdate flag on all resources
-            if (previousLocale != locale && project.stringResourceHolder.isTranslatable) {
-                project.stringResourceHolder.stringResources.replaceAll { resource ->
-                    resource.copy(needsTranslationUpdate = true)
+        val errors = project.stringResourceHolder.setDefaultLocale(locale)
+        errors.forEach { error ->
+            val errorMessage =
+                when (error) {
+                    is SetDefaultLocaleError.GeneralError ->
+                        getString(Res.string.error_failed_to_set_default_locale, error.message)
                 }
-            }
-        } catch (e: Exception) {
-            Logger.e(e) { "Error setting default locale" }
-            result.errorMessages.add(
-                getString(Res.string.error_failed_to_set_default_locale, e.message ?: "Unknown error"),
-            )
+            Logger.e { errorMessage }
+            result.errorMessages.add(errorMessage)
         }
         return result
     }

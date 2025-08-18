@@ -38,7 +38,7 @@ fun String.toComposeResourceName(resourceType: String = "string"): String =
         .replace(' ', '_')
         .replace('-', '_')
         .replace('.', '_')
-        .filter { it in 'a'..'z' || it.isDigit() || it == '_' }
+        .filter { it in 'a'..'z' || it in '0'..'9' || it == '_' }
         .ifEmpty { "${resourceType}_resource" }
         .let {
             if (it[0] !in 'a'..'z') {
