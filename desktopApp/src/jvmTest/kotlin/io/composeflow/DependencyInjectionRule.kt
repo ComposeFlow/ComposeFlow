@@ -32,7 +32,7 @@ class DependencyInjectionRule(
                     // We might migrate DataStore to another saving mechanism
                     // FIXME: Without random, I saw this error.
                     // IllegalStateException: There are multiple DataStores active for the same file
-                    getCacheDir().resolve("test${Random.nextInt()}.compose.builder.preferences_pb")
+                    getCacheDir().resolve("test${Random.nextInt()}.compose.builder.preferences_pb").toFile()
                 },
             ),
         )

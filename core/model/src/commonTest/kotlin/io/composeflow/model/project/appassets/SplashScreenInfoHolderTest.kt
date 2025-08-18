@@ -6,7 +6,6 @@ import io.composeflow.cloud.storage.BlobInfoWrapper
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SplashScreenInfoHolderTest {
@@ -64,48 +63,6 @@ class SplashScreenInfoHolderTest {
     }
 
     @Test
-    fun testCopyContentsWithNullValues() {
-        val source = SplashScreenInfoHolder()
-        val target = SplashScreenInfoHolder()
-
-        // Set target to have some initial values
-        target.androidSplashScreenImageBlobInfo?.value =
-            createTestBlobInfoWrapper("old-android", "old.png")
-        target.androidSplashScreenBackgroundColor?.value = Color.Red
-        target.iOSSplashScreenImageBlobInfo?.value =
-            createTestBlobInfoWrapper("old-ios", "old_ios.png")
-        target.iOSSplashScreenBackgroundColor?.value = Color.Cyan
-
-        // Source has null/default values, should copy manually to avoid serialization issues
-        target.androidSplashScreenImageBlobInfo?.let { targetProp ->
-            source.androidSplashScreenImageBlobInfo?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-        target.androidSplashScreenBackgroundColor?.let { targetProp ->
-            source.androidSplashScreenBackgroundColor?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-        target.iOSSplashScreenImageBlobInfo?.let { targetProp ->
-            source.iOSSplashScreenImageBlobInfo?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-        target.iOSSplashScreenBackgroundColor?.let { targetProp ->
-            source.iOSSplashScreenBackgroundColor?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-
-        // Verify null values were copied (overwriting target's initial values)
-        assertNull(target.androidSplashScreenImageBlobInfo?.value)
-        assertNull(target.androidSplashScreenBackgroundColor?.value)
-        assertNull(target.iOSSplashScreenImageBlobInfo?.value)
-        assertNull(target.iOSSplashScreenBackgroundColor?.value)
-    }
-
-    @Test
     fun testCopyContentsOverwritesExistingData() {
         val source = SplashScreenInfoHolder()
         val target = SplashScreenInfoHolder()
@@ -145,60 +102,6 @@ class SplashScreenInfoHolderTest {
         )
         assertEquals("source_ios.png", target.iOSSplashScreenImageBlobInfo.value?.fileName)
         assertEquals(Color.Magenta, target.iOSSplashScreenBackgroundColor.value)
-    }
-
-    @Test
-    fun testCopyContentsWithMixedNullAndNonNullValues() {
-        val source = SplashScreenInfoHolder()
-        val target = SplashScreenInfoHolder()
-
-        // Set source with some null and some non-null values
-        source.androidSplashScreenImageBlobInfo?.value =
-            createTestBlobInfoWrapper("android-only", "android.png")
-        source.androidSplashScreenBackgroundColor?.value = null
-        source.iOSSplashScreenImageBlobInfo?.value = null
-        source.iOSSplashScreenBackgroundColor?.value = Color(0xFF800080) // Purple
-
-        // Set target with different initial values
-        target.androidSplashScreenImageBlobInfo?.value = null
-        target.androidSplashScreenBackgroundColor?.value = Color(0xFFFFA500) // Orange
-        target.iOSSplashScreenImageBlobInfo?.value =
-            createTestBlobInfoWrapper("target-ios", "target.png")
-        target.iOSSplashScreenBackgroundColor?.value = null
-
-        // Copy contents manually to avoid serialization issues
-        target.androidSplashScreenImageBlobInfo?.let { targetProp ->
-            source.androidSplashScreenImageBlobInfo?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-        target.androidSplashScreenBackgroundColor?.let { targetProp ->
-            source.androidSplashScreenBackgroundColor?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-        target.iOSSplashScreenImageBlobInfo?.let { targetProp ->
-            source.iOSSplashScreenImageBlobInfo?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-        target.iOSSplashScreenBackgroundColor?.let { targetProp ->
-            source.iOSSplashScreenBackgroundColor?.let { sourceProp ->
-                targetProp.value = sourceProp.value
-            }
-        }
-
-        // Verify mixed values were copied correctly
-        assertEquals(
-            "android-only",
-            target.androidSplashScreenImageBlobInfo?.value
-                ?.blobId
-                ?.name,
-        )
-        assertEquals("android.png", target.androidSplashScreenImageBlobInfo?.value?.fileName)
-        assertNull(target.androidSplashScreenBackgroundColor?.value)
-        assertNull(target.iOSSplashScreenImageBlobInfo?.value)
-        assertEquals(Color(0xFF800080), target.iOSSplashScreenBackgroundColor?.value)
     }
 
     // Helper Tests
@@ -250,7 +153,8 @@ class SplashScreenInfoHolderTest {
 
         // Check splash image drawable file
         assertTrue(xmlFiles.containsKey("composeApp/src/androidMain/res/drawable/$ANDROID_IC_SPLASH_IMAGE.xml"))
-        val drawableXml = xmlFiles["composeApp/src/androidMain/res/drawable/$ANDROID_IC_SPLASH_IMAGE.xml"]!!
+        val drawableXml =
+            xmlFiles["composeApp/src/androidMain/res/drawable/$ANDROID_IC_SPLASH_IMAGE.xml"]!!
         assertTrue(drawableXml.contains("<?xml version=\"1.0\" encoding=\"utf-8\"?>"))
         assertTrue(drawableXml.contains("<layer-list"))
         assertTrue(drawableXml.contains("@drawable/${ANDROID_IC_SPLASH_IMAGE}_actual"))
@@ -289,7 +193,8 @@ class SplashScreenInfoHolderTest {
 
         // Check iOS Contents.json file
         assertTrue(xmlFiles.containsKey("iosApp/iosApp/Assets.xcassets/SplashImage.imageset/Contents.json"))
-        val contentsJson = xmlFiles["iosApp/iosApp/Assets.xcassets/SplashImage.imageset/Contents.json"]!!
+        val contentsJson =
+            xmlFiles["iosApp/iosApp/Assets.xcassets/SplashImage.imageset/Contents.json"]!!
         assertTrue(contentsJson.contains("ios_splash.png"))
         assertTrue(contentsJson.contains("universal"))
         assertTrue(contentsJson.contains("filename"))
@@ -315,7 +220,8 @@ class SplashScreenInfoHolderTest {
 
         // Check iOS file
         assertTrue(xmlFiles.containsKey("iosApp/iosApp/Assets.xcassets/SplashImage.imageset/Contents.json"))
-        val contentsJson = xmlFiles["iosApp/iosApp/Assets.xcassets/SplashImage.imageset/Contents.json"]!!
+        val contentsJson =
+            xmlFiles["iosApp/iosApp/Assets.xcassets/SplashImage.imageset/Contents.json"]!!
         assertTrue(contentsJson.contains("ios.jpg"))
     }
 }

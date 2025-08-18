@@ -105,17 +105,8 @@ data class SplashScreenInfoHolder(
 }
 
 fun SplashScreenInfoHolder.copyContents(other: SplashScreenInfoHolder) {
-    // Defensive copying to handle potential serialization-related initialization issues
-    if (this.androidSplashScreenImageBlobInfo != null && other.androidSplashScreenImageBlobInfo != null) {
-        this.androidSplashScreenImageBlobInfo.value = other.androidSplashScreenImageBlobInfo.value
-    }
-    if (this.androidSplashScreenBackgroundColor != null && other.androidSplashScreenBackgroundColor != null) {
-        this.androidSplashScreenBackgroundColor.value = other.androidSplashScreenBackgroundColor.value
-    }
-    if (this.iOSSplashScreenImageBlobInfo != null && other.iOSSplashScreenImageBlobInfo != null) {
-        this.iOSSplashScreenImageBlobInfo.value = other.iOSSplashScreenImageBlobInfo.value
-    }
-    if (this.iOSSplashScreenBackgroundColor != null && other.iOSSplashScreenBackgroundColor != null) {
-        this.iOSSplashScreenBackgroundColor.value = other.iOSSplashScreenBackgroundColor.value
-    }
+    androidSplashScreenImageBlobInfo.value = other.androidSplashScreenImageBlobInfo.value
+    androidSplashScreenBackgroundColor.value = other.androidSplashScreenBackgroundColor.value
+    iOSSplashScreenImageBlobInfo.value = other.iOSSplashScreenImageBlobInfo.value
+    iOSSplashScreenBackgroundColor.value = other.iOSSplashScreenBackgroundColor.value
 }
