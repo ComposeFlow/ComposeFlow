@@ -1,5 +1,7 @@
 package io.composeflow.datastore
 
+import kotlinx.coroutines.flow.Flow
+
 /**
  * Multiplatform wrapper for DataStore functionality
  */
@@ -10,6 +12,12 @@ interface PlatformDataStore {
     )
 
     suspend fun getString(key: String): String?
+
+    /**
+     * Observes changes to a string value in the DataStore.
+     * Returns a Flow that emits the current value and all subsequent changes.
+     */
+    fun observeString(key: String): Flow<String?>
 
     suspend fun putBoolean(
         key: String,

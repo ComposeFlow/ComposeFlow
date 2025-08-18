@@ -84,6 +84,12 @@ private class DataStoreWrapper(
                 preferences[stringPreferencesKey(key)]
             }.first()
 
+    override fun observeString(key: String): kotlinx.coroutines.flow.Flow<String?> =
+        dataStore.data
+            .map { preferences ->
+                preferences[stringPreferencesKey(key)]
+            }
+
     override suspend fun putBoolean(
         key: String,
         value: Boolean,
