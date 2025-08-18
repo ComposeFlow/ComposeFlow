@@ -19,7 +19,6 @@ import io.composeflow.editor.validator.ValidateResult
 import io.composeflow.model.parameter.lazylist.LazyListChildParams
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
-import io.composeflow.model.project.string.updateStringResourceDefaultLocaleValue
 import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.property.FloatProperty
 import io.composeflow.model.property.FunctionScopeParameterProperty
