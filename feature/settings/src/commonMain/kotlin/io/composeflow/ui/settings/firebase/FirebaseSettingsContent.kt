@@ -64,7 +64,6 @@ import io.composeflow.ui.openInBrowser
 import io.composeflow.ui.settings.SettingsCallbacks
 import io.composeflow.ui.textfield.SmallOutlinedTextField
 import org.jetbrains.compose.resources.stringResource
-import java.net.URI
 
 @Composable
 fun FirebaseSettingsContent(
@@ -232,12 +231,12 @@ private fun FirebaseProjectIdEditor(
                                 (
                                     firebaseProjectIdInEdit.isNotEmpty() &&
                                         firebaseProjectIdInEdit != firebaseAppInfo.firebaseProjectId
-                                ) ||
+                                    ) ||
                                     (
                                         firebaseProjectIdInEdit.isNotEmpty() &&
                                             firebaseAppInfo.getConnectedStatus() == FirebaseConnectedStatus.PartiallyConnected
-                                    )
-                            ),
+                                        )
+                                ),
                 ) {
                     Row {
                         ComposeFlowIcon(
@@ -421,7 +420,7 @@ private fun FirebaseAppLabelContainer(firebaseApiAppResult: FirebaseApiAppResult
                 consoleUrl?.let {
                     IconButton(
                         onClick = {
-                            openInBrowser(URI(it))
+                            openInBrowser(it)
                         },
                         modifier =
                             Modifier
@@ -473,10 +472,10 @@ private fun FirebaseAuthContent(
             TextButton(
                 onClick = {
                     openInBrowser(
-                        URI(
-                            "${FIREBASE_CONSOLE_URL}project/${firebaseAppInfo.firebaseProjectId}/authentication",
-                        ),
-                    )
+
+                        "${FIREBASE_CONSOLE_URL}project/${firebaseAppInfo.firebaseProjectId}/authentication",
+
+                        )
                 },
                 modifier = Modifier.hoverIconClickable(),
             ) {

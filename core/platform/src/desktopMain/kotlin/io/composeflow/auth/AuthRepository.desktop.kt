@@ -11,7 +11,7 @@ import io.composeflow.auth.google.TokenResponse
 import io.composeflow.di.ServiceLocator
 import io.composeflow.http.KtorClientFactory
 import io.composeflow.platform.Uri
-import io.composeflow.platform.getOrCreateDataStore
+import io.composeflow.platform.getOrCreateActualDataStore
 import io.composeflow.platform.toJavaUri
 import io.composeflow.ui.openInBrowser
 import kotlinx.coroutines.CoroutineScope
@@ -86,7 +86,7 @@ actual class AuthRepository {
 
     companion object {
         private val dataStore: DataStore<Preferences> =
-            ServiceLocator.getOrPut { getOrCreateDataStore() }
+            ServiceLocator.getOrPut { getOrCreateActualDataStore() }
 
         private val jsonSerializer: Json =
             Json {

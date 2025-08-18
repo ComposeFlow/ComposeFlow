@@ -7,7 +7,6 @@ import io.composeflow.di.ServiceLocator
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.io.File
 import kotlin.time.Instant
 
 actual fun createLocalProjectSaver(): ProjectSaver = LocalProjectSaverImpl()
@@ -27,7 +26,7 @@ class LocalProjectSaverImpl(
         withContext(ioDispatcher) {
             val projectsDir = prepareProjectDir(userId = userId, projectId = projectId)
             val file = projectsDir.resolve(PROJECT_YAML_FILE_NAME)
-            file.writeText(yamlContent)
+            file.toFile().writeText(yamlContent)
         }
     }
 
@@ -49,10 +48,11 @@ class LocalProjectSaverImpl(
         projectId: String,
     ): ProjectYamlNameWithLastModified? {
         val projectsDir = prepareProjectDir(userId = userId, projectId = projectId)
-        val file = projectsDir.resolve(PROJECT_YAML_FILE_NAME)
-        if (!file.exists()) {
+        val platformFile = projectsDir.resolve(PROJECT_YAML_FILE_NAME)
+        if (!platformFile.exists()) {
             return null
         }
+        val file = platformFile.toFile()
         return ProjectYamlNameWithLastModified(
             file.readText(),
             Instant.fromEpochMilliseconds(file.lastModified()),
@@ -81,7 +81,7 @@ class LocalProjectSaverImpl(
 private fun prepareProjectDir(
     userId: String,
     projectId: String,
-): File {
+): PlatformFile {
     val projectsDir = getCacheDir().resolve("projects").resolve(userId).resolve(projectId)
     projectsDir.mkdirs()
     return projectsDir

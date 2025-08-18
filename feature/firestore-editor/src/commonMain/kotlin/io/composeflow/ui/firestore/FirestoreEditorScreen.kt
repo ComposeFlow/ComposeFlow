@@ -97,7 +97,6 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
-import java.net.URI
 
 @Composable
 fun FirestoreEditorScreen(
@@ -302,7 +301,7 @@ private fun FirebaseFirestoreContent(
     Column(modifier = modifier) {
         TextButton(
             onClick = {
-                openInBrowser(URI("${FIREBASE_CONSOLE_URL}project/${firebaseAppInfo.firebaseProjectId}/firestore"))
+                openInBrowser("${FIREBASE_CONSOLE_URL}project/${firebaseAppInfo.firebaseProjectId}/firestore")
             },
             modifier = Modifier.hoverIconClickable(),
         ) {

@@ -1,6 +1,5 @@
 package io.composeflow.platform
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
+import io.composeflow.datastore.PlatformDataStore
 
-expect fun getOrCreateDataStore(): DataStore<Preferences>
+expect fun getOrCreateDataStore(): PlatformDataStore

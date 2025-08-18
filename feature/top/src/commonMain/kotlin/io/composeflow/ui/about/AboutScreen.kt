@@ -40,7 +40,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import java.net.URI
 
 val updateController: SoftwareUpdateController? = SoftwareUpdateController.getInstance()
 val canDoOnlineUpdates get() = updateController?.canTriggerUpdateCheckUI() == SoftwareUpdateController.Availability.AVAILABLE
@@ -141,7 +140,7 @@ private fun VersionCell() {
                     coroutineScope.launch {
                         billingClient.createPricingTableLink().mapBoth(
                             success = {
-                                openInBrowser(URI(it))
+                                openInBrowser(it)
                             },
                             failure = {
                                 Logger.e("Failed to create pricing table link", it)

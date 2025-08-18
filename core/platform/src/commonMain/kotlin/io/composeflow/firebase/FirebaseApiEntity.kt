@@ -1,9 +1,9 @@
 package io.composeflow.firebase
 
 import io.composeflow.firebase.management.FIREBASE_CONSOLE_URL
+import io.ktor.util.decodeBase64Bytes
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.apache.commons.codec.binary.Base64
 
 @Serializable
 data class AndroidAppRequest(
@@ -33,7 +33,7 @@ data class AppConfig(
     val configFilename: String,
     val configFileContents: String,
 ) {
-    fun decodeFileContents(): String = String(Base64.decodeBase64(configFileContents))
+    fun decodeFileContents(): String = configFileContents.decodeBase64Bytes().decodeToString()
 }
 
 @Serializable

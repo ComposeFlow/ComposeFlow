@@ -32,7 +32,7 @@ data class AssetHolder(
                     projectId = projectId,
                     blobInfoWrapper = it,
                 )
-            cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
+            cacheFile.toFile().path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
         } +
             icons.associate {
                 val cacheFile =
@@ -41,6 +41,6 @@ data class AssetHolder(
                         projectId = projectId,
                         blobInfoWrapper = it,
                     )
-                cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
+                cacheFile.toFile().path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
             }
 }

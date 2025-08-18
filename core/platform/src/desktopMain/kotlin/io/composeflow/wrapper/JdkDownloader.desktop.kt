@@ -17,6 +17,7 @@ import okio.BufferedSink
 import okio.buffer
 import okio.sink
 import java.io.File
+import io.composeflow.platform.PlatformFile
 import kotlin.io.path.inputStream
 
 actual object JdkDownloader {
@@ -47,18 +48,19 @@ actual object JdkDownloader {
             var extractedJavaHome: String? = null
             when (currentOs) {
                 CurrentOs.Windows -> {
-                    tempFile.inputStream().unzip(destDir.toPath())
-                    extractedJavaHome = tryToFindJavaHomeDir(destDir)
+                    val zipWrapper = ZipWrapper()
+                    zipWrapper.unzip(PlatformFile(tempFile.toFile()), destDir)
+                    extractedJavaHome = tryToFindJavaHomeDir(destDir.toFile())
                 }
 
                 CurrentOs.Linux -> {
-                    tarExtractor.extractTarGz(tempFile.toFile(), destDir)
-                    extractedJavaHome = tryToFindJavaHomeDir(destDir)
+                    tarExtractor.extractTarGz(PlatformFile(tempFile.toFile()), destDir)
+                    extractedJavaHome = tryToFindJavaHomeDir(destDir.toFile())
                 }
 
                 CurrentOs.Mac -> {
-                    tarExtractor.extractTarGz(tempFile.toFile(), destDir)
-                    extractedJavaHome = tryToFindJavaHomeDir(destDir)
+                    tarExtractor.extractTarGz(PlatformFile(tempFile.toFile()), destDir)
+                    extractedJavaHome = tryToFindJavaHomeDir(destDir.toFile())
                 }
 
                 CurrentOs.Other -> {}

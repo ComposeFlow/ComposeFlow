@@ -496,7 +496,7 @@ class LlmRepository(
             is ToolArgs.ListDataTypesArgs,
             is ToolArgs.ListCustomEnumsArgs,
             is ToolArgs.ListScreensArgs,
-            -> {
+                -> {
                 // These have minimal content but potentially large results
                 estimatedSize += 50
             }
@@ -544,8 +544,8 @@ class LlmRepository(
                         append(".yaml")
                     }
 
-                val yamlFile = debugDir.resolve(filename)
-                val metadataFile = debugDir.resolve("$filename.metadata.txt")
+                val yamlFile = debugDir.resolve(filename).toFile()
+                val metadataFile = debugDir.resolve("$filename.metadata.txt").toFile()
 
                 // Save the successful YAML content
                 yamlFile.writeText(yamlContent)
@@ -609,8 +609,8 @@ class LlmRepository(
                         append(".yaml")
                     }
 
-                val yamlFile = debugDir.resolve(filename)
-                val metadataFile = debugDir.resolve("$filename.metadata.txt")
+                val yamlFile = debugDir.resolve(filename).toFile()
+                val metadataFile = debugDir.resolve("$filename.metadata.txt").toFile()
 
                 // Save the failed YAML content
                 yamlFile.writeText(yamlContent)

@@ -1,11 +1,6 @@
 package io.composeflow.model.settings
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
+import io.composeflow.datastore.PlatformDataStore
 import io.composeflow.di.ServiceLocator
 import io.composeflow.di.ServiceLocator.KEY_DEFAULT_DISPATCHER
 import io.composeflow.json.jsonSerializer
@@ -15,11 +10,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SettingsRepository(
-    private val dataStore: DataStore<Preferences> = ServiceLocator.getOrPut { getOrCreateDataStore() },
+    private val dataStore: PlatformDataStore = ServiceLocator.getOrPut { getOrCreateDataStore() },
     private val javaHomePathFromEnvVar: PathSetting.FromEnvVar? =
         getEnvVar("JAVA_HOME")?.let {
             PathSetting.FromEnvVar("JAVA_HOME", it)
@@ -28,38 +25,53 @@ class SettingsRepository(
 ) {
     private val scope: CoroutineScope = CoroutineScope(dispatchers)
 
-    private val darkThemeKey = intPreferencesKey("dark_theme")
-    private val appDarkThemeKey = intPreferencesKey("app_dark_theme")
-    private val javaHomeKey = stringPreferencesKey("java_home")
-    private val showBordersKey = booleanPreferencesKey("show_borders")
-    private val versionAskedToUpdateKey = stringPreferencesKey("version_asked_to_update")
-    private val onboardingCompletedKey = booleanPreferencesKey("onboarding_completed")
+    // Preference keys as strings
+    private val darkThemeKey = "dark_theme"
+    private val appDarkThemeKey = "app_dark_theme"
+    private val javaHomeKey = "java_home"
+    private val showBordersKey = "show_borders"
+    private val versionAskedToUpdateKey = "version_asked_to_update"
+    private val onboardingCompletedKey = "onboarding_completed"
+    
+    // Internal state flows for reactive behavior
+    private val _settingsFlow = MutableStateFlow<ComposeBuilderSettings?>(null)
+    private val _hasShownOnboardingFlow = MutableStateFlow<Boolean?>(null)
 
-    val settings: Flow<ComposeBuilderSettings> =
-        dataStore.data.map { preference ->
-            ComposeBuilderSettings(
-                composeBuilderDarkThemeSetting =
-                    DarkThemeSetting.fromOrdinal(
-                        preference[darkThemeKey] ?: DarkThemeSetting.Dark.ordinal,
-                    ),
-                appDarkThemeSetting =
-                    DarkThemeSetting.fromOrdinal(
-                        preference[appDarkThemeKey] ?: DarkThemeSetting.System.ordinal,
-                    ),
-                showBordersInCanvas = preference[showBordersKey] == true,
-                javaHome =
-                    preference[javaHomeKey]?.let {
-                        jsonSerializer.decodeFromString<PathSetting>(it)
-                    } ?: javaHomePathFromEnvVar,
-                versionAskedToUpdate = preference[versionAskedToUpdateKey],
-            )
+    val settings: Flow<ComposeBuilderSettings> = _settingsFlow.filterNotNull()
+    
+    private suspend fun loadSettings(): ComposeBuilderSettings {
+        val composeBuilderTheme = dataStore.getInt(darkThemeKey) ?: DarkThemeSetting.Dark.ordinal
+        val appTheme = dataStore.getInt(appDarkThemeKey) ?: DarkThemeSetting.System.ordinal
+        val showBorders = dataStore.getBoolean(showBordersKey) ?: false
+        val javaHomeJson = dataStore.getString(javaHomeKey)
+        val versionAskedToUpdate = dataStore.getString(versionAskedToUpdateKey)
+        
+        val javaHome = javaHomeJson?.let {
+            jsonSerializer.decodeFromString<PathSetting>(it)
+        } ?: javaHomePathFromEnvVar
+        
+        return ComposeBuilderSettings(
+            composeBuilderDarkThemeSetting = DarkThemeSetting.fromOrdinal(composeBuilderTheme),
+            appDarkThemeSetting = DarkThemeSetting.fromOrdinal(appTheme),
+            showBordersInCanvas = showBorders,
+            javaHome = javaHome,
+            versionAskedToUpdate = versionAskedToUpdate,
+        ).also { _settingsFlow.value = it }
+    }
+    
+    init {
+        // Load settings on initialization
+        scope.launch {
+            loadSettings()
+            loadOnboardingStatus()
         }
+    }
 
     fun saveComposeBuilderDarkTheme(darkThemeSetting: DarkThemeSetting) {
         scope.launch {
-            dataStore.edit {
-                it[darkThemeKey] = darkThemeSetting.ordinal
-            }
+            dataStore.putInt(darkThemeKey, darkThemeSetting.ordinal)
+            // Refresh cached settings
+            loadSettings()
         }
     }
 
@@ -74,46 +86,49 @@ class SettingsRepository(
 
     fun saveAppDarkTheme(darkThemeSetting: DarkThemeSetting) {
         scope.launch {
-            dataStore.edit {
-                it[appDarkThemeKey] = darkThemeSetting.ordinal
-            }
+            dataStore.putInt(appDarkThemeKey, darkThemeSetting.ordinal)
+            // Refresh cached settings
+            loadSettings()
         }
     }
 
     fun saveShowBorders(showBorders: Boolean) {
         scope.launch {
-            dataStore.edit {
-                it[showBordersKey] = showBorders
-            }
+            dataStore.putBoolean(showBordersKey, showBorders)
+            // Refresh cached settings
+            loadSettings()
         }
     }
 
     fun saveJavaHomePath(javaHomePath: PathSetting) {
         scope.launch {
-            dataStore.edit {
-                it[javaHomeKey] = jsonSerializer.encodeToString(javaHomePath)
-            }
+            dataStore.putString(javaHomeKey, jsonSerializer.encodeToString(javaHomePath))
+            // Refresh cached settings
+            loadSettings()
         }
     }
 
     fun saveVersionAskedToUpdate(versionAskedToUpdate: String) {
         scope.launch {
-            dataStore.edit {
-                it[versionAskedToUpdateKey] = versionAskedToUpdate
-            }
+            dataStore.putString(versionAskedToUpdateKey, versionAskedToUpdate)
+            // Refresh cached settings
+            loadSettings()
         }
     }
 
-    val hasShownOnboarding: Flow<Boolean> =
-        dataStore.data.map { preferences ->
-            preferences[onboardingCompletedKey] ?: false
-        }
+    val hasShownOnboarding: Flow<Boolean> = _hasShownOnboardingFlow.filterNotNull()
+    
+    private suspend fun loadOnboardingStatus(): Boolean {
+        val status = dataStore.getBoolean(onboardingCompletedKey) ?: false
+        _hasShownOnboardingFlow.value = status
+        return status
+    }
 
     fun saveOnboardingCompleted(completed: Boolean) {
         scope.launch {
-            dataStore.edit {
-                it[onboardingCompletedKey] = completed
-            }
+            dataStore.putBoolean(onboardingCompletedKey, completed)
+            // Refresh cached onboarding status
+            loadOnboardingStatus()
         }
     }
 }
