@@ -1,7 +1,10 @@
 package io.composeflow.model.project.string
 
+import io.composeflow.override.toMutableStateMapEqualsOverride
 import io.composeflow.util.generateUniqueName
 import io.composeflow.util.toComposeResourceName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 // Extension functions for StringResourceHolder that provide business logic operations
 // for managing string resources.
@@ -106,51 +109,79 @@ sealed interface DeleteStringResourceError {
 
 /**
  * Updates existing string resources.
- * @param stringResources List of string resources to update
+ * @param updates List of string resource updates to apply
  * @return List of errors that occurred during the operation
  */
-fun StringResourceHolder.updateStringResources(stringResources: List<StringResource>): List<UpdateStringResourceError> {
+fun StringResourceHolder.updateStringResources(updates: List<StringResourceUpdate>): List<UpdateStringResourceError> {
     val errors = mutableListOf<UpdateStringResourceError>()
-    if (stringResources.isEmpty()) {
+    if (updates.isEmpty()) {
         return errors
     }
 
     val defaultLocale = this.defaultLocale.value
-    stringResources.forEach { newResource ->
-        try {
-            val existingResourceIndex = this.stringResources.indexOfFirst { it.id == newResource.id }
-            if (existingResourceIndex == -1) {
-                errors.add(UpdateStringResourceError.ResourceIdNotFound(newResource.id))
-                return@forEach
-            }
+    updates.forEach { update ->
+        val existingResourceIndex = this.stringResources.indexOfFirst { it.id == update.id }
+        if (existingResourceIndex == -1) {
+            errors.add(UpdateStringResourceError.ResourceIdNotFound(update.id))
+            return@forEach
+        }
 
-            val existingResource = this.stringResources[existingResourceIndex]
+        val existingResource = this.stringResources[existingResourceIndex]
+        try {
+            val updatedKey =
+                update.key?.let { key ->
+                    val existingKeys = this.stringResources.map { it.key }.toSet()
+                    generateUniqueName(
+                        key.toComposeResourceName(),
+                        existingKeys,
+                    )
+                } ?: existingResource.key
+            val updatedDescription = (update.description ?: existingResource.description)?.ifBlank { null }
+            val updatedLocalizedValues =
+                existingResource.localizedValues.toMutableStateMapEqualsOverride().also { newValues ->
+                    update.localizedValuesToDelete.forEach { locale ->
+                        if (locale != defaultLocale) {
+                            newValues.remove(locale)
+                        }
+                    }
+                    update.localizedValuesToSet.forEach { (locale, value) ->
+                        newValues[locale] = value
+                    }
+                }
+
             val needsTranslationUpdate =
-                if (this.isTranslatable) {
-                    // If the flag is explicitly set to false (e.g., after translation), keep it false
-                    if (!newResource.needsTranslationUpdate && existingResource.needsTranslationUpdate) {
-                        false
-                    } else {
-                        val descriptionChanged = existingResource.description != newResource.description
+                // If explicitly set in the update, use that value
+                update.needsTranslationUpdate
+                    ?: if (this.isTranslatable) {
+                        // Otherwise, calculate based on changes
+                        val descriptionChanged = existingResource.description != updatedDescription
                         val defaultValueChanged =
-                            existingResource.localizedValues[defaultLocale] != newResource.localizedValues[defaultLocale]
+                            update.localizedValuesToSet.containsKey(defaultLocale) &&
+                                existingResource.localizedValues[defaultLocale] != update.localizedValuesToSet[defaultLocale]
 
                         // Set flag if content changed, or keep existing flag
                         (descriptionChanged || defaultValueChanged) || existingResource.needsTranslationUpdate
+                    } else {
+                        // No translation update needed if there's only one locale
+                        false
                     }
-                } else {
-                    // No translation update needed if there's only one locale
-                    false
-                }
 
-            val updatedResource = newResource.copy(needsTranslationUpdate = needsTranslationUpdate)
+            // Create the updated resource
+            val updatedResource =
+                existingResource.copy(
+                    key = updatedKey,
+                    description = updatedDescription,
+                    localizedValues = updatedLocalizedValues,
+                    needsTranslationUpdate = needsTranslationUpdate,
+                )
+
             this.stringResources[existingResourceIndex] = updatedResource
         } catch (e: Exception) {
             errors.add(
                 UpdateStringResourceError.GeneralError(
                     message = e.message ?: UNKNOWN_ERROR_MESSAGE,
-                    resourceId = newResource.id,
-                    resourceKey = newResource.key,
+                    resourceId = update.id,
+                    resourceKey = existingResource.key,
                 ),
             )
         }
@@ -158,6 +189,17 @@ fun StringResourceHolder.updateStringResources(stringResources: List<StringResou
 
     return errors
 }
+
+@Serializable
+@SerialName("StringResourceUpdate")
+data class StringResourceUpdate(
+    val id: String,
+    val key: String? = null,
+    val description: String? = null,
+    val localizedValuesToSet: Map<ResourceLocale, String> = emptyMap(),
+    val localizedValuesToDelete: Set<ResourceLocale> = emptySet(),
+    val needsTranslationUpdate: Boolean? = null,
+)
 
 sealed interface UpdateStringResourceError {
     data class ResourceIdNotFound(

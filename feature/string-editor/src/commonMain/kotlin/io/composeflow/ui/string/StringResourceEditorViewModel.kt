@@ -11,7 +11,7 @@ import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.string.ResourceLocale
 import io.composeflow.model.project.string.StringResource
-import io.composeflow.override.toMutableStateMapEqualsOverride
+import io.composeflow.model.project.string.StringResourceUpdate
 import io.composeflow.repository.ProjectRepository
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
@@ -53,8 +53,12 @@ class StringResourceEditorViewModel(
         newKey: String,
     ) {
         viewModelScope.launch {
-            val updatedResource = resource.copy(key = newKey)
-            val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
+            val update =
+                StringResourceUpdate(
+                    id = resource.id,
+                    key = newKey,
+                )
+            val result = stringResourceEditorOperator.updateStringResource(project, update)
             if (result.errorMessages.isEmpty()) {
                 saveProject()
             }
@@ -66,8 +70,12 @@ class StringResourceEditorViewModel(
         newDescription: String,
     ) {
         viewModelScope.launch {
-            val updatedResource = resource.copy(description = newDescription.ifBlank { null })
-            val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
+            val update =
+                StringResourceUpdate(
+                    id = resource.id,
+                    description = newDescription,
+                )
+            val result = stringResourceEditorOperator.updateStringResource(project, update)
             if (result.errorMessages.isEmpty()) {
                 saveProject()
             }
@@ -80,14 +88,12 @@ class StringResourceEditorViewModel(
         value: String,
     ) {
         viewModelScope.launch {
-            val updatedResource =
-                resource.copy(
-                    localizedValues =
-                        resource.localizedValues.toMutableStateMapEqualsOverride().apply {
-                            this[locale] = value
-                        },
+            val update =
+                StringResourceUpdate(
+                    id = resource.id,
+                    localizedValuesToSet = mapOf(locale to value),
                 )
-            val result = stringResourceEditorOperator.updateStringResources(project, listOf(updatedResource))
+            val result = stringResourceEditorOperator.updateStringResource(project, update)
             if (result.errorMessages.isEmpty()) {
                 saveProject()
             }
@@ -183,28 +189,32 @@ class StringResourceEditorViewModel(
                     )
                 when (result) {
                     is TranslateStringsResult.Success -> {
-                        val updatedResources = mutableListOf<StringResource>()
+                        val updates = mutableListOf<StringResourceUpdate>()
                         resourcesToTranslate.forEach { resource ->
-                            val translationsForResource = result.translations[resource.key]
-                            if (translationsForResource != null) {
-                                val updatedLocalizedValues = resource.localizedValues.toMutableStateMapEqualsOverride()
-                                translationsForResource.forEach { (localeCode, translation) ->
-                                    val locale = ResourceLocale.fromString(localeCode)
-                                    if (locale != null && targetLocales.contains(locale)) {
-                                        updatedLocalizedValues[locale] = translation
-                                    }
-                                }
-                                val updatedResource =
-                                    resource.copy(
-                                        localizedValues = updatedLocalizedValues,
+                            val translations = result.translations[resource.key]
+                            if (translations != null) {
+                                val localizedValuesToSet =
+                                    translations
+                                        .mapNotNull { (localeCode, translation) ->
+                                            val locale = ResourceLocale.fromString(localeCode)
+                                            if (locale != null && targetLocales.contains(locale)) {
+                                                locale to translation
+                                            } else {
+                                                null
+                                            }
+                                        }.toMap()
+                                updates.add(
+                                    StringResourceUpdate(
+                                        id = resource.id,
+                                        localizedValuesToSet = localizedValuesToSet,
                                         // Clear the flag after successful translation
                                         needsTranslationUpdate = false,
-                                    )
-                                updatedResources.add(updatedResource)
+                                    ),
+                                )
                             }
                         }
-                        if (updatedResources.isNotEmpty()) {
-                            stringResourceEditorOperator.updateStringResources(project, updatedResources)
+                        if (updates.isNotEmpty()) {
+                            stringResourceEditorOperator.updateStringResources(project, updates)
                         }
                         selectedResourceIds.clear()
                         saveProject()

@@ -20,6 +20,7 @@ import io.composeflow.model.project.string.DeleteStringResourceError
 import io.composeflow.model.project.string.ResourceLocale
 import io.composeflow.model.project.string.SetDefaultLocaleError
 import io.composeflow.model.project.string.StringResource
+import io.composeflow.model.project.string.StringResourceUpdate
 import io.composeflow.model.project.string.UpdateStringResourceError
 import io.composeflow.model.project.string.UpdateSupportedLocalesError
 import io.composeflow.model.project.string.addStringResources
@@ -139,12 +140,17 @@ class StringResourceEditorOperator {
             }
         }
 
+    suspend fun updateStringResource(
+        project: Project,
+        update: StringResourceUpdate,
+    ): EventResult = updateStringResources(project, listOf(update))
+
     suspend fun updateStringResources(
         project: Project,
-        stringResources: List<StringResource>,
+        updates: List<StringResourceUpdate>,
     ): EventResult {
         val result = EventResult()
-        val errors = project.stringResourceHolder.updateStringResources(stringResources)
+        val errors = project.stringResourceHolder.updateStringResources(updates)
         errors.forEach { error ->
             val errorMessage =
                 when (error) {
@@ -174,13 +180,13 @@ class StringResourceEditorOperator {
     ): EventResult =
         try {
             // Try to parse as list first, fallback to single resource
-            val stringResources =
+            val updates =
                 try {
-                    decodeFromStringWithFallback<List<StringResource>>(stringResourceYaml)
+                    decodeFromStringWithFallback<List<StringResourceUpdate>>(stringResourceYaml)
                 } catch (_: Exception) {
-                    listOf(decodeFromStringWithFallback<StringResource>(stringResourceYaml))
+                    listOf(decodeFromStringWithFallback<StringResourceUpdate>(stringResourceYaml))
                 }
-            updateStringResources(project, stringResources)
+            updateStringResources(project, updates)
         } catch (e: Exception) {
             Logger.e(e) { "Error parsing string resource YAML" }
             EventResult().apply {
