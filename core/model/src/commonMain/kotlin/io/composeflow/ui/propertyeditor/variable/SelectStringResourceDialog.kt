@@ -159,6 +159,7 @@ fun SelectStringResourceDialog(
                                                     ),
                                             )
                                         val errors = project.stringResourceHolder.addStringResources(listOf(newResource))
+                                        // TODO Display errors to the user
                                         if (errors.isEmpty()) {
                                             onValidPropertyChanged(
                                                 initialProperty.mergeProperty(
