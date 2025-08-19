@@ -5,9 +5,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Instant
 
 @OptIn(kotlin.time.ExperimentalTime::class)
-expect fun Any.toKotlinxInstant(): Instant
-
-@OptIn(kotlin.time.ExperimentalTime::class)
 fun Instant.asDateString(timeZone: TimeZone? = null): String {
     val date = toLocalDateTime(timeZone ?: TimeZone.currentSystemDefault()).date
     return "${date.year}-${
