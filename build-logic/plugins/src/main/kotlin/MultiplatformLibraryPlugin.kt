@@ -28,7 +28,7 @@ class MultiplatformLibraryPlugin : Plugin<Project> {
                         }
                     }
                 }
-                
+
                 with(sourceSets) {
                     getByName("commonMain").apply {
                         dependencies {
