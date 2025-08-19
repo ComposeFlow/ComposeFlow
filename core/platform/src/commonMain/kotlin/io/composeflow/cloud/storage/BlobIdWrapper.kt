@@ -8,5 +8,3 @@ data class BlobIdWrapper(
     val name: String,
     val generation: Long?,
 )
-
-expect fun Any.toKotlinWrapper(): BlobIdWrapper
