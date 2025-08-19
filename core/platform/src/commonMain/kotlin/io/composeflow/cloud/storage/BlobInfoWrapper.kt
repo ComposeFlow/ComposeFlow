@@ -57,8 +57,6 @@ data class BlobInfoWrapper(
     }
 }
 
-expect fun Any.toBlobInfoWrapper(contentBytes: ByteArray? = null): BlobInfoWrapper
-
 @OptIn(ExperimentalTime::class)
 fun Reference.toKotlinWrapper(contentBytes: ByteArray? = null): BlobInfoWrapper {
     val split = location.path.split("/")
