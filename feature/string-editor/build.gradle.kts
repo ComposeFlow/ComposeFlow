@@ -66,7 +66,7 @@ tasks.register("runKsp") {
         mkdir("${project.buildDir}/generated/llm-tools")
     }
 
-    // Depend on the KSP task for the desktop target
+    // Depend on the KSP task for the JVM target
     dependsOn("kspKotlinJvm")
 }
 
