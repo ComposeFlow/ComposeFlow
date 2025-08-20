@@ -17,15 +17,25 @@ fi
 # Target directory for schema files
 TARGET_DIR="${API_TS_DIR}/schemas"
 
+# Clear up the old JSON schema files
+echo "Cleaning up old JSON schema files..."
+find "${TARGET_DIR}" -name "*_mcp_tool.json" -delete
+rm -fr feature/uibuilder/build/generated/llm-tools
+rm -fr feature/appstate-editor/build/generated/llm-tools
+rm -fr feature/datatype-editor/build/generated/llm-tools
+rm -fr feature/string-editor/build/generated/llm-tools
+
 # Print information
 echo "Generating MCP schema files..."
 echo "Target directory: ${TARGET_DIR}"
 
 # Run KSP to generate JSON schema files
 echo "Running KSP to generate JSON schema files..."
-./gradlew :feature:uibuilder:runKsp
-./gradlew :feature:appstate-editor:runKsp
-./gradlew :feature:datatype-editor:runKsp
+./gradlew \
+    :feature:uibuilder:runKsp \
+    :feature:appstate-editor:runKsp \
+    :feature:datatype-editor:runKsp \
+    :feature:string-editor:runKsp
 
 # Check if KSP ran successfully
 if [ $? -ne 0 ]; then
@@ -48,8 +58,7 @@ echo "Copying MCP tool schema files to ${TARGET_DIR}..."
 find feature/uibuilder/build/generated/llm-tools -name "*_mcp_tool.json" -exec cp {} "${TARGET_DIR}" \;
 find feature/appstate-editor/build/generated/llm-tools -name "*_mcp_tool.json" -exec cp {} "${TARGET_DIR}" \;
 find feature/datatype-editor/build/generated/llm-tools -name "*_mcp_tool.json" -exec cp {} "${TARGET_DIR}" \;
-# TODO Add *_mcp_tool.json files from feature/string-editor/build/generated/llm-tools when the module is wired with LLM.
-#      https://github.com/ComposeFlow/ComposeFlow/issues/64
+find feature/string-editor/build/generated/llm-tools -name "*_mcp_tool.json" -exec cp {} "${TARGET_DIR}" \;
 
 # Count the number of files copied
 NUM_FILES=$(find "${TARGET_DIR}" -name "*_mcp_tool.json" | wc -l)
