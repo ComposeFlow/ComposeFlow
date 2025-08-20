@@ -53,7 +53,7 @@ data class PropertyContainer(
                     )
                 }
 
-                assignableProperty.checkResourceReference(project)?.let { issue ->
+                assignableProperty.checkResourceReference(project).forEach { issue ->
                     add(
                         TrackableIssue(
                             destinationContext =
@@ -92,13 +92,17 @@ data class PropertyContainer(
     }
 }
 
-private fun AssignableProperty.checkResourceReference(project: Project): Issue? {
-    if (this is StringProperty.ValueFromStringResource) {
-        if (project.stringResourceHolder.stringResources.none { it.id == stringResourceId }) {
-            return Issue.InvalidResourceReference(
-                resourceType = "string",
-            )
+private fun AssignableProperty.checkResourceReference(project: Project): List<Issue> =
+    buildList {
+        if (this@checkResourceReference is StringProperty.ValueFromStringResource) {
+            val stringResourceIds =
+                project.stringResourceHolder.stringResources
+                    .map { it.id }
+                    .toSet()
+            if (stringResourceId !in stringResourceIds) {
+                add(
+                    Issue.InvalidResourceReference(resourceType = "string"),
+                )
+            }
         }
     }
-    return null
-}
