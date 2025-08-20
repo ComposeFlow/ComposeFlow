@@ -235,6 +235,7 @@ By associating a Firestore collection with a data type, you can easily update or
     <string name="invalid_asset_reference">Invalid asset reference</string>
     <string name="invalid_api_reference">Invalid API reference</string>
     <string name="invalid_api_parameter_reference">Invalid API parameter reference</string>
+    <string name="invalid_resource_reference">Invalid %1$s resource reference</string>
     <string name="invalid_screen_reference">Invalid screen reference</string>
     <string name="invalid_state_navigation_drawer_not_set">Navigation Drawer is not set</string>
     <string name="invalid_type">Invalid type</string>

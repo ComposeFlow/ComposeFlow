@@ -7,6 +7,7 @@ import io.composeflow.invalid_api_reference
 import io.composeflow.invalid_asset_reference
 import io.composeflow.invalid_modifier_wrong_parent_relation
 import io.composeflow.invalid_reference
+import io.composeflow.invalid_resource_reference
 import io.composeflow.invalid_screen_reference
 import io.composeflow.model.InspectorTabDestination
 import io.composeflow.model.action.Action
@@ -124,6 +125,18 @@ sealed interface Issue {
     ) : Issue {
         @Composable
         override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_asset_reference)
+    }
+
+    data class InvalidResourceReference(
+        val resourceType: String = "string",
+        override val destination: NavigatableDestination =
+            NavigatableDestination.UiBuilderScreen(
+                inspectorTabDestination = InspectorTabDestination.Inspector,
+            ),
+        override val issueContext: Any? = null,
+    ) : Issue {
+        @Composable
+        override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_resource_reference, resourceType)
     }
 
     data class InvalidApiParameterReference(

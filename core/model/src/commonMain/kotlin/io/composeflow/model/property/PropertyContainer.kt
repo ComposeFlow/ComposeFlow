@@ -53,6 +53,19 @@ data class PropertyContainer(
                     )
                 }
 
+                assignableProperty.checkResourceReference(project)?.let { issue ->
+                    add(
+                        TrackableIssue(
+                            destinationContext =
+                                DestinationContext.UiBuilderScreen(
+                                    canvasEditableId = canvasEditable.id,
+                                    composeNodeId = composeNode.id,
+                                ),
+                            issue = issue,
+                        ),
+                    )
+                }
+
                 // Adds issues generated from the AssignableProperties derived from the property
                 // except for the self  property because self property is considered above block
                 assignableProperty
@@ -77,4 +90,15 @@ data class PropertyContainer(
             }
         }
     }
+}
+
+private fun AssignableProperty.checkResourceReference(project: Project): Issue? {
+    if (this is StringProperty.ValueFromStringResource) {
+        if (project.stringResourceHolder.stringResources.none { it.id == stringResourceId }) {
+            return Issue.InvalidResourceReference(
+                resourceType = "string",
+            )
+        }
+    }
+    return null
 }
