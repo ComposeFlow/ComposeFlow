@@ -9,8 +9,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.action.ActionType
@@ -56,8 +56,8 @@ data class DropdownTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.add("items = ")
         when (items) {
             null -> {
@@ -199,11 +199,11 @@ data class DropdownTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement(
             "%M(",
-            MemberName("io.composeflow.ui.textfield", "DropdownMenuTextField"),
+            MemberNameWrapper.get("io.composeflow.ui.textfield", "DropdownMenuTextField"),
         )
         codeBlockBuilder.add(
             generateParamsCode(

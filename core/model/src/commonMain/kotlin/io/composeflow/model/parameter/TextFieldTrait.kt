@@ -14,9 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
@@ -107,8 +108,8 @@ data class TextFieldTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.add("value = ")
         codeBlockBuilder.add(
             value.transformedCodeBlock(
@@ -141,7 +142,7 @@ data class TextFieldTrait(
             if (node.actionsMap[ActionType.OnChange]?.isNotEmpty() == true) {
                 if (enableValidator == true) {
                     codeBlockBuilder.add(
-                        CodeBlock.of(
+                        CodeBlockWrapper.of(
                             "if (${writeState.getValidateResultName(context)}.%M()) {",
                             MemberHolder.ComposeFlow.isSuccess,
                         ),
@@ -169,9 +170,9 @@ data class TextFieldTrait(
             codeBlockBuilder.add(it.transformedCodeBlock(project, context, dryRun = dryRun))
             codeBlockBuilder.addStatement(",")
         }
-        val text = MemberName("androidx.compose.material3", "Text")
-        val modifier = MemberName("androidx.compose.ui", "Modifier")
-        val alpha = MemberName("androidx.compose.ui.draw", "alpha")
+        val text = MemberNameWrapper.get("androidx.compose.material3", "Text")
+        val modifier = MemberNameWrapper.get("androidx.compose.ui", "Modifier")
+        val alpha = MemberNameWrapper.get("androidx.compose.ui.draw", "alpha")
         label?.let {
             codeBlockBuilder.addStatement(
                 """label = {
@@ -217,10 +218,10 @@ data class TextFieldTrait(
             )
         }
         leadingIcon?.let {
-            val iconMember = MemberName("androidx.compose.material3", "Icon")
-            val iconsMember = MemberName("androidx.compose.material.icons", "Icons")
+            val iconMember = MemberNameWrapper.get("androidx.compose.material3", "Icon")
+            val iconsMember = MemberNameWrapper.get("androidx.compose.material.icons", "Icons")
             val imageVectorMember =
-                MemberName("androidx.compose.material.icons.${it.packageDescriptor}", it.name)
+                MemberNameWrapper.get("androidx.compose.material.icons.${it.packageDescriptor}", it.name)
             codeBlockBuilder.addStatement(
                 """leadingIcon = { %M(imageVector = %M.${it.memberDescriptor}.%M, contentDescription = null) },""",
                 iconMember,
@@ -229,10 +230,10 @@ data class TextFieldTrait(
             )
         }
         trailingIcon?.let {
-            val iconMember = MemberName("androidx.compose.material3", "Icon")
-            val iconsMember = MemberName("androidx.compose.material.icons", "Icons")
+            val iconMember = MemberNameWrapper.get("androidx.compose.material3", "Icon")
+            val iconsMember = MemberNameWrapper.get("androidx.compose.material.icons", "Icons")
             val imageVectorMember =
-                MemberName("androidx.compose.material.icons.${it.packageDescriptor}", it.name)
+                MemberNameWrapper.get("androidx.compose.material.icons.${it.packageDescriptor}", it.name)
             codeBlockBuilder.addStatement(
                 """trailingIcon = { %M(imageVector = %M.${it.memberDescriptor}.%M, contentDescription = null) },""",
                 iconMember,
@@ -249,7 +250,7 @@ data class TextFieldTrait(
         shapeWrapper?.generateCode(codeBlockBuilder)
         if (shouldUseTransparentIndicator()) {
             codeBlockBuilder.add(
-                CodeBlock.of(
+                CodeBlockWrapper.of(
                     """colors = %M.colors(
                     focusedIndicatorColor = %M.Transparent,
                     unfocusedIndicatorColor = %M.Transparent,
@@ -269,19 +270,19 @@ data class TextFieldTrait(
                 """keyboardOptions = %T.Default.copy(
                 imeAction = %T.Done
             ),""",
-                ClassName("androidx.compose.foundation.text", "KeyboardOptions"),
-                ClassName("androidx.compose.ui.text.input", "ImeAction"),
+                ClassNameWrapper.get("androidx.compose.foundation.text", "KeyboardOptions"),
+                ClassNameWrapper.get("androidx.compose.ui.text.input", "ImeAction"),
             )
 
             codeBlockBuilder.add(
                 "keyboardActions = %T(",
-                ClassName("androidx.compose.foundation.text", "KeyboardActions"),
+                ClassNameWrapper.get("androidx.compose.foundation.text", "KeyboardActions"),
             )
             codeBlockBuilder.add("onDone = {")
 
             if (enableValidator == true && writeState != null && writeState is WriteableState) {
                 codeBlockBuilder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         "if (${writeState.getValidateResultName(context)}.%M()) {",
                         MemberHolder.ComposeFlow.isSuccess,
                     ),
@@ -303,7 +304,7 @@ data class TextFieldTrait(
                 MemberHolder.ComposeFlow.ValidateResult,
             )
             codeBlockBuilder.add(
-                CodeBlock.of(
+                CodeBlockWrapper.of(
                     """
                 supportingText = ${writeState.getValidateResultName(context)}.%M()?.let {
                     {
@@ -323,10 +324,10 @@ data class TextFieldTrait(
                         keyboardType = %T.Password,
                         imeAction = %T.Done,
                     ),""",
-                ClassName("androidx.compose.ui.text.input", "PasswordVisualTransformation"),
-                ClassName("androidx.compose.foundation.text", "KeyboardOptions"),
+                ClassNameWrapper.get("androidx.compose.ui.text.input", "PasswordVisualTransformation"),
+                ClassNameWrapper.get("androidx.compose.foundation.text", "KeyboardOptions"),
                 ClassName("androidx.compose.ui.text.input", "KeyboardType"),
-                ClassName("androidx.compose.ui.text.input", "ImeAction"),
+                ClassNameWrapper.get("androidx.compose.ui.text.input", "ImeAction"),
             )
         }
         return codeBlockBuilder.build()
@@ -513,8 +514,8 @@ data class TextFieldTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement("%M(", textFieldType.toMemberName())
         codeBlockBuilder.add(
             generateParamsCode(
@@ -528,10 +529,10 @@ data class TextFieldTrait(
         val hasUnfocusedActions = node.actionsMap[ActionType.OnUnfocused]?.isNotEmpty() == true
         val focusModifierCode =
             if (hasFocusedActions || hasUnfocusedActions) {
-                val additionalCodeBuilder = CodeBlock.builder()
+                val additionalCodeBuilder = CodeBlockWrapper.builder()
                 additionalCodeBuilder.addStatement(
                     ".%M {",
-                    MemberName("androidx.compose.ui.focus", "onFocusChanged"),
+                    MemberNameWrapper.get("androidx.compose.ui.focus", "onFocusChanged"),
                 )
                 if (hasFocusedActions) {
                     additionalCodeBuilder.addStatement("if (it.isFocused) {")
@@ -579,7 +580,7 @@ data class TextFieldTrait(
                 val companionState = project.findLocalStateOrNull(companionStateId)
 
                 if (companionState != null && companionState is WriteableState) {
-                    val launchedEffectBuilder = CodeBlock.builder()
+                    val launchedEffectBuilder = CodeBlockWrapper.builder()
                     launchedEffectBuilder.add(
                         """
                     %M(Unit) {
@@ -632,12 +633,12 @@ object TextFieldTypeSerializer : FallbackEnumSerializer<TextFieldType>(
 @Serializable(TextFieldTypeSerializer::class)
 enum class TextFieldType {
     Default {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "TextField")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "TextField")
     },
     Outlined {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "OutlinedTextField")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "OutlinedTextField")
     },
     ;
 
-    abstract fun toMemberName(): MemberName
+    abstract fun toMemberName(): MemberNameWrapper
 }

@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.DrawerMenu
@@ -53,8 +53,8 @@ data class NavigationDrawerItemTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement("onClick = {")
         node.actionsMap[ActionType.OnClick]?.forEach {
             codeBlockBuilder.add(it.generateCodeBlock(project, context, dryRun = dryRun))
@@ -72,7 +72,7 @@ data class NavigationDrawerItemTrait(
                 context,
                 ComposeFlowType.StringType(),
                 dryRun = dryRun,
-            ) ?: CodeBlock.of(""),
+            ) ?: CodeBlockWrapper.of(""),
         )
         codeBlockBuilder.addStatement(")")
         codeBlockBuilder.addStatement("},")
@@ -180,11 +180,11 @@ data class NavigationDrawerItemTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement(
             "%M(",
-            MemberName("androidx.compose.material3", "NavigationDrawerItem"),
+            MemberNameWrapper.get("androidx.compose.material3", "NavigationDrawerItem"),
         )
         codeBlockBuilder.add(generateParamsCode(project, node, context, dryRun))
         codeBlockBuilder.addStatement(")")

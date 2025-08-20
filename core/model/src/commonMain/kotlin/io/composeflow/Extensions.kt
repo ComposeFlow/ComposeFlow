@@ -10,7 +10,6 @@ import com.mohamedrejeb.richeditor.model.rememberRichTextState
 import io.github.nomisrev.JsonPath
 import io.github.nomisrev.path
 import kotlinx.serialization.json.JsonElement
-import java.util.Collections.addAll
 
 fun <T> MutableList<T>.swap(
     index1: Int,
@@ -79,7 +78,7 @@ fun <T> List<T>.eachEquals(
 
 fun String.removeLineBreak() = this.replace("\r\n|\r|\n".toRegex(), "")
 
-fun <K, V> MutableMap<K, V>.copyAsMutableStateMap(): MutableMap<K, V> = mutableStateMapOf<K, V>().apply { addAll(entries) }
+fun <K, V> MutableMap<K, V>.copyAsMutableStateMap(): MutableMap<K, V> = mutableStateMapOf<K, V>().apply { putAll(this@copyAsMutableStateMap) }
 
 fun String.asClassName() =
     this

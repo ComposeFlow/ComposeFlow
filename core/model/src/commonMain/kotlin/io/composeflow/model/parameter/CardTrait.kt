@@ -10,8 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.materialicons.Outlined
@@ -196,8 +196,8 @@ data class CardTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val allParamsEmpty = areAllParamsEmpty() && node.modifierList.isEmpty()
         if (allParamsEmpty) {
             codeBlockBuilder.addStatement("%M {", cardType.toMemberName())
@@ -227,15 +227,15 @@ object CardTypeSerializer : FallbackEnumSerializer<CardType>(CardType::class)
 @Serializable(CardTypeSerializer::class)
 enum class CardType {
     Default {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "Card")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "Card")
     },
     Elevated {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "ElevatedCard")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "ElevatedCard")
     },
     Outlined {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "OutlinedCard")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "OutlinedCard")
     },
     ;
 
-    abstract fun toMemberName(): MemberName
+    abstract fun toMemberName(): MemberNameWrapper
 }

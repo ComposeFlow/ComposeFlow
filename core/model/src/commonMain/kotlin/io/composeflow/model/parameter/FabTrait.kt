@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.materialicons.ImageVectorHolder
@@ -258,8 +258,8 @@ data class FabTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement(
             "%M(",
             fabType.toMemberName(),
@@ -297,13 +297,13 @@ data class FabTrait(
             val elevationMember =
                 when (it) {
                     FabElevationWrapper.Default ->
-                        MemberName(
+                        MemberNameWrapper.get(
                             "androidx.compose.material3.FloatingActionButtonDefaults",
                             "elevation",
                         )
 
                     FabElevationWrapper.Lowered ->
-                        MemberName(
+                        MemberNameWrapper.get(
                             "androidx.compose.material3.FloatingActionButtonDefaults",
                             "loweredElevation",
                         )
@@ -315,7 +315,7 @@ data class FabTrait(
         )
         codeBlockBuilder.addStatement(") {")
 
-        codeBlockBuilder.addStatement("%M(", MemberName("androidx.compose.material3", "Icon"))
+        codeBlockBuilder.addStatement("%M(", MemberNameWrapper.get("androidx.compose.material3", "Icon"))
         codeBlockBuilder.addStatement("imageVector = ")
         codeBlockBuilder.add(imageVectorHolder.asCodeBlock())
         codeBlockBuilder.addStatement(",")
@@ -351,18 +351,18 @@ object FabTypeSerializer : FallbackEnumSerializer<FabType>(FabType::class)
 @Serializable(FabTypeSerializer::class)
 enum class FabType {
     Default {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "FloatingActionButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "FloatingActionButton")
     },
     Small {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "SmallFloatingActionButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "SmallFloatingActionButton")
     },
     Large {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "LargeFloatingActionButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "LargeFloatingActionButton")
     },
     Extended {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "ExtendedFloatingActionButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "ExtendedFloatingActionButton")
     },
     ;
 
-    abstract fun toMemberName(): MemberName
+    abstract fun toMemberName(): MemberNameWrapper
 }

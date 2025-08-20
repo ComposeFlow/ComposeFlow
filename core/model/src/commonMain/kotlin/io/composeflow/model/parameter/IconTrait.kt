@@ -4,8 +4,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.cloud.storage.BlobInfoWrapper
 import io.composeflow.kotlinpoet.GenerationContext
@@ -61,15 +61,15 @@ data class IconTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
 
         if (node.actionHandler.allActionNodes().isNotEmpty()) {
-            val iconButtonMember = MemberName("androidx.compose.material3", "IconButton")
+            val iconButtonMember = MemberNameWrapper.get("androidx.compose.material3", "IconButton")
             // actual onClick code is written in the modifier in Icon
             codeBlockBuilder.addStatement("%M(onClick = {}) {", iconButtonMember)
         }
-        val iconMember = MemberName("androidx.compose.material3", "Icon")
+        val iconMember = MemberNameWrapper.get("androidx.compose.material3", "Icon")
         codeBlockBuilder.addStatement("%M(", iconMember)
         codeBlockBuilder.add(
             generateIconParamsCode(

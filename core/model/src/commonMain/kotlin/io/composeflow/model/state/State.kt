@@ -6,14 +6,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.asTypeName
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
+import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.parameterizedBy
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
+import io.composeflow.kotlinpoet.wrapper.toWrapper
 import io.composeflow.ViewModelConstant
 import io.composeflow.asVariableName
 import io.composeflow.kotlinpoet.ClassHolder
@@ -54,13 +55,13 @@ sealed interface ReadableState {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun generateReadBlock(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun getReadVariableName(
         project: Project,
@@ -81,7 +82,7 @@ sealed interface ReadableState {
     fun generateStatePropertiesToViewModel(
         project: Project,
         context: GenerationContext,
-    ): List<PropertySpec> = emptyList()
+    ): List<PropertySpecWrapper> = emptyList()
 
     fun getUniqueIdentifier(context: GenerationContext): String =
         context.getCurrentComposableContext().getOrAddIdentifier(
@@ -104,25 +105,25 @@ sealed interface WriteableState : ReadableState {
         canvasEditable: CanvasEditable,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun getUpdateMethodName(context: GenerationContext): String
 
-    fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec
+    fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper
 
     fun generateUpdateStateCodeToViewModel(
         project: Project,
         context: GenerationContext,
         readProperty: AssignableProperty,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
-    fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock
+    fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper
 
     override fun generateStatePropertiesToViewModel(
         project: Project,
         context: GenerationContext,
-    ): List<PropertySpec>
+    ): List<PropertySpecWrapper>
 
     fun getValidateResultName(context: GenerationContext): String = getUniqueIdentifier(context).asVariableName() + "ValidateResult"
 }
@@ -139,13 +140,13 @@ sealed interface State<T> :
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     override fun generateReadBlock(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     override val userWritable: Boolean
 
@@ -159,47 +160,47 @@ sealed interface State<T> :
         canvasEditable: CanvasEditable,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     override fun getUpdateMethodName(context: GenerationContext): String {
         val uniqueIdentifier = getUniqueIdentifier(context)
         return "on${uniqueIdentifier.asVariableName().capitalize(Locale.current)}Updated"
     }
 
-    override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec
+    override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper
 
     override fun generateUpdateStateCodeToViewModel(
         project: Project,
         context: GenerationContext,
         readProperty: AssignableProperty,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
-    override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock
+    override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper
 
     override fun generateStatePropertiesToViewModel(
         project: Project,
         context: GenerationContext,
-    ): List<PropertySpec>
+    ): List<PropertySpecWrapper>
 
     val defaultValue: T?
 }
 
 sealed interface BooleanState : State<Boolean> {
-    fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlock
+    fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper
 }
 
 sealed interface ListAppState {
     fun generateStateProperty(
         propertyName: String,
         stateName: String,
-        typeClassName: ClassName,
-    ): PropertySpec =
-        PropertySpec
+        typeClassName: ClassNameWrapper,
+    ): PropertySpecWrapper =
+        PropertySpecWrapper
             .builder(
                 propertyName,
-                ClassHolder.Coroutines.Flow.StateFlow.parameterizedBy(
-                    ClassHolder.Collections.List.parameterizedBy(typeClassName),
+                ClassHolder.Coroutines.Flow.StateFlow.toWrapper().parameterizedBy(
+                    ClassHolder.Collections.List.toWrapper().parameterizedBy(typeClassName),
                 ),
             ).initializer(
                 """
@@ -224,8 +225,8 @@ sealed interface ListAppState {
                 MemberHolder.Coroutines.Flow.SharingStarted,
             ).build()
 
-    fun generateClearStateCode(stateName: String): CodeBlock =
-        CodeBlock.of(
+    fun generateClearStateCode(stateName: String): CodeBlockWrapper =
+        CodeBlockWrapper.of(
             """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putString("$stateName", "[]")
                 }""",
@@ -238,14 +239,14 @@ sealed interface ListAppState {
         context: GenerationContext,
         readProperty: AssignableProperty,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun generateRemoveFirstValueCode(
         project: Project,
         context: GenerationContext,
         writeState: WriteableState,
-    ): CodeBlock =
-        CodeBlock.of(
+    ): CodeBlockWrapper =
+        CodeBlockWrapper.of(
             """%M.%M {
                 val list = ${writeState.getFlowName(context)}.value.toMutableList()
                 if (list.isNotEmpty()) {
@@ -262,8 +263,8 @@ sealed interface ListAppState {
         project: Project,
         context: GenerationContext,
         writeState: WriteableState,
-    ): CodeBlock =
-        CodeBlock.of(
+    ): CodeBlockWrapper =
+        CodeBlockWrapper.of(
             """%M.%M {
                 val list = ${writeState.getFlowName(context)}.value.toMutableList()
                 if (list.isNotEmpty()) {
@@ -281,12 +282,12 @@ sealed interface ListAppState {
         context: GenerationContext,
         functionName: String,
         writeState: WriteableState,
-    ): FunSpec {
+    ): FunSpecWrapper {
         val indexToRemove = "indexToRemove"
-        return FunSpec
+        return FunSpecWrapper
             .builder(functionName)
             .addParameter(
-                ParameterSpec.builder(name = indexToRemove, Int::class).build(),
+                ParameterSpecWrapper.builder(name = indexToRemove, Int::class.asTypeNameWrapper()).build(),
             ).addCode(
                 """
                 val list = ${writeState.getFlowName(context)}.value.toMutableList()
@@ -307,14 +308,14 @@ sealed interface ListAppState {
         project: Project,
         context: GenerationContext,
         functionName: String,
-        readCodeBlock: CodeBlock,
+        readCodeBlock: CodeBlockWrapper,
         writeState: WriteableState,
-    ): FunSpec.Builder {
+    ): FunSpecWrapper {
         val indexToUpdate = "indexToUpdate"
-        return FunSpec
+        return FunSpecWrapper
             .builder(functionName)
             .addParameter(
-                ParameterSpec.builder(name = indexToUpdate, Int::class).build(),
+                ParameterSpecWrapper.builder(name = indexToUpdate, Int::class.asTypeNameWrapper()).build(),
             ).addCode(
                 """
                 val list = ${writeState.getFlowName(context)}.value.toMutableList()
@@ -326,7 +327,7 @@ sealed interface ListAppState {
                 MemberHolder.PreCompose.viewModelScope,
                 MemberHolder.Coroutines.launch,
                 MemberHolder.Serialization.encodeToString,
-            )
+            ).build()
     }
 }
 
@@ -346,8 +347,8 @@ sealed interface ScreenState<T> : State<T> {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val builder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
         val variableName = getReadVariableName(project, context)
         builder.addStatement(
             "val $variableName by ${context.currentEditable.viewModelName}.${getFlowName(context)}.%M()",
@@ -360,7 +361,7 @@ sealed interface ScreenState<T> : State<T> {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock? {
+    ): CodeBlockWrapper? {
         val companionNode =
             companionNodeId?.let {
                 project.findComposeNodeOrNull(it)
@@ -368,7 +369,7 @@ sealed interface ScreenState<T> : State<T> {
 
         val result =
             companionNode.trait.value.getStateValidator()?.let { stateValidator ->
-                CodeBlock.of(
+                CodeBlockWrapper.of(
                     """val ${getValidateResultName(context)} by %M(${
                         getReadVariableName(
                             project,
@@ -398,11 +399,11 @@ sealed interface ScreenState<T> : State<T> {
         override val userWritable: Boolean = true,
         override val companionNodeId: String? = null,
     ) : ScreenState<String> {
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec {
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper {
             val flowName = getFlowName(context)
-            return FunSpec
+            return FunSpecWrapper
                 .builder(getUpdateMethodName(context))
-                .addParameter("newValue", String::class)
+                .addParameter("newValue", String::class.asTypeNameWrapper())
                 .addStatement("_$flowName.value = newValue")
                 .build()
         }
@@ -412,8 +413,8 @@ sealed interface ScreenState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -431,8 +432,8 @@ sealed interface ScreenState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """
                     _${getFlowName(context)}.value = "$defaultValue"
                 """,
@@ -441,20 +442,20 @@ sealed interface ScreenState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val backingProperty =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.parameterizedBy(String::class),
-                    ).addModifiers(KModifier.PRIVATE)
+                        MutableStateFlow::class.asTypeNameWrapper().parameterizedBy(String::class.asTypeNameWrapper()),
+                    ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow("$defaultValue")""")
                     .build()
             val property =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(String::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(String::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
             return listOf(
@@ -467,8 +468,8 @@ sealed interface ScreenState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -478,8 +479,8 @@ sealed interface ScreenState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(
                 "${canvasEditable.viewModelName}.${getUpdateMethodName(context)}(it)",
             )
@@ -503,11 +504,11 @@ sealed interface ScreenState<T> : State<T> {
         override val userWritable: Boolean = true,
         override val companionNodeId: String? = null,
     ) : ScreenState<Float> {
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec {
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper {
             val flowName = getFlowName(context)
-            return FunSpec
+            return FunSpecWrapper
                 .builder(getUpdateMethodName(context))
-                .addParameter("newValue", Float::class)
+                .addParameter("newValue", Float::class.asTypeNameWrapper())
                 .addStatement("_$flowName.value = newValue")
                 .build()
         }
@@ -517,8 +518,8 @@ sealed interface ScreenState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -536,8 +537,8 @@ sealed interface ScreenState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """
                     _${getFlowName(context)}.value = "${defaultValue}f"
                 """,
@@ -546,20 +547,20 @@ sealed interface ScreenState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val backingProperty =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.parameterizedBy(Float::class),
-                    ).addModifiers(KModifier.PRIVATE)
+                        MutableStateFlow::class.asTypeNameWrapper().parameterizedBy(Float::class.asTypeNameWrapper()),
+                    ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow(${defaultValue}f)""")
                     .build()
             val property =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(Float::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(Float::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
             return listOf(
@@ -572,8 +573,8 @@ sealed interface ScreenState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -583,8 +584,8 @@ sealed interface ScreenState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(
                 "${canvasEditable.viewModelName}.${getUpdateMethodName(context)}(it)",
             )
@@ -609,11 +610,11 @@ sealed interface ScreenState<T> : State<T> {
         override val companionNodeId: String? = null,
     ) : ScreenState<Boolean>,
         BooleanState {
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec {
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper {
             val flowName = getFlowName(context)
-            return FunSpec
+            return FunSpecWrapper
                 .builder(getUpdateMethodName(context))
-                .addParameter("newValue", Boolean::class)
+                .addParameter("newValue", Boolean::class.asTypeNameWrapper())
                 .addStatement("_$flowName.value = newValue")
                 .build()
         }
@@ -623,8 +624,8 @@ sealed interface ScreenState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -642,8 +643,8 @@ sealed interface ScreenState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """
                     _${getFlowName(context)}.value = $defaultValue
                 """,
@@ -652,20 +653,20 @@ sealed interface ScreenState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val backingProperty =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.parameterizedBy(Boolean::class),
-                    ).addModifiers(KModifier.PRIVATE)
+                        MutableStateFlow::class.asTypeNameWrapper().parameterizedBy(Boolean::class.asTypeNameWrapper()),
+                    ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow($defaultValue)""")
                     .build()
             val property =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(Boolean::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(Boolean::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
             return listOf(
@@ -674,8 +675,8 @@ sealed interface ScreenState<T> : State<T> {
             )
         }
 
-        override fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """
                     _${getFlowName(context)}.value = !${getFlowName(context)}.value
                 """,
@@ -685,8 +686,8 @@ sealed interface ScreenState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -696,8 +697,8 @@ sealed interface ScreenState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(
                 "${canvasEditable.viewModelName}.${getUpdateMethodName(context)}(it)",
             )
@@ -721,11 +722,11 @@ sealed interface ScreenState<T> : State<T> {
         override val userWritable: Boolean = true,
         override val companionNodeId: String? = null,
     ) : ScreenState<Int> {
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec {
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper {
             val flowName = getFlowName(context)
-            return FunSpec
+            return FunSpecWrapper
                 .builder(getUpdateMethodName(context))
-                .addParameter("newValue", Int::class)
+                .addParameter("newValue", Int::class.asTypeNameWrapper())
                 .addStatement("_$flowName.value = newValue")
                 .build()
         }
@@ -735,8 +736,8 @@ sealed interface ScreenState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -754,8 +755,8 @@ sealed interface ScreenState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """
                     _${getFlowName(context)}.value = $defaultValue
                 """,
@@ -764,20 +765,20 @@ sealed interface ScreenState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val backingProperty =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.parameterizedBy(Int::class),
-                    ).addModifiers(KModifier.PRIVATE)
+                        MutableStateFlow::class.asTypeNameWrapper().parameterizedBy(Int::class.asTypeNameWrapper()),
+                    ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow($defaultValue)""")
                     .build()
             val property =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(Int::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(Int::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
             return listOf(
@@ -790,8 +791,8 @@ sealed interface ScreenState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -801,8 +802,8 @@ sealed interface ScreenState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(
                 "${canvasEditable.viewModelName}.${getUpdateMethodName(context)}(it)",
             )
@@ -832,8 +833,8 @@ sealed interface ScreenState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -851,8 +852,8 @@ sealed interface ScreenState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """
                     _${getFlowName(context)}.value = $defaultValue
                 """,
@@ -861,25 +862,25 @@ sealed interface ScreenState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val backingProperty =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        ClassHolder.Coroutines.Flow.MutableStateFlow
-                            .parameterizedBy(Instant::class.asTypeName()),
-                    ).addModifiers(KModifier.PRIVATE)
+                        ClassHolder.Coroutines.Flow.MutableStateFlow.toWrapper()
+                            .parameterizedBy(Instant::class.asTypeNameWrapper()),
+                    ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer(
                         "%T(%T.System.now())",
                         ClassHolder.Coroutines.Flow.MutableStateFlow,
-                        Clock::class.asTypeName(),
+                        Clock::class.asTypeNameWrapper(),
                     ).build()
             val property =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        ClassHolder.Coroutines.Flow.StateFlow
-                            .parameterizedBy(Instant::class.asTypeName()),
+                        ClassHolder.Coroutines.Flow.StateFlow.toWrapper()
+                            .parameterizedBy(Instant::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
             return listOf(
@@ -892,8 +893,8 @@ sealed interface ScreenState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -903,13 +904,13 @@ sealed interface ScreenState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec {
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper {
             val flowName = getFlowName(context)
-            return FunSpec
+            return FunSpecWrapper
                 .builder(getUpdateMethodName(context))
-                .addParameter("newValue", Instant::class)
+                .addParameter("newValue", Instant::class.asTypeNameWrapper())
                 .addStatement("_$flowName.value = newValue")
                 .build()
         }
@@ -941,8 +942,8 @@ sealed interface ScreenState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -960,18 +961,18 @@ sealed interface ScreenState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """
                     _${getFlowName(context)}.value = emptyList()
                 """,
             )
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec {
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper {
             val flowName = getFlowName(context)
-            return FunSpec
+            return FunSpecWrapper
                 .builder(getUpdateMethodName(context))
-                .addParameter("newValue", List::class.parameterizedBy(String::class))
+                .addParameter("newValue", List::class.asTypeNameWrapper().parameterizedBy(String::class.asTypeNameWrapper()))
                 .addStatement("_$flowName.value = newValue")
                 .build()
         }
@@ -979,26 +980,26 @@ sealed interface ScreenState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val backingProperty =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        ClassHolder.Coroutines.Flow.MutableStateFlow.parameterizedBy(
-                            List::class.parameterizedBy(
-                                String::class,
+                        ClassHolder.Coroutines.Flow.MutableStateFlow.toWrapper().parameterizedBy(
+                            List::class.asTypeNameWrapper().parameterizedBy(
+                                String::class.asTypeNameWrapper(),
                             ),
                         ),
-                    ).addModifiers(KModifier.PRIVATE)
+                    ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow(List(0) { "" })""")
                     .build()
             val property =
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        ClassHolder.Coroutines.Flow.StateFlow.parameterizedBy(
-                            List::class.parameterizedBy(
-                                String::class,
+                        ClassHolder.Coroutines.Flow.StateFlow.toWrapper().parameterizedBy(
+                            List::class.asTypeNameWrapper().parameterizedBy(
+                                String::class.asTypeNameWrapper(),
                             ),
                         ),
                     ).initializer("""_${getFlowName(context)}""")
@@ -1013,8 +1014,8 @@ sealed interface ScreenState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -1024,8 +1025,8 @@ sealed interface ScreenState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             val composeContext = context.getCurrentComposableContext()
             val newItems =
                 composeContext.getOrAddIdentifier(
@@ -1034,7 +1035,7 @@ sealed interface ScreenState<T> : State<T> {
                 )
             if (singleValueOnly) {
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         """
                     val $newItems = ${getReadVariableName(project, context)}.%M()
                     if ($newItems.%M()) {
@@ -1051,7 +1052,7 @@ sealed interface ScreenState<T> : State<T> {
                 )
             } else {
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         """
                     val $newItems = ${getReadVariableName(project, context)}.%M()
                     if ($newItems.contains(it)) {
@@ -1118,8 +1119,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -1129,16 +1130,16 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(
                 "${canvasEditable.viewModelName}.${getUpdateMethodName(context)}(it)",
             )
             return builder.build()
         }
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper
                 .builder(getUpdateMethodName(context))
                 .build()
 
@@ -1152,8 +1153,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1173,8 +1174,8 @@ sealed interface AppState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putString("$name", "$defaultValue")
                 }""",
@@ -1185,12 +1186,12 @@ sealed interface AppState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(String::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(String::class.asTypeNameWrapper()),
                     ).initializer(
                         """
                        ${ViewModelConstant.flowSettings.name}.%M(
@@ -1230,14 +1231,14 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun generateWriteBlock(
             project: Project,
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1249,8 +1250,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1270,11 +1271,11 @@ sealed interface AppState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putInt("$name", $defaultValue)
                 }""",
@@ -1285,12 +1286,12 @@ sealed interface AppState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(Int::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(Int::class.asTypeNameWrapper()),
                     ).initializer(
                         """
                        ${ViewModelConstant.flowSettings.name}.%M(
@@ -1330,14 +1331,14 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun generateWriteBlock(
             project: Project,
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1349,8 +1350,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1370,11 +1371,11 @@ sealed interface AppState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putFloat("$name", ${defaultValue}f)
                 }""",
@@ -1385,12 +1386,12 @@ sealed interface AppState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(Float::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(Float::class.asTypeNameWrapper()),
                     ).initializer(
                         """
                        ${ViewModelConstant.flowSettings.name}.%M(
@@ -1431,14 +1432,14 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun generateWriteBlock(
             project: Project,
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1450,8 +1451,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1471,11 +1472,11 @@ sealed interface AppState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putBoolean("$name", $defaultValue)
                 }""",
@@ -1483,8 +1484,8 @@ sealed interface AppState<T> : State<T> {
                 MemberHolder.Coroutines.launch,
             )
 
-        override fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putBoolean("$name", !${
                     getFlowName(
@@ -1499,12 +1500,12 @@ sealed interface AppState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(Boolean::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(Boolean::class.asTypeNameWrapper()),
                     ).initializer(
                         """
                        ${ViewModelConstant.flowSettings.name}.%M(
@@ -1544,14 +1545,14 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun generateWriteBlock(
             project: Project,
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1563,8 +1564,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1584,11 +1585,11 @@ sealed interface AppState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putLong("$name", ${defaultValue.generateCode()}.toEpochMilliseconds())
                 }""",
@@ -1599,14 +1600,14 @@ sealed interface AppState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.parameterizedBy(Instant::class),
+                        StateFlow::class.asTypeNameWrapper().parameterizedBy(Instant::class.asTypeNameWrapper()),
                     ).initializer(
-                        CodeBlock.of(
+                        CodeBlockWrapper.of(
                             """
                        ${ViewModelConstant.flowSettings.name}.%M(
                          "$name",
@@ -1649,8 +1650,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -1660,7 +1661,7 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1675,18 +1676,18 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
             super.generateClearStateCode(stateName = name)
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
                 super.generateStateProperty(
                     propertyName = getFlowName(context),
@@ -1700,8 +1701,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1742,8 +1743,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -1753,7 +1754,7 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1765,18 +1766,18 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
             super.generateClearStateCode(stateName = name)
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
                 super.generateStateProperty(
                     propertyName = getFlowName(context),
@@ -1790,8 +1791,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1833,8 +1834,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -1844,7 +1845,7 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1856,18 +1857,18 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
             super.generateClearStateCode(stateName = name)
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
                 super.generateStateProperty(
                     propertyName = getFlowName(context),
@@ -1881,8 +1882,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -1924,8 +1925,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -1935,7 +1936,7 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -1947,18 +1948,18 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
             super.generateClearStateCode(stateName = name)
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
                 super.generateStateProperty(
                     propertyName = getFlowName(context),
@@ -1972,8 +1973,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -2015,8 +2016,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -2026,7 +2027,7 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -2041,18 +2042,18 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
             super.generateClearStateCode(stateName = name)
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> =
+        ): List<PropertySpecWrapper> =
             listOf(
                 super.generateStateProperty(
                     propertyName = getFlowName(context),
@@ -2066,8 +2067,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             readProperty
                 .transformedCodeBlock(project, context, dryRun = dryRun)
                 .let { readExpression ->
@@ -2110,8 +2111,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -2121,7 +2122,7 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun valueType(
             project: Project,
@@ -2137,18 +2138,18 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
             super.generateClearStateCode(stateName = name)
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val dataType = project.findDataTypeOrThrow(dataTypeId)
             return listOf(
                 super.generateStateProperty(
@@ -2164,8 +2165,8 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             return builder.build()
         }
     }
@@ -2186,8 +2187,8 @@ sealed interface AppState<T> : State<T> {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(getReadVariableName(project, context))
             return builder.build()
         }
@@ -2197,8 +2198,8 @@ sealed interface AppState<T> : State<T> {
             canvasEditable: CanvasEditable,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             builder.addStatement(
                 "${canvasEditable.viewModelName}.${getUpdateMethodName(context)}(it)",
             )
@@ -2219,16 +2220,16 @@ sealed interface AppState<T> : State<T> {
             context: GenerationContext,
             readProperty: AssignableProperty,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             return builder.build()
         }
 
-        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpec =
-            FunSpec.builder(getUpdateMethodName(context)).build()
+        override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
+            FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlock =
-            CodeBlock.of(
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 """%M.%M {
                     ${ViewModelConstant.flowSettings.name}.putString("$name", "{}")
                 }""",
@@ -2239,13 +2240,13 @@ sealed interface AppState<T> : State<T> {
         override fun generateStatePropertiesToViewModel(
             project: Project,
             context: GenerationContext,
-        ): List<PropertySpec> {
+        ): List<PropertySpecWrapper> {
             val dataType = project.findDataTypeOrThrow(dataTypeId)
             return listOf(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        ClassHolder.Coroutines.Flow.StateFlow.parameterizedBy(
+                        ClassHolder.Coroutines.Flow.StateFlow.toWrapper().parameterizedBy(
                             dataType.asKotlinPoetClassName(
                                 project,
                             ),
@@ -2285,9 +2286,9 @@ sealed interface AppState<T> : State<T> {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
+    ): CodeBlockWrapper {
         val variableName = getReadVariableName(project, context)
-        return CodeBlock.of(
+        return CodeBlockWrapper.of(
             "val $variableName by ${context.currentEditable.viewModelName}.${getFlowName(context)}.%M()",
             MemberHolder.AndroidX.Runtime.collectAsState,
         )
@@ -2553,7 +2554,7 @@ sealed interface AuthenticatedUserState : ReadableState {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
+    ): CodeBlockWrapper {
         val authenticatedUser = AUTHENTICATED_USER
         context.getCurrentComposableContext().addCompositionLocalVariableEntryIfNotPresent(
             id = authenticatedUser,
@@ -2562,7 +2563,7 @@ sealed interface AuthenticatedUserState : ReadableState {
         )
         // Initialize the authenticatedUser once in the compose file instead of initializing it in
         // every state that has a reference
-        return CodeBlock.of("")
+        return CodeBlockWrapper.of("")
     }
 
     @Serializable
@@ -2576,7 +2577,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("""$AUTHENTICATED_USER != null""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""$AUTHENTICATED_USER != null""")
 
         override fun valueType(
             project: Project,
@@ -2595,7 +2596,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("""($AUTHENTICATED_USER?.displayName ?: "Invalid display name")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.displayName ?: "Invalid display name")""")
 
         override fun valueType(
             project: Project,
@@ -2614,7 +2615,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("""($AUTHENTICATED_USER?.email ?: "Invalid email")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.email ?: "Invalid email")""")
 
         override fun valueType(
             project: Project,
@@ -2633,7 +2634,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("""($AUTHENTICATED_USER?.phoneNumber ?: "Invalid phone number")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.phoneNumber ?: "Invalid phone number")""")
 
         override fun valueType(
             project: Project,
@@ -2652,7 +2653,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("""($AUTHENTICATED_USER?.photoURL ?: "Invalid photo url")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.photoURL ?: "Invalid photo url")""")
 
         override fun valueType(
             project: Project,
@@ -2671,7 +2672,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = CodeBlock.of("""($AUTHENTICATED_USER?.isAnonymous ?: false)""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.isAnonymous ?: false)""")
 
         override fun valueType(
             project: Project,

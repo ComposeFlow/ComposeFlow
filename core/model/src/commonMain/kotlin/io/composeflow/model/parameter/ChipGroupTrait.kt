@@ -14,8 +14,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Choice
@@ -218,8 +219,8 @@ data class ChipGroupTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val chipGroupTrait = node.trait.value as ChipGroupTrait
 
         val companionState =
@@ -240,7 +241,7 @@ data class ChipGroupTrait(
         val itemsCodeBlock =
             when (val items = chipItems) {
                 null -> {
-                    CodeBlock.of("emptyList<String>()")
+                    CodeBlockWrapper.of("emptyList<String>()")
                 }
 
                 else -> {
@@ -255,14 +256,14 @@ data class ChipGroupTrait(
 
         fun generateChipCode(
             groupParams: ChipGroupTrait,
-            builder: CodeBlock.Builder,
+            builder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
         ) {
             val chipMember =
                 if (groupParams.selectable) {
-                    MemberName("androidx.compose.material3", "FilterChip")
+                    MemberNameWrapper.get("androidx.compose.material3", "FilterChip")
                 } else {
-                    MemberName("androidx.compose.material3", "AssistChip")
+                    MemberNameWrapper.get("androidx.compose.material3", "AssistChip")
                 }
             builder.add("%M(", chipMember)
             if (updatedState is WriteableState) {
@@ -306,7 +307,7 @@ data class ChipGroupTrait(
 
         codeBlockBuilder.addStatement(
             "%M(",
-            MemberName("androidx.compose.foundation.layout", "FlowRow"),
+            MemberNameWrapper.get("androidx.compose.foundation.layout", "FlowRow"),
         )
         codeBlockBuilder.add(
             node.generateModifierCode(project, context, dryRun = dryRun),

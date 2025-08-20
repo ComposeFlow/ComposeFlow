@@ -1,7 +1,7 @@
 package io.composeflow.model.parameter
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Smartphone
@@ -43,5 +43,5 @@ data object ScreenTrait : ComposeTrait {
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock = CodeBlock.of("")
+    ): CodeBlockWrapper = CodeBlockWrapper.of("")
 }

@@ -16,8 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.TopHeader
@@ -299,31 +300,31 @@ data class TopAppBarTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val topAppBarNode = node as TopAppBarNode
         val topAppBarMemberName =
             when (topAppBarType) {
                 TopAppBarTypeWrapper.Default ->
-                    MemberName(
+                    MemberNameWrapper.get(
                         "androidx.compose.material3",
                         "TopAppBar",
                     )
 
                 TopAppBarTypeWrapper.CenterAligned ->
-                    MemberName(
+                    MemberNameWrapper.get(
                         "androidx.compose.material3",
                         "CenterAlignedTopAppBar",
                     )
 
                 TopAppBarTypeWrapper.Medium ->
-                    MemberName(
+                    MemberNameWrapper.get(
                         "androidx.compose.material3",
                         "MediumTopAppBar",
                     )
 
                 TopAppBarTypeWrapper.Large ->
-                    MemberName(
+                    MemberNameWrapper.get(
                         "androidx.compose.material3",
                         "LargeTopAppBar",
                     )
@@ -338,7 +339,7 @@ data class TopAppBarTrait(
             // Title for screen specific TopAppBar
             codeBlockBuilder.addStatement(
                 "title = { %M(",
-                MemberName("androidx.compose.material3", "Text"),
+                MemberNameWrapper.get("androidx.compose.material3", "Text"),
             )
             codeBlockBuilder.add(
                 title.transformedCodeBlock(
@@ -352,7 +353,7 @@ data class TopAppBarTrait(
         } ?: {
             codeBlockBuilder.addStatement(
                 "title = currentDestination?.let { { %M(",
-                MemberName("androidx.compose.material3", "Text"),
+                MemberNameWrapper.get("androidx.compose.material3", "Text"),
             )
             codeBlockBuilder.addStatement("it.title")
             codeBlockBuilder.addStatement(") }")
@@ -361,15 +362,15 @@ data class TopAppBarTrait(
 
         fun writeIconButton(
             iconNode: ComposeNode,
-            builder: CodeBlock.Builder,
+            builder: CodeBlockBuilderWrapper,
         ) {
             val iconTrait = iconNode.trait.value as? IconTrait
             iconTrait?.imageVectorHolder?.let { imageVectorHolder ->
-                val iconMember = MemberName("androidx.compose.material3", "Icon")
-                val iconButtonMember = MemberName("androidx.compose.material3", "IconButton")
-                val iconsMember = MemberName("androidx.compose.material.icons", "Icons")
+                val iconMember = MemberNameWrapper.get("androidx.compose.material3", "Icon")
+                val iconButtonMember = MemberNameWrapper.get("androidx.compose.material3", "IconButton")
+                val iconsMember = MemberNameWrapper.get("androidx.compose.material.icons", "Icons")
                 val imageVectorMember =
-                    MemberName(
+                    MemberNameWrapper.get(
                         "androidx.compose.material.icons.${imageVectorHolder.packageDescriptor}",
                         imageVectorHolder.name,
                     )

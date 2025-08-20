@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.modifier.ModifierWrapper
@@ -37,9 +37,9 @@ data class BoxTrait(
 ) : ComposeTrait {
     override fun areAllParamsEmpty(): Boolean = contentAlignment == null && propagateMinConstraints == null
 
-    private fun generateParamsCode(): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
-        val alignmentMember = MemberName("androidx.compose.ui", "Alignment")
+    private fun generateParamsCode(): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
+        val alignmentMember = MemberNameWrapper.get("androidx.compose.ui", "Alignment")
         contentAlignment?.let {
             codeBlockBuilder.addStatement("contentAlignment = %M.${it.name},", alignmentMember)
         }
@@ -116,9 +116,9 @@ data class BoxTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
-        val boxMember = MemberName("androidx.compose.foundation.layout", "Box")
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
+        val boxMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "Box")
         val allParamsEmpty = areAllParamsEmpty() && node.modifierList.isEmpty()
         if (allParamsEmpty) {
             codeBlockBuilder.addStatement("%M {", boxMember)

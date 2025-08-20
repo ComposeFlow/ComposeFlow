@@ -6,6 +6,9 @@ plugins {
 
 kotlin {
     jvm()
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -27,7 +30,7 @@ kotlin {
             implementation(libs.kaml)
             implementation(libs.kmpauth.uihelper)
             implementation(libs.koin.core)
-            implementation(libs.kotlinpoet)
+            // KotlinPoet moved to JVM-only dependencies
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.jsonpath)
             implementation(libs.kotlin.datetime)
@@ -53,6 +56,8 @@ kotlin {
         jvmMain.dependencies {
             implementation(libs.xmlutil.core.jdk)
             implementation(libs.xmlutil.serialization.jvm)
+            // KotlinPoet is only available on JVM
+            implementation(libs.kotlinpoet)
         }
         all {
             optInComposeExperimentalApis()

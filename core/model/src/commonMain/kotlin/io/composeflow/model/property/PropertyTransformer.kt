@@ -9,7 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.referentialEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.toWrapper
 import io.composeflow.Res
 import io.composeflow.add_string_after
 import io.composeflow.add_string_before
@@ -86,10 +87,10 @@ sealed interface PropertyTransformer {
 
     fun transformedCodeBlock(
         project: Project,
-        input: CodeBlock,
+        input: CodeBlockWrapper,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun isValid(): Boolean = true
 
@@ -201,11 +202,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
                 builder.add(".plus(")
                 builder.add(input)
@@ -259,11 +260,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".plus(")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -317,11 +318,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".substringBefore(")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -376,11 +377,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".substringAfter(")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -442,11 +443,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".contains(")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -500,11 +501,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".startsWith(")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -558,11 +559,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".endsWith(")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -610,11 +611,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".isEmpty()")
                 return builder.build()
@@ -665,11 +666,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".length")
                 return builder.build()
@@ -713,11 +714,11 @@ sealed interface FromString : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add("(")
                 builder.add(input)
                 builder.add(")")
@@ -792,11 +793,11 @@ sealed interface FromBoolean : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".toString()")
                 return builder.build()
@@ -825,11 +826,11 @@ sealed interface FromBoolean : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add("(!")
                 builder.add(input)
                 builder.add(")")
@@ -878,11 +879,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" + ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -936,11 +937,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" * ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -997,11 +998,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".toString()")
                 return builder.build()
@@ -1034,11 +1035,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" < ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1092,11 +1093,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" <= ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1150,11 +1151,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" == ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1208,11 +1209,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" >= ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1266,11 +1267,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" > ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1334,11 +1335,11 @@ sealed interface FromInt : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".mod(")
                 builder.add(mod.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1443,11 +1444,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" + ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1501,11 +1502,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" * ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1562,11 +1563,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".toString()")
                 return builder.build()
@@ -1599,11 +1600,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" < ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1657,11 +1658,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" <= ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1715,11 +1716,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" == ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1773,11 +1774,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" >= ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1831,11 +1832,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(" > ")
                 builder.add(value.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -1899,11 +1900,11 @@ sealed interface FromFloat : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".mod(")
                 builder.add(mod.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -2008,14 +2009,14 @@ sealed interface FromInstant : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         ".%M(${
                             value.value.transformedCodeBlock(
                                 project,
@@ -2078,14 +2079,14 @@ sealed interface FromInstant : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         ".%M(${
                             value.value.transformedCodeBlock(
                                 project,
@@ -2148,14 +2149,14 @@ sealed interface FromInstant : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         ".%M(${
                             value.value.transformedCodeBlock(
                                 project,
@@ -2228,21 +2229,21 @@ sealed interface FromInstant : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         ".%M(%M.currentSystemDefault(",
                         MemberHolder.DateTime.toLocalDateTime,
                         MemberHolder.DateTime.TimeZone,
                     ),
                 )
-                builder.add(CodeBlock.of(")).%M(", MemberHolder.DateTime.format))
-                builder.add(dateTimeFormatter.value.asCodeBlock())
+                builder.add(CodeBlockWrapper.of(")).%M(", MemberHolder.DateTime.format))
+                builder.add(dateTimeFormatter.value.asCodeBlock().toWrapper())
                 builder.add(")")
                 return builder.build()
             }
@@ -2362,11 +2363,11 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(
                     """.filter { ${
@@ -2435,14 +2436,14 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         """.%M()""",
                         MemberHolder.Kotlin.Collection.sorted,
                     ),
@@ -2489,11 +2490,11 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 if (innerType !is ComposeFlowType.CustomDataType) return builder.build()
                 val dataType =
                     project.findDataTypeOrNull(innerType.dataTypeId) ?: return builder.build()
@@ -2501,7 +2502,7 @@ sealed interface FromList : PropertyTransformer {
                     dataType.findDataFieldOrNull(dataFieldIdToSort.value)
                         ?: if (dataType.fields.isNotEmpty()) dataType.fields[0] else null
                 builder.add(input)
-                builder.add(CodeBlock.of(".%M", MemberHolder.Kotlin.Collection.sortedBy))
+                builder.add(CodeBlockWrapper.of(".%M", MemberHolder.Kotlin.Collection.sortedBy))
                 builder.add(" { it.${dataField?.variableName} }")
                 return builder.build()
             }
@@ -2576,11 +2577,11 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(
                     """.map { ${
@@ -2771,11 +2772,11 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".joinToString(")
                 builder.add(separator.value.transformedCodeBlock(project, context, dryRun = dryRun))
@@ -2840,11 +2841,11 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".toString()")
                 return builder.build()
@@ -2887,16 +2888,16 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
+            ): CodeBlockWrapper {
                 val block =
                     innerType.copyWith(newIsList = false).convertCodeFromType(
                         value.value.valueType(project),
                         value.value.transformedCodeBlock(project, context, dryRun = dryRun),
                     )
-                val builder = CodeBlock.builder()
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".contains($block)")
                 value.value.addReadProperty(project, context, dryRun = dryRun)
@@ -2954,11 +2955,11 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".isEmpty()")
                 return builder.build()
@@ -2991,11 +2992,11 @@ sealed interface FromList : PropertyTransformer {
 
             override fun transformedCodeBlock(
                 project: Project,
-                input: CodeBlock,
+                input: CodeBlockWrapper,
                 context: GenerationContext,
                 dryRun: Boolean,
-            ): CodeBlock {
-                val builder = CodeBlock.builder()
+            ): CodeBlockWrapper {
+                val builder = CodeBlockWrapper.builder()
                 builder.add(input)
                 builder.add(".size")
                 return builder.build()

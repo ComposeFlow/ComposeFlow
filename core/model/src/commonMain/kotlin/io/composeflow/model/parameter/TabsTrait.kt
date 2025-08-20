@@ -12,8 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
@@ -212,11 +212,11 @@ data object TabsTrait : ComposeTrait {
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
+    ): CodeBlockWrapper {
         if (!hasValidChildren(node)) {
-            return CodeBlock.builder().build()
+            return CodeBlockWrapper.builder().build()
         }
-        val codeBlockBuilder = CodeBlock.builder()
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         if (node.modifierList.isEmpty()) {
             codeBlockBuilder.addStatement("%M {", MemberHolder.AndroidX.Layout.Column)
         } else {
@@ -281,13 +281,13 @@ data object TabsTrait : ComposeTrait {
         context: GenerationContext,
         dryRun: Boolean,
         scrollable: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val tabRowMember =
             if (scrollable) {
-                MemberName("androidx.compose.material3", "ScrollableTabRow")
+                MemberNameWrapper.get("androidx.compose.material3", "ScrollableTabRow")
             } else {
-                MemberName("androidx.compose.material3", "TabRow")
+                MemberNameWrapper.get("androidx.compose.material3", "TabRow")
             }
         codeBlockBuilder.addStatement(
             """%M(

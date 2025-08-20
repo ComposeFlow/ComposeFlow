@@ -8,8 +8,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Slider
@@ -59,8 +59,8 @@ data class SliderTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.add("value = ")
         codeBlockBuilder.add(value.transformedCodeBlock(project, context, dryRun = dryRun))
         codeBlockBuilder.addStatement(",")
@@ -194,11 +194,11 @@ data class SliderTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement(
             "%M(",
-            MemberName("androidx.compose.material3", "Slider"),
+            MemberNameWrapper.get("androidx.compose.material3", "Slider"),
         )
         codeBlockBuilder.add(
             generateParamsCode(

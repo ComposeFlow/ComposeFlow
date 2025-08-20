@@ -7,8 +7,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.BottomAppBar
@@ -152,26 +153,26 @@ data class BottomAppBarTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val bottomAppBarNode = node as BottomAppBarNode
 
         codeBlockBuilder.addStatement(
             "%M(",
-            MemberName("androidx.compose.material3", "BottomAppBar"),
+            MemberNameWrapper.get("androidx.compose.material3", "BottomAppBar"),
         )
 
         fun writeIconButton(
             iconNode: ComposeNode,
-            builder: CodeBlock.Builder,
+            builder: CodeBlockBuilderWrapper,
         ) {
             val iconTrait = iconNode.trait.value as IconTrait
             iconTrait.imageVectorHolder?.let { imageVectorHolder ->
-                val iconMember = MemberName("androidx.compose.material3", "Icon")
-                val iconButtonMember = MemberName("androidx.compose.material3", "IconButton")
-                val iconsMember = MemberName("androidx.compose.material.icons", "Icons")
+                val iconMember = MemberNameWrapper.get("androidx.compose.material3", "Icon")
+                val iconButtonMember = MemberNameWrapper.get("androidx.compose.material3", "IconButton")
+                val iconsMember = MemberNameWrapper.get("androidx.compose.material.icons", "Icons")
                 val imageVectorMember =
-                    MemberName(
+                    MemberNameWrapper.get(
                         "androidx.compose.material.icons.${imageVectorHolder.packageDescriptor}",
                         imageVectorHolder.name,
                     )

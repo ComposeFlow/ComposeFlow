@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
@@ -62,22 +62,22 @@ data class ButtonTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement("onClick = {")
         node.actionsMap[ActionType.OnClick]?.forEach {
             codeBlockBuilder.add(it.generateCodeBlock(project, context, dryRun = dryRun))
         }
         codeBlockBuilder.addStatement("},")
 
-        val validateResultBuilder = CodeBlock.builder()
+        val validateResultBuilder = CodeBlockWrapper.builder()
         val validatorNodes =
             node.getDependentValidatorNodesForActionType(project, ActionType.OnClick)
         validatorNodes.forEachIndexed { index, validatorNode ->
             val validateResultName =
                 validatorNode.getCompanionStateOrNull(project)?.getValidateResultName(context)
             validateResultBuilder.add(
-                CodeBlock.of(
+                CodeBlockWrapper.of(
                     "$validateResultName.%M()",
                     MemberHolder.ComposeFlow.isSuccess,
                 ),
@@ -290,8 +290,8 @@ data class ButtonTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val buttonMember = buttonType.toMemberName()
         codeBlockBuilder.addStatement("%M(", buttonMember)
         codeBlockBuilder.add(
@@ -335,23 +335,23 @@ data class ButtonTrait(
 @Serializable(ButtonType.Serializer::class)
 enum class ButtonType {
     Default {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "Button")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "Button")
     },
     Elevated {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "ElevatedButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "ElevatedButton")
     },
     Outlined {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "OutlinedButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "OutlinedButton")
     },
     FilledTonal {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "FilledTonalButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "FilledTonalButton")
     },
     Text {
-        override fun toMemberName(): MemberName = MemberName("androidx.compose.material3", "TextButton")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "TextButton")
     },
     ;
 
-    abstract fun toMemberName(): MemberName
+    abstract fun toMemberName(): MemberNameWrapper
 
     object Serializer : FallbackEnumSerializer<ButtonType>(ButtonType::class)
 }

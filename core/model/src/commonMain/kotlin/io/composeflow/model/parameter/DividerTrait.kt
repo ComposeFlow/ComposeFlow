@@ -1,8 +1,8 @@
 package io.composeflow.model.parameter
 
 import androidx.compose.ui.unit.Dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.palette.TraitCategory
 import io.composeflow.model.project.Project
@@ -30,12 +30,12 @@ abstract class DividerTrait(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         thickness?.let {
             codeBlockBuilder.addStatement(
                 "thickness = ${it.value.toInt()}.%M,",
-                MemberName("androidx.compose.ui.unit", "dp"),
+                MemberNameWrapper.get("androidx.compose.ui.unit", "dp"),
             )
         }
         color?.let {

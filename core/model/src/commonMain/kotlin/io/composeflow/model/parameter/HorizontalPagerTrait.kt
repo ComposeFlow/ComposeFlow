@@ -18,8 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.HorizontalPager
@@ -77,12 +77,12 @@ data class HorizontalPagerTrait(
 
     override var defaultChildNumOfItems: Int = ComposeTrait.NUM_OF_ITEMS_IN_PAGER
 
-    override fun generateParamsCode(): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
-        val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+    override fun generateParamsCode(): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
+        val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
         contentPadding?.let {
             val paddingValuesMember =
-                MemberName("androidx.compose.foundation.layout", "PaddingValues")
+                MemberNameWrapper.get("androidx.compose.foundation.layout", "PaddingValues")
             codeBlockBuilder
                 .addStatement(
                     "contentPadding = %M(${it.value.toInt()}.%M),",
@@ -105,7 +105,7 @@ data class HorizontalPagerTrait(
             codeBlockBuilder.addStatement("reverseLayout = $it,")
         }
         verticalAlignment?.let {
-            val alignmentMember = MemberName("androidx.compose.ui", "Alignment")
+            val alignmentMember = MemberNameWrapper.get("androidx.compose.ui", "Alignment")
             codeBlockBuilder.addStatement("verticalAlignment = %M.${it.name},", alignmentMember)
         }
         userScrollEnabled?.let {
@@ -335,9 +335,9 @@ data class HorizontalPagerTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
+    ): CodeBlockWrapper {
         val horizontalPagerMember =
-            MemberName("androidx.compose.foundation.pager", "HorizontalPager")
+            MemberNameWrapper.get("androidx.compose.foundation.pager", "HorizontalPager")
         return PagerTraitNode.generateCode(
             project = project,
             node = node,

@@ -1,8 +1,8 @@
 package io.composeflow.kotlinpoet
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.PropertySpec
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.model.project.CanvasEditable
 import io.composeflow.model.project.appscreen.screen.Screen
 
@@ -21,7 +21,7 @@ data class GenerationContext(
     val currentEditable: CanvasEditable = Screen(name = ""),
 ) {
     fun addProperty(
-        propertySpec: PropertySpec,
+        propertySpec: PropertySpecWrapper,
         dryRun: Boolean,
     ) {
         val composableContext = getCurrentComposableContext()
@@ -30,7 +30,7 @@ data class GenerationContext(
     }
 
     fun addPrioritizedProperty(
-        propertySpec: PropertySpec,
+        propertySpec: PropertySpecWrapper,
         dryRun: Boolean,
     ) {
         val composableContext = getCurrentComposableContext()
@@ -39,7 +39,7 @@ data class GenerationContext(
     }
 
     fun addFunction(
-        funSpec: FunSpec,
+        funSpec: FunSpecWrapper,
         dryRun: Boolean,
     ) {
         val composableContext = getCurrentComposableContext()
@@ -48,7 +48,7 @@ data class GenerationContext(
     }
 
     fun addFunctionInConstructor(
-        funSpec: FunSpec,
+        funSpec: FunSpecWrapper,
         dryRun: Boolean,
     ) {
         val composableContext = getCurrentComposableContext()
@@ -57,7 +57,7 @@ data class GenerationContext(
     }
 
     fun addLaunchedEffectBlock(
-        codeBlock: CodeBlock,
+        codeBlock: CodeBlockWrapper,
         dryRun: Boolean,
     ) {
         val composableContext = getCurrentComposableContext()

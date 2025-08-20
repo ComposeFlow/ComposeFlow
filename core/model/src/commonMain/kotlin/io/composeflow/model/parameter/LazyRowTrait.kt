@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.LazyRow
@@ -59,12 +59,12 @@ data class LazyRowTrait(
             verticalAlignment == null &&
             userScrollEnabled == null
 
-    override fun generateParamsCode(): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
-        val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+    override fun generateParamsCode(): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
+        val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
         contentPadding?.let {
             val paddingValuesMember =
-                MemberName("androidx.compose.foundation.layout", "PaddingValues")
+                MemberNameWrapper.get("androidx.compose.foundation.layout", "PaddingValues")
             codeBlockBuilder
                 .addStatement(
                     "contentPadding = %M(${it.value.toInt()}.%M),",
@@ -76,12 +76,12 @@ data class LazyRowTrait(
             codeBlockBuilder.addStatement("reverseLayout = $it,")
         }
         horizontalArrangement?.let {
-            val arrangementMember = MemberName("androidx.compose.foundation.layout", "Arrangement")
+            val arrangementMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "Arrangement")
             codeBlockBuilder
                 .addStatement("horizontalArrangement = %M.${it.name},", arrangementMember)
         }
         verticalAlignment?.let {
-            val alignmentMember = MemberName("androidx.compose.ui", "Alignment")
+            val alignmentMember = MemberNameWrapper.get("androidx.compose.ui", "Alignment")
             codeBlockBuilder.addStatement("verticalAlignment = %M.${it.name},", alignmentMember)
         }
         userScrollEnabled?.let {
@@ -192,8 +192,8 @@ data class LazyRowTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val lazyRowMember = MemberName("androidx.compose.foundation.lazy", "LazyRow")
+    ): CodeBlockWrapper {
+        val lazyRowMember = MemberNameWrapper.get("androidx.compose.foundation.lazy", "LazyRow")
         return LazyListTraitNode.generateCode(
             project = project,
             node = node,

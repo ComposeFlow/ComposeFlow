@@ -1,55 +1,55 @@
 package io.composeflow.kotlinpoet
 
-import com.squareup.kotlinpoet.ClassName
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 
 object ClassHolder {
     object AndroidX {
         object Lazy {
-            val GridCells = ClassName("androidx.compose.foundation.lazy.grid", "GridCells")
+            val GridCells = ClassNameWrapper.get("androidx.compose.foundation.lazy.grid", "GridCells")
         }
 
         object Ui {
-            val Modifier = ClassName("androidx.compose.ui", "Modifier")
-            val Color = ClassName("androidx.compose.ui.graphics", "Color")
+            val Modifier = ClassNameWrapper.get("androidx.compose.ui", "Modifier")
+            val Color = ClassNameWrapper.get("androidx.compose.ui.graphics", "Color")
         }
     }
 
     object Kotlin {
-        val Boolean = ClassName("kotlin", "Boolean")
-        val Int = ClassName("kotlin", "Int")
-        val Float = ClassName("kotlin", "Float")
-        val Long = ClassName("kotlin", "Long")
-        val String = ClassName("kotlin", "String")
+        val Boolean = ClassNameWrapper.get("kotlin", "Boolean")
+        val Int = ClassNameWrapper.get("kotlin", "Int")
+        val Float = ClassNameWrapper.get("kotlin", "Float")
+        val Long = ClassNameWrapper.get("kotlin", "Long")
+        val String = ClassNameWrapper.get("kotlin", "String")
     }
 
     object Kotlinx {
         object DateTime {
-            val Clock = ClassName("kotlinx.datetime", "Clock")
+            val Clock = ClassNameWrapper.get("kotlinx.datetime", "Clock")
         }
 
         object Serialization {
-            val JsonElement = ClassName("kotlinx.serialization.json", "JsonElement")
-            val JsonArray = ClassName("kotlinx.serialization.json", "JsonArray")
-            val JsonObject = ClassName("kotlinx.serialization.json", "JsonObject")
-            val JsonPrimitive = ClassName("kotlinx.serialization.json", "JsonPrimitive")
-            val Serializable = ClassName("kotlinx.serialization", "Serializable")
+            val JsonElement = ClassNameWrapper.get("kotlinx.serialization.json", "JsonElement")
+            val JsonArray = ClassNameWrapper.get("kotlinx.serialization.json", "JsonArray")
+            val JsonObject = ClassNameWrapper.get("kotlinx.serialization.json", "JsonObject")
+            val JsonPrimitive = ClassNameWrapper.get("kotlinx.serialization.json", "JsonPrimitive")
+            val Serializable = ClassNameWrapper.get("kotlinx.serialization", "Serializable")
         }
     }
 
     object ComposeFlow {
-        val DataResult = ClassName("$COMPOSEFLOW_PACKAGE.model", "DataResult")
-        val EventResultState = ClassName("$COMPOSEFLOW_PACKAGE.model", "EventResultState")
+        val DataResult = ClassNameWrapper.get("$COMPOSEFLOW_PACKAGE.model", "DataResult")
+        val EventResultState = ClassNameWrapper.get("$COMPOSEFLOW_PACKAGE.model", "EventResultState")
     }
 
     object Collections {
-        val List = ClassName("kotlin.collections", "List")
+        val List = ClassNameWrapper.get("kotlin.collections", "List")
     }
 
     object Coroutines {
         object Flow {
-            val StateFlow = ClassName("kotlinx.coroutines.flow", "StateFlow")
-            val MutableStateFlow = ClassName("kotlinx.coroutines.flow", "MutableStateFlow")
+            val StateFlow = ClassNameWrapper.get("kotlinx.coroutines.flow", "StateFlow")
+            val MutableStateFlow = ClassNameWrapper.get("kotlinx.coroutines.flow", "MutableStateFlow")
         }
     }
 }

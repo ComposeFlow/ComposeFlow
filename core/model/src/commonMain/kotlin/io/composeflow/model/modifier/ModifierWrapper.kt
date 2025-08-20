@@ -33,8 +33,9 @@ import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.model.action.ActionType
@@ -82,10 +83,10 @@ sealed class ModifierWrapper(
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val member = MemberName("androidx.compose.ui.draw", "alpha")
+        ): CodeBlockBuilderWrapper {
+            val member = MemberNameWrapper.get("androidx.compose.ui.draw", "alpha")
             val alpha = if (alpha == 1.0f) "" else "alpha = ${alpha}f"
             codeBlockBuilder.addStatement(".%M($alpha)", member)
             return codeBlockBuilder
@@ -113,10 +114,10 @@ sealed class ModifierWrapper(
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val aspectRatioMember = MemberName("androidx.compose.foundation.layout", "aspectRatio")
+        ): CodeBlockBuilderWrapper {
+            val aspectRatioMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "aspectRatio")
             val ratioParam = "ratio = ${ratio}f,"
             val matchHeightConstraintsFirstParam =
                 if (matchHeightConstraintsFirst != null) {
@@ -191,10 +192,10 @@ sealed class ModifierWrapper(
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val backgroundMember = MemberName("androidx.compose.foundation", "background")
+        ): CodeBlockBuilderWrapper {
+            val backgroundMember = MemberNameWrapper.get("androidx.compose.foundation", "background")
             codeBlockBuilder.addStatement(
                 """.%M(""",
                 backgroundMember,
@@ -271,11 +272,11 @@ sealed class ModifierWrapper(
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val borderMember = MemberName("androidx.compose.foundation", "border")
-            val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+        ): CodeBlockBuilderWrapper {
+            val borderMember = MemberNameWrapper.get("androidx.compose.foundation", "border")
+            val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             codeBlockBuilder.addStatement(
                 """.%M(width = ${width.value.toInt()}.%M,""",
                 borderMember,
@@ -315,10 +316,10 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val member = MemberName("androidx.compose.ui.draw", "clip")
+        ): CodeBlockBuilderWrapper {
+            val member = MemberNameWrapper.get("androidx.compose.ui.draw", "clip")
 
             codeBlockBuilder.addStatement(".%M(", member)
             shapeWrapper.generateCode(codeBlockBuilder)
@@ -344,11 +345,11 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val heightMember = MemberName("androidx.compose.foundation.layout", "height")
-            val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+        ): CodeBlockBuilderWrapper {
+            val heightMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "height")
+            val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             codeBlockBuilder
                 .addStatement(".%M(${height.value.toInt()}.%M)", heightMember, dpMember)
             return codeBlockBuilder
@@ -374,10 +375,10 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val member = MemberName("androidx.compose.foundation.layout", "fillMaxHeight")
+        ): CodeBlockBuilderWrapper {
+            val member = MemberNameWrapper.get("androidx.compose.foundation.layout", "fillMaxHeight")
             val fraction = if (fraction == 1.0f) "" else "fraction = ${fraction}f"
             codeBlockBuilder.addStatement(".%M($fraction)", member)
             return codeBlockBuilder
@@ -403,10 +404,10 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val member = MemberName("androidx.compose.foundation.layout", "fillMaxWidth")
+        ): CodeBlockBuilderWrapper {
+            val member = MemberNameWrapper.get("androidx.compose.foundation.layout", "fillMaxWidth")
             val fraction = if (fraction == 1.0f) "" else "fraction = ${fraction}f"
             codeBlockBuilder.addStatement(".%M($fraction)", member)
             return codeBlockBuilder
@@ -432,10 +433,10 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val member = MemberName("androidx.compose.foundation.layout", "fillMaxSize")
+        ): CodeBlockBuilderWrapper {
+            val member = MemberNameWrapper.get("androidx.compose.foundation.layout", "fillMaxSize")
             val fraction = if (fraction == 1.0f) "" else "fraction = ${fraction}f"
             codeBlockBuilder.addStatement(".%M($fraction)", member)
             return codeBlockBuilder
@@ -465,11 +466,11 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val offsetMember = MemberName("androidx.compose.foundation.layout", "offset")
-            val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+        ): CodeBlockBuilderWrapper {
+            val offsetMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "offset")
+            val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             codeBlockBuilder
                 .addStatement(
                     ".%M(x = ${x.value.toInt()}.%M, y = ${y.value.toInt()}.%M)",
@@ -509,11 +510,11 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val paddingMember = MemberName("androidx.compose.foundation.layout", "padding")
-            val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+        ): CodeBlockBuilderWrapper {
+            val paddingMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "padding")
+            val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             codeBlockBuilder.add(".%M(", paddingMember)
             when (spec()) {
                 PaddingSpec.All -> {
@@ -606,10 +607,10 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val member = MemberName("androidx.compose.ui.draw", "rotate")
+        ): CodeBlockBuilderWrapper {
+            val member = MemberNameWrapper.get("androidx.compose.ui.draw", "rotate")
             val degreesParam = "${degrees}f"
             codeBlockBuilder.addStatement(".%M($degreesParam)", member)
             return codeBlockBuilder
@@ -639,10 +640,10 @@ a color and a shape and clip it"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val scaleMember = MemberName("androidx.compose.ui.draw", "scale")
+        ): CodeBlockBuilderWrapper {
+            val scaleMember = MemberNameWrapper.get("androidx.compose.ui.draw", "scale")
             codeBlockBuilder.addStatement(".%M(", scaleMember)
             when (spec()) {
                 ScaleSpec.All -> {
@@ -692,10 +693,10 @@ scale factors along the horizontal and vertical axis respectively"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val shadowMember = MemberName("androidx.compose.ui.draw", "shadow")
+        ): CodeBlockBuilderWrapper {
+            val shadowMember = MemberNameWrapper.get("androidx.compose.ui.draw", "shadow")
             codeBlockBuilder.addStatement(
                 ".%M(elevation = ${elevation.value.toInt()}.%M,",
                 shadowMember,
@@ -728,12 +729,12 @@ scale factors along the horizontal and vertical axis respectively"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val sizeMember = MemberName("androidx.compose.foundation.layout", "size")
-            val dpMember = MemberName("androidx.compose.ui.unit", "dp")
-            val dpObjectMember = MemberName("androidx.compose.ui.unit", "Dp")
+        ): CodeBlockBuilderWrapper {
+            val sizeMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "size")
+            val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
+            val dpObjectMember = MemberNameWrapper.get("androidx.compose.ui.unit", "Dp")
             codeBlockBuilder.addStatement(".%M(", sizeMember)
             if (width != Dp.Unspecified) {
                 codeBlockBuilder.addStatement("width = ${width.value.toInt()}.%M,", dpMember)
@@ -771,12 +772,12 @@ scale factors along the horizontal and vertical axis respectively"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val verticalScroll = MemberName("androidx.compose.foundation", "horizontalScroll")
+        ): CodeBlockBuilderWrapper {
+            val verticalScroll = MemberNameWrapper.get("androidx.compose.foundation", "horizontalScroll")
             val rememberScrollState =
-                MemberName("androidx.compose.foundation", "rememberScrollState")
+                MemberNameWrapper.get("androidx.compose.foundation", "rememberScrollState")
             codeBlockBuilder.addStatement(".%M(%M())", verticalScroll, rememberScrollState)
             return codeBlockBuilder
         }
@@ -800,12 +801,12 @@ scale factors along the horizontal and vertical axis respectively"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val verticalScroll = MemberName("androidx.compose.foundation", "verticalScroll")
+        ): CodeBlockBuilderWrapper {
+            val verticalScroll = MemberNameWrapper.get("androidx.compose.foundation", "verticalScroll")
             val rememberScrollState =
-                MemberName("androidx.compose.foundation", "rememberScrollState")
+                MemberNameWrapper.get("androidx.compose.foundation", "rememberScrollState")
             codeBlockBuilder.addStatement(".%M(%M())", verticalScroll, rememberScrollState)
             return codeBlockBuilder
         }
@@ -829,11 +830,11 @@ scale factors along the horizontal and vertical axis respectively"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val widthMember = MemberName("androidx.compose.foundation.layout", "width")
-            val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+        ): CodeBlockBuilderWrapper {
+            val widthMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "width")
+            val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             codeBlockBuilder.addStatement(
                 ".%M(${width.value.toInt()}.%M)",
                 widthMember,
@@ -866,17 +867,17 @@ scale factors along the horizontal and vertical axis respectively"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
+        ): CodeBlockBuilderWrapper {
             codeBlockBuilder.addStatement(
                 ".%M(",
-                MemberName("androidx.compose.foundation.layout", "wrapContentHeight"),
+                MemberNameWrapper.get("androidx.compose.foundation.layout", "wrapContentHeight"),
             )
             align?.let {
                 codeBlockBuilder.addStatement(
                     "align = %M.${it.name},",
-                    MemberName("androidx.compose.ui", "Alignment"),
+                    MemberNameWrapper.get("androidx.compose.ui", "Alignment"),
                 )
             }
             unbounded?.let {
@@ -910,17 +911,17 @@ without regard for the incoming measurement"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
+        ): CodeBlockBuilderWrapper {
             codeBlockBuilder.addStatement(
                 ".%M(",
-                MemberName("androidx.compose.foundation.layout", "wrapContentSize"),
+                MemberNameWrapper.get("androidx.compose.foundation.layout", "wrapContentSize"),
             )
             align?.let {
                 codeBlockBuilder.addStatement(
                     "align = %M.${it.name},",
-                    MemberName("androidx.compose.ui", "Alignment"),
+                    MemberNameWrapper.get("androidx.compose.ui", "Alignment"),
                 )
             }
             unbounded?.let {
@@ -954,17 +955,17 @@ regard for the incoming measurement"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
+        ): CodeBlockBuilderWrapper {
             codeBlockBuilder.addStatement(
                 ".%M(",
-                MemberName("androidx.compose.foundation.layout", "wrapContentWidth"),
+                MemberNameWrapper.get("androidx.compose.foundation.layout", "wrapContentWidth"),
             )
             align?.let {
                 codeBlockBuilder.addStatement(
                     "align = %M.${it.name},",
-                    MemberName("androidx.compose.ui", "Alignment"),
+                    MemberNameWrapper.get("androidx.compose.ui", "Alignment"),
                 )
             }
             unbounded?.let {
@@ -993,10 +994,10 @@ regard for the incoming measurement"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
-            val zIndexMember = MemberName("androidx.compose.ui", "zIndex")
+        ): CodeBlockBuilderWrapper {
+            val zIndexMember = MemberNameWrapper.get("androidx.compose.ui", "zIndex")
             codeBlockBuilder.addStatement(".%M(zIndex = ${zIndex ?: 0}f)", zIndexMember)
             return codeBlockBuilder
         }
@@ -1036,12 +1037,12 @@ for the children of the same layout parent"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
+        ): CodeBlockBuilderWrapper {
             codeBlockBuilder.addStatement(
                 ".align(%M.${align.name})",
-                MemberName("androidx.compose.ui", "Alignment"),
+                MemberNameWrapper.get("androidx.compose.ui", "Alignment"),
             )
             return codeBlockBuilder
         }
@@ -1075,12 +1076,12 @@ for the children of the same layout parent"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
+        ): CodeBlockBuilderWrapper {
             codeBlockBuilder.addStatement(
                 ".align(%M.${align.name})",
-                MemberName("androidx.compose.ui", "Alignment"),
+                MemberNameWrapper.get("androidx.compose.ui", "Alignment"),
             )
             return codeBlockBuilder
         }
@@ -1113,12 +1114,12 @@ for the children of the same layout parent"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
+        ): CodeBlockBuilderWrapper {
             codeBlockBuilder.addStatement(
                 ".align(%M.${align.name})",
-                MemberName("androidx.compose.ui", "Alignment"),
+                MemberNameWrapper.get("androidx.compose.ui", "Alignment"),
             )
             return codeBlockBuilder
         }
@@ -1153,9 +1154,9 @@ for the children of the same layout parent"""
         override fun generateCode(
             project: Project,
             context: GenerationContext,
-            codeBlockBuilder: CodeBlock.Builder,
+            codeBlockBuilder: CodeBlockBuilderWrapper,
             dryRun: Boolean,
-        ): CodeBlock.Builder {
+        ): CodeBlockBuilderWrapper {
             // weight doesn't have to be with the package name because it's inferred from the
             // parent ColumnScope or RowScope
             codeBlockBuilder.addStatement(".weight(weight = ${weight}f, fill = $fill)")
@@ -1205,9 +1206,9 @@ relative to other weighted sibling elements in the Row"""
     abstract fun generateCode(
         project: Project,
         context: GenerationContext,
-        codeBlockBuilder: CodeBlock.Builder,
+        codeBlockBuilder: CodeBlockBuilderWrapper,
         dryRun: Boolean,
-    ): CodeBlock.Builder
+    ): CodeBlockBuilderWrapper
 
     abstract fun category(): ModifierCategory
 
@@ -1301,13 +1302,13 @@ fun List<ModifierWrapper>.sumPadding(): ModifierWrapper.Padding =
 fun List<ModifierWrapper>.generateCode(
     project: Project,
     context: GenerationContext,
-    codeBlockBuilder: CodeBlock.Builder = CodeBlock.builder(),
+    codeBlockBuilder: CodeBlockBuilderWrapper = CodeBlockWrapper.builder(),
     dryRun: Boolean,
-): CodeBlock.Builder =
+): CodeBlockBuilderWrapper =
     if (isEmpty()) {
         codeBlockBuilder
     } else {
-        val modifier = MemberName("androidx.compose.ui", "Modifier")
+        val modifier = MemberNameWrapper.get("androidx.compose.ui", "Modifier")
         codeBlockBuilder.addStatement("modifier = %M", modifier)
         this@generateCode.forEach {
             it.generateCode(project = project, context, codeBlockBuilder, dryRun = dryRun)
@@ -1320,11 +1321,11 @@ fun ComposeNode.generateModifierCode(
     project: Project,
     context: GenerationContext,
     dryRun: Boolean,
-    additionalCode: CodeBlock? = null,
-): CodeBlock {
-    val codeBlockBuilder = CodeBlock.builder()
+    additionalCode: CodeBlockWrapper? = null,
+): CodeBlockWrapper {
+    val codeBlockBuilder = CodeBlockWrapper.builder()
     var modifierImported = false
-    val modifierMember = MemberName("androidx.compose.ui", "Modifier")
+    val modifierMember = MemberNameWrapper.get("androidx.compose.ui", "Modifier")
     if (modifierList.isNotEmpty()) {
         modifierImported = true
         codeBlockBuilder.add("modifier = %M", modifierMember)
@@ -1346,7 +1347,7 @@ fun ComposeNode.generateModifierCode(
         }
         codeBlockBuilder.addStatement(
             ".%M(",
-            MemberName("androidx.compose.foundation", "combinedClickable"),
+            MemberNameWrapper.get("androidx.compose.foundation", "combinedClickable"),
         )
         // onClick is a mandatory parameter for combinedClickable regardless of if the actions is set
         codeBlockBuilder.add("onClick = {")
@@ -1376,7 +1377,7 @@ fun ComposeNode.generateModifierCode(
         }
         codeBlockBuilder.add(
             ".%M {",
-            MemberName("androidx.compose.foundation", "clickable"),
+            MemberNameWrapper.get("androidx.compose.foundation", "clickable"),
         )
         actionsMap[ActionType.OnClick]?.forEach {
             codeBlockBuilder.add(it.generateCodeBlock(project, context, dryRun))

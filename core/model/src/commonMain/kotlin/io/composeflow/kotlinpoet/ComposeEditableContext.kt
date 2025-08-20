@@ -1,10 +1,11 @@
 package io.composeflow.kotlinpoet
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.MemberName
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
+import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.TypeSpecBuilderWrapper
 import io.composeflow.ViewModelConstant
 import io.composeflow.model.project.CanvasEditable
 import io.composeflow.util.generateUniqueName
@@ -14,24 +15,24 @@ import io.composeflow.util.generateUniqueName
  * screen.
  */
 class ComposeEditableContext(
-    private val typeSpecBuilder: TypeSpec.Builder,
+    private val typeSpecBuilder: TypeSpecBuilderWrapper,
     val canvasEditable: CanvasEditable,
 ) {
-    private val funSpecs: MutableSet<FunSpec> = mutableSetOf()
-    private val propertySpecs: MutableSet<PropertySpec> = mutableSetOf()
-    private val prioritizedPropertySpecs: MutableSet<PropertySpec> = mutableSetOf()
+    private val funSpecs: MutableSet<FunSpecWrapper> = mutableSetOf()
+    private val propertySpecs: MutableSet<PropertySpecWrapper> = mutableSetOf()
+    private val prioritizedPropertySpecs: MutableSet<PropertySpecWrapper> = mutableSetOf()
     private val _dependencies: MutableSet<ViewModelConstant> = mutableSetOf()
-    private val constructorFunSpecBuilder = FunSpec.constructorBuilder()
+    private val constructorFunSpecBuilder = FunSpecWrapper.constructorBuilder()
     var isCoroutineScopeUsed: Boolean = false
     val dependencies: Set<ViewModelConstant> = _dependencies
 
-    fun allProperties(): List<PropertySpec> = prioritizedPropertySpecs.toList() + propertySpecs.toList()
+    fun allProperties(): List<PropertySpecWrapper> = prioritizedPropertySpecs.toList() + propertySpecs.toList()
 
     /**
      * LaunchedEffect block for Composable screen.
      */
-    private val _launchedEffectBlock: MutableSet<CodeBlock> = mutableSetOf()
-    val launchedEffectBlock: Set<CodeBlock> = _launchedEffectBlock
+    private val _launchedEffectBlock: MutableSet<CodeBlockWrapper> = mutableSetOf()
+    val launchedEffectBlock: Set<CodeBlockWrapper> = _launchedEffectBlock
 
     /**
      * Holds the information about the map of the ID to identifier (such as variable name within
@@ -40,17 +41,17 @@ class ComposeEditableContext(
     private val identifierMap: MutableMap<String, String> = mutableMapOf()
 
     /**
-     * Holds the pairs of a variable name and corresponding MemberName used for retrieving a value in
+     * Holds the pairs of a variable name and corresponding MemberNameWrapper used for retrieving a value in
      * CompositionLocal.
      * e.g. `val uriHandler = LocalUriHandler.current`, then following pair will be added to the map
      *  key : "uriHandler"
-     *  value : MemberName("androidx.compose.ui.platform", "LocalUriHandler")
+     *  value : MemberNameWrapper("androidx.compose.ui.platform", "LocalUriHandler")
      */
-    private val _compositionLocalVariables: MutableMap<String, MemberName> = mutableMapOf()
-    val compositionLocalVariables: Map<String, MemberName> = _compositionLocalVariables
+    private val _compositionLocalVariables: MutableMap<String, MemberNameWrapper> = mutableMapOf()
+    val compositionLocalVariables: Map<String, MemberNameWrapper> = _compositionLocalVariables
 
     fun addFunction(
-        funSpec: FunSpec,
+        funSpec: FunSpecWrapper,
         dryRun: Boolean,
     ) {
         if (dryRun) return
@@ -64,7 +65,7 @@ class ComposeEditableContext(
     }
 
     fun addFunctionInConstructor(
-        funSpec: FunSpec,
+        funSpec: FunSpecWrapper,
         dryRun: Boolean,
     ) {
         if (dryRun) return
@@ -72,7 +73,7 @@ class ComposeEditableContext(
     }
 
     fun addProperty(
-        propertySpec: PropertySpec,
+        propertySpec: PropertySpecWrapper,
         dryRun: Boolean,
     ) {
         if (dryRun) return
@@ -91,7 +92,7 @@ class ComposeEditableContext(
      * (e.g. FlowSettings property needs to be defined before each property that depends on FlowSettings)
      */
     fun addPrioritizedProperty(
-        propertySpec: PropertySpec,
+        propertySpec: PropertySpecWrapper,
         dryRun: Boolean,
     ) {
         if (dryRun) return
@@ -122,7 +123,7 @@ class ComposeEditableContext(
      * LaunchedEffect code block in the Compose code.
      */
     fun addLaunchedEffectBlock(
-        codeBlock: CodeBlock,
+        codeBlock: CodeBlockWrapper,
         dryRun: Boolean,
     ) {
         if (dryRun) return
@@ -132,7 +133,7 @@ class ComposeEditableContext(
     fun addCompositionLocalVariableEntryIfNotPresent(
         id: String,
         initialIdentifier: String,
-        compositionLocalMember: MemberName,
+        compositionLocalMember: MemberNameWrapper,
     ): String {
         val newName = getOrAddIdentifier(id, initialIdentifier)
         if (!_compositionLocalVariables.contains(newName)) {
@@ -154,7 +155,7 @@ class ComposeEditableContext(
         return newName
     }
 
-    fun buildTypeSpec(): TypeSpec {
+    fun buildTypeSpec(): TypeSpecWrapper {
         prioritizedPropertySpecs.forEach {
             typeSpecBuilder.addProperty(it)
         }

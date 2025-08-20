@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.serializer.LocationAwareDpSerializer
@@ -15,7 +15,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("LazyGridCells")
 sealed interface LazyGridCells : DropdownItem {
-    fun asCodeBlock(): CodeBlock
+    fun asCodeBlock(): CodeBlockWrapper
 
     fun asComposeGridCells(): GridCells
 
@@ -30,8 +30,8 @@ sealed interface LazyGridCells : DropdownItem {
 
         override fun isSameItem(item: Any): Boolean = item is Adaptive
 
-        override fun asCodeBlock(): CodeBlock =
-            CodeBlock.of(
+        override fun asCodeBlock(): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 "%T.Adaptive(${minSize.value.toInt()}.%M)",
                 ClassHolder.AndroidX.Lazy.GridCells,
                 MemberHolder.AndroidX.Ui.dp,
@@ -50,8 +50,8 @@ sealed interface LazyGridCells : DropdownItem {
 
         override fun isSameItem(item: Any): Boolean = item is Fixed
 
-        override fun asCodeBlock(): CodeBlock =
-            CodeBlock.of(
+        override fun asCodeBlock(): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 "%T.Fixed($count)",
                 ClassHolder.AndroidX.Lazy.GridCells,
             )
@@ -70,8 +70,8 @@ sealed interface LazyGridCells : DropdownItem {
 
         override fun isSameItem(item: Any): Boolean = item is FixedSize
 
-        override fun asCodeBlock(): CodeBlock =
-            CodeBlock.of(
+        override fun asCodeBlock(): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 "%T.FixedSize(${size.value.toInt()}.%M)",
                 ClassHolder.AndroidX.Lazy.GridCells,
                 MemberHolder.AndroidX.Ui.dp,

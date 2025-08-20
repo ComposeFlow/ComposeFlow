@@ -8,8 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Row
@@ -41,17 +41,17 @@ data class RowTrait(
         horizontalArrangement == null &&
             verticalAlignment == null
 
-    private fun generateParamsCode(): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    private fun generateParamsCode(): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         horizontalArrangement?.let {
-            val arrangementMember = MemberName("androidx.compose.foundation.layout", "Arrangement")
+            val arrangementMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "Arrangement")
             codeBlockBuilder.addStatement(
                 "horizontalArrangement = %M.${it.name},",
                 arrangementMember,
             )
         }
         verticalAlignment?.let {
-            val alignmentMember = MemberName("androidx.compose.ui", "Alignment")
+            val alignmentMember = MemberNameWrapper.get("androidx.compose.ui", "Alignment")
             codeBlockBuilder.addStatement(
                 "verticalAlignment = %M.${it.name},",
                 alignmentMember,
@@ -130,9 +130,9 @@ data class RowTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
-        val rowMember = MemberName("androidx.compose.foundation.layout", "Row")
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
+        val rowMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "Row")
         val allParamsEmpty = areAllParamsEmpty() && node.modifierList.isEmpty()
         if (allParamsEmpty) {
             codeBlockBuilder.addStatement("%M {", rowMember)

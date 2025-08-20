@@ -2,9 +2,9 @@
 
 package io.composeflow.model.parameter.wrapper
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
-import com.squareup.kotlinpoet.asClassName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
@@ -25,15 +25,15 @@ data class InstantWrapper(
             date(LocalDate.Formats.ISO)
         }
 
-    fun generateCode(): CodeBlock =
+    fun generateCode(): CodeBlockWrapper =
         if (instant == null) {
-            CodeBlock.of("%T.System.now()", Clock::class.asClassName())
+            CodeBlockWrapper.of("%T.System.now()", Clock::class.asTypeNameWrapper())
         } else {
-            CodeBlock.of(
+            CodeBlockWrapper.of(
                 "%T.parse(\"${asString()}\").%M(%T.UTC)",
-                LocalDate::class.asClassName(),
-                MemberName("kotlinx.datetime", "atStartOfDayIn", isExtension = true),
-                TimeZone::class.asClassName(),
+                LocalDate::class.asTypeNameWrapper(),
+                MemberNameWrapper.get("kotlinx.datetime", "atStartOfDayIn", isExtension = true),
+                TimeZone::class.asTypeNameWrapper(),
             )
         }
 

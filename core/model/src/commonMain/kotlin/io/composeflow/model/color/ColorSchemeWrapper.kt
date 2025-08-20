@@ -2,7 +2,7 @@ package io.composeflow.model.color
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
-import com.squareup.kotlinpoet.PropertySpec
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.serializer.LocationAwareColorSerializer
 import io.composeflow.serializer.asString
@@ -128,155 +128,155 @@ data class ColorSchemeWrapper(
             surfaceContainerLowest = this.surfaceContainerLowest,
         )
 
-    fun generateColorProperties(suffix: String = ""): List<PropertySpec> =
+    fun generateColorProperties(suffix: String = ""): List<PropertySpecWrapper> =
         listOf(
-            PropertySpec
+            PropertySpecWrapper
                 .builder("primary$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${primary.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onPrimary$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onPrimary.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("primaryContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${primaryContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onPrimaryContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onPrimaryContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("inversePrimary$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${inversePrimary.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("secondary$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${secondary.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onSecondary$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onSecondary.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("secondaryContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${secondaryContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onSecondaryContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer(
                     "%T(${onSecondaryContainer.asString()})",
                     ClassHolder.AndroidX.Ui.Color,
                 ).build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("tertiary$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${tertiary.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onTertiary$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onTertiary.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("tertiaryContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${tertiaryContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onTertiaryContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onTertiaryContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("background$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${background.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onBackground$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onBackground.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surface$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${surface.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onSurface$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onSurface.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceVariant$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${surfaceVariant.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onSurfaceVariant$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onSurfaceVariant.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceTint$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${surfaceTint.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("inverseSurface$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${inverseSurface.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("inverseOnSurface$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${inverseOnSurface.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("error$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${error.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onError$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onError.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("errorContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${errorContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("onErrorContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${onErrorContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("outline$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${outline.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("outlineVariant$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${outlineVariant.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("scrim$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${scrim.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceBright$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${surfaceBright.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceDim$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${surfaceDim.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceContainer$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${surfaceContainer.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceContainerHigh$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer(
                     "%T(${surfaceContainerHigh.asString()})",
                     ClassHolder.AndroidX.Ui.Color,
                 ).build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceContainerHighest$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer(
                     "%T(${surfaceContainerHighest.asString()})",
                     ClassHolder.AndroidX.Ui.Color,
                 ).build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceContainerLow$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer("%T(${surfaceContainerLow.asString()})", ClassHolder.AndroidX.Ui.Color)
                 .build(),
-            PropertySpec
+            PropertySpecWrapper
                 .builder("surfaceContainerLowest$suffix", ClassHolder.AndroidX.Ui.Color)
                 .initializer(
                     "%T(${surfaceContainerLowest.asString()})",

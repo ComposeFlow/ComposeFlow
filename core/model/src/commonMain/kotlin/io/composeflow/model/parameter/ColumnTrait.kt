@@ -8,8 +8,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Column
@@ -40,17 +40,17 @@ data class ColumnTrait(
 ) : ComposeTrait {
     override fun areAllParamsEmpty(): Boolean = verticalArrangementWrapper == null && horizontalAlignmentWrapper == null
 
-    private fun generateParamsCode(): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    private fun generateParamsCode(): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         verticalArrangementWrapper?.let {
-            val arrangementMember = MemberName("androidx.compose.foundation.layout", "Arrangement")
+            val arrangementMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "Arrangement")
             codeBlockBuilder.addStatement(
                 "verticalArrangement = %M.${it.name},",
                 arrangementMember,
             )
         }
         horizontalAlignmentWrapper?.let {
-            val alignmentMember = MemberName("androidx.compose.ui", "Alignment")
+            val alignmentMember = MemberNameWrapper.get("androidx.compose.ui", "Alignment")
             codeBlockBuilder.addStatement("horizontalAlignment = %M.${it.name},", alignmentMember)
         }
         return codeBlockBuilder.build()
@@ -128,8 +128,8 @@ data class ColumnTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val allParamsEmpty = areAllParamsEmpty() && node.modifierList.isEmpty()
         if (allParamsEmpty) {
             codeBlockBuilder.addStatement("%M {", MemberHolder.AndroidX.Layout.Column)

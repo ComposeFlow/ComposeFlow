@@ -3,8 +3,8 @@ package io.composeflow.model.parameter
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.materialicons.ImageVectorHolder
@@ -32,8 +32,8 @@ data class TabTrait(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.add("selected = $selectedTabIndexVariableName == $index,")
         codeBlockBuilder.add(
             """
@@ -45,7 +45,7 @@ data class TabTrait(
         text?.let {
             codeBlockBuilder.add(
                 "text = { %M(",
-                MemberName("androidx.compose.material3", "Text"),
+                MemberNameWrapper.get("androidx.compose.material3", "Text"),
             )
             codeBlockBuilder.add(
                 text.transformedCodeBlock(
@@ -58,10 +58,10 @@ data class TabTrait(
             codeBlockBuilder.addStatement(") },")
         }
         icon?.let {
-            val iconMember = MemberName("androidx.compose.material3", "Icon")
-            val iconsMember = MemberName("androidx.compose.material.icons", "Icons")
+            val iconMember = MemberNameWrapper.get("androidx.compose.material3", "Icon")
+            val iconsMember = MemberNameWrapper.get("androidx.compose.material.icons", "Icons")
             val imageVectorMember =
-                MemberName(
+                MemberNameWrapper.get(
                     "androidx.compose.material.icons.${icon.packageDescriptor}",
                     icon.name,
                 )
@@ -98,11 +98,11 @@ data class TabTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.addStatement(
             "%M(",
-            MemberName("androidx.compose.material3", "Tab"),
+            MemberNameWrapper.get("androidx.compose.material3", "Tab"),
         )
         codeBlockBuilder.add(
             generateParamsCode(

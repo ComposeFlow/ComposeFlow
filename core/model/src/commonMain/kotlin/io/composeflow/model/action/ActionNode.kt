@@ -1,7 +1,7 @@
 package io.composeflow.model.action
 
 import androidx.compose.runtime.mutableStateListOf
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.project.Project
 import io.composeflow.model.property.AssignableProperty
@@ -65,13 +65,13 @@ sealed interface ActionNode {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun generateInitializationCodeBlocks(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): List<CodeBlock?>
+    ): List<CodeBlockWrapper?>
 
     @Serializable
     @SerialName("Simple")
@@ -109,23 +109,23 @@ sealed interface ActionNode {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock =
+        ): CodeBlockWrapper =
             action?.let {
-                val builder = CodeBlock.builder()
+                val builder = CodeBlockWrapper.builder()
                 it
                     .generateActionTriggerCodeBlock(project, context, dryRun = dryRun)
-                    ?.let { codeBlock ->
+                    ?.let { codeBlock: CodeBlockWrapper ->
                         builder.add(codeBlock)
                     }
                 builder.addStatement("")
                 builder.build()
-            } ?: CodeBlock.of("")
+            } ?: CodeBlockWrapper.of("")
 
         override fun generateInitializationCodeBlocks(
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): List<CodeBlock?> = listOf(action?.generateInitializationCodeBlock(project, context, dryRun = dryRun))
+        ): List<CodeBlockWrapper?> = listOf(action?.generateInitializationCodeBlock(project, context, dryRun = dryRun))
     }
 
     @Serializable
@@ -225,8 +225,8 @@ sealed interface ActionNode {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
-            val builder = CodeBlock.builder()
+        ): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             if (trueNodes.isEmpty() && falseNodes.isEmpty()) {
                 return builder.build()
             }
@@ -258,7 +258,7 @@ sealed interface ActionNode {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): List<CodeBlock?> =
+        ): List<CodeBlockWrapper?> =
             trueNodes.flatMap {
                 it.generateInitializationCodeBlocks(
                     project,
@@ -388,14 +388,14 @@ sealed interface ActionNode {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): List<CodeBlock?> {
-            val trueBlockBuilder = CodeBlock.builder()
+        ): List<CodeBlockWrapper?> {
+            val trueBlockBuilder = CodeBlockWrapper.builder()
             if (trueNodes.isNotEmpty()) {
                 trueNodes.forEach { actionNode ->
                     trueBlockBuilder.add(actionNode.generateCodeBlock(project, context, dryRun))
                 }
             }
-            val falseBlockBuilder = CodeBlock.builder()
+            val falseBlockBuilder = CodeBlockWrapper.builder()
             if (falseNodes.isNotEmpty()) {
                 falseNodes.forEach { actionNode ->
                     falseBlockBuilder.add(actionNode.generateCodeBlock(project, context, dryRun))
@@ -434,8 +434,8 @@ sealed interface ActionNode {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock =
+        ): CodeBlockWrapper =
             forkedAction.generateActionTriggerCodeBlock(project, context, dryRun)
-                ?: CodeBlock.of("")
+                ?: CodeBlockWrapper.of("")
     }
 }

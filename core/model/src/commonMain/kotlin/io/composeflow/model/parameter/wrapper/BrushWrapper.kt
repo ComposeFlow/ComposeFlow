@@ -5,8 +5,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TileMode
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.Serializable
 
@@ -125,9 +125,9 @@ data class BrushWrapper(
         }
     }
 
-    fun generateCode(): CodeBlock {
-        val builder = CodeBlock.builder()
-        val brushMember = MemberName("androidx.compose.ui.graphics", "Brush")
+    fun generateCode(): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
+        val brushMember = MemberNameWrapper.get("androidx.compose.ui.graphics", "Brush")
 
         if (colors.isEmpty()) {
             builder.add("null")
@@ -158,19 +158,19 @@ data class BrushWrapper(
                 if (startX != 0f || startY != 0f) {
                     builder.add(
                         ", start = %M(${startX}f, ${startY}f)",
-                        MemberName("androidx.compose.ui.geometry", "Offset"),
+                        MemberNameWrapper.get("androidx.compose.ui.geometry", "Offset"),
                     )
                 }
                 if (endX != Float.POSITIVE_INFINITY || endY != Float.POSITIVE_INFINITY) {
                     builder.add(
                         ", end = %M(${endX}f, ${endY}f)",
-                        MemberName("androidx.compose.ui.geometry", "Offset"),
+                        MemberNameWrapper.get("androidx.compose.ui.geometry", "Offset"),
                     )
                 }
                 if (tileMode != null) {
                     builder.add(
                         ", tileMode = %M.${tileMode.toTileMode()}",
-                        MemberName("androidx.compose.ui.graphics", "TileMode"),
+                        MemberNameWrapper.get("androidx.compose.ui.graphics", "TileMode"),
                     )
                 }
             }
@@ -198,7 +198,7 @@ data class BrushWrapper(
                 if (tileMode != null) {
                     builder.add(
                         ", tileMode = %M.${tileMode.toTileMode()}",
-                        MemberName("androidx.compose.ui.graphics", "TileMode"),
+                        MemberNameWrapper.get("androidx.compose.ui.graphics", "TileMode"),
                     )
                 }
             }
@@ -226,7 +226,7 @@ data class BrushWrapper(
                 if (tileMode != null) {
                     builder.add(
                         ", tileMode = %M.${tileMode.toTileMode()}",
-                        MemberName("androidx.compose.ui.graphics", "TileMode"),
+                        MemberNameWrapper.get("androidx.compose.ui.graphics", "TileMode"),
                     )
                 }
             }
@@ -254,7 +254,7 @@ data class BrushWrapper(
                 if (centerX != 0.5f || centerY != 0.5f) {
                     builder.add(
                         ", center = %M(${centerX}f, ${centerY}f)",
-                        MemberName("androidx.compose.ui.geometry", "Offset"),
+                        MemberNameWrapper.get("androidx.compose.ui.geometry", "Offset"),
                     )
                 }
                 if (radius != Float.POSITIVE_INFINITY) {
@@ -263,7 +263,7 @@ data class BrushWrapper(
                 if (tileMode != null) {
                     builder.add(
                         ", tileMode = %M.${tileMode.toTileMode()}",
-                        MemberName("androidx.compose.ui.graphics", "TileMode"),
+                        MemberNameWrapper.get("androidx.compose.ui.graphics", "TileMode"),
                     )
                 }
             }
@@ -291,7 +291,7 @@ data class BrushWrapper(
                 if (centerX != 0.5f || centerY != 0.5f) {
                     builder.add(
                         ", center = %M(${centerX}f, ${centerY}f)",
-                        MemberName("androidx.compose.ui.geometry", "Offset"),
+                        MemberNameWrapper.get("androidx.compose.ui.geometry", "Offset"),
                     )
                 }
             }

@@ -2,8 +2,8 @@ package io.composeflow.model.datatype
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.findDataTypeOrNull
@@ -35,47 +35,47 @@ enum class FilterOperator : DropdownTextDisplayable {
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Equal to (==)")
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("equalTo")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("equalTo")
     },
     NotEqualTo {
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Not equal to (!=)")
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("notEqualTo")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("notEqualTo")
     },
     LessThan {
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Less than (<)")
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("lessThan")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("lessThan")
     },
     LessThanOrEqualTo {
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Less than or equal to (<=)")
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("lessThanOrEqualTo")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("lessThanOrEqualTo")
     },
     GreaterThan {
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Greater than (>)")
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("greaterThan")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("greaterThan")
     },
     GreaterThanOrEqualTo {
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Greater than or equal to (>=)")
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("greaterThanOrEqualTo")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("greaterThanOrEqualTo")
     },
     Contains {
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Contains")
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("contains")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("contains")
     },
     ;
 
-    abstract fun asCodeBlock(): CodeBlock
+    abstract fun asCodeBlock(): CodeBlockWrapper
 }
 
 @Serializable
@@ -84,7 +84,7 @@ sealed interface FilterExpression {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun getAssignableProperties(): List<AssignableProperty>
 }
@@ -98,8 +98,8 @@ sealed interface LogicalFilterExpression : FilterExpression {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val builder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
         return if (filters.isEmpty()) {
             builder.build()
         } else if (filters.size == 1) {
@@ -133,15 +133,15 @@ data class SingleFilter(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val builder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
         builder.add("(")
         when (filterFieldType) {
             is FilterFieldType.DocumentId -> {
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         "%M.documentId ",
-                        MemberName("dev.gitlive.firebase.firestore", "FieldPath"),
+                        MemberNameWrapper.get("dev.gitlive.firebase.firestore", "FieldPath"),
                     ),
                 )
             }

@@ -4,7 +4,7 @@ package io.composeflow.model.datatype
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.model.parameter.wrapper.InstantWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.findDataTypeOrThrow
@@ -19,7 +19,7 @@ import kotlin.time.Clock
 sealed interface FieldType<T> : DropdownItem {
     fun defaultValue(): T
 
-    fun defaultValueAsCodeBlock(project: Project): CodeBlock
+    fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper
 
     fun type(): ComposeFlowType
 
@@ -36,7 +36,7 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): kotlin.String = defaultValue
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("\"${defaultValue}\"")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("\"${defaultValue}\"")
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("String")
@@ -55,7 +55,7 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): kotlin.Int = defaultValue
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("$defaultValue")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("$defaultValue")
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Int")
@@ -74,7 +74,7 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): kotlin.Float = defaultValue
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("${defaultValue}f")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("${defaultValue}f")
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Float")
@@ -93,7 +93,7 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): kotlin.Boolean = defaultValue
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("$defaultValue")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("$defaultValue")
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Boolean")
@@ -112,7 +112,11 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): kotlin.time.Instant = defaultValue.instant ?: Clock.System.now()
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = defaultValue.generateCode()
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper {
+            // Bridge function until InstantWrapper.generateCode returns wrapper
+            val codeBlock = defaultValue.generateCode()
+            return CodeBlockWrapper.of(codeBlock.toString())
+        }
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Instant")
@@ -132,9 +136,9 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): DataType = defaultValue
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock {
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper {
             val dataType = project.findDataTypeOrThrow(dataTypeId)
-            return CodeBlock.of("%T()", dataType.asKotlinPoetClassName(project))
+            return CodeBlockWrapper.of("%T()", dataType.asKotlinPoetClassName(project))
         }
 
         @Composable
@@ -158,7 +162,7 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): kotlin.String = ""
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("DocumentId")

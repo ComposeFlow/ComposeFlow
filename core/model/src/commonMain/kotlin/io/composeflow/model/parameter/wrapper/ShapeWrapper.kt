@@ -7,8 +7,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.serializer.FallbackSealedSerializer
 import io.composeflow.serializer.LocationAwareDpSerializer
 import io.composeflow.serializer.withLocationAwareExceptions
@@ -79,8 +79,8 @@ sealed interface ShapeWrapper {
     data object Rectangle : ShapeWrapper {
         override fun toShape(): Shape = RectangleShape
 
-        override fun generateCode(codeBlockBuilder: CodeBlock.Builder): CodeBlock.Builder {
-            val memberName = MemberName("androidx.compose.ui.graphics", "RectangleShape")
+        override fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper {
+            val memberName = MemberNameWrapper.get("androidx.compose.ui.graphics", "RectangleShape")
             codeBlockBuilder.addStatement("shape = %M,", memberName)
             return codeBlockBuilder
         }
@@ -91,8 +91,8 @@ sealed interface ShapeWrapper {
     data object Circle : ShapeWrapper {
         override fun toShape(): Shape = CircleShape
 
-        override fun generateCode(codeBlockBuilder: CodeBlock.Builder): CodeBlock.Builder {
-            val memberName = MemberName("androidx.compose.foundation.shape", "CircleShape")
+        override fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper {
+            val memberName = MemberNameWrapper.get("androidx.compose.foundation.shape", "CircleShape")
             codeBlockBuilder.addStatement("shape = %M,", memberName)
             return codeBlockBuilder
         }
@@ -116,9 +116,9 @@ sealed interface ShapeWrapper {
 
         override fun toShape(): Shape = RoundedCornerShape(topStart, topEnd, bottomEnd, bottomStart)
 
-        override fun generateCode(codeBlockBuilder: CodeBlock.Builder): CodeBlock.Builder {
-            val memberName = MemberName("androidx.compose.foundation.shape", "RoundedCornerShape")
-            val dpMemberName = MemberName("androidx.compose.ui.unit", "dp")
+        override fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper {
+            val memberName = MemberNameWrapper.get("androidx.compose.foundation.shape", "RoundedCornerShape")
+            val dpMemberName = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             when (spec()) {
                 ShapeCornerSpec.All -> {
                     codeBlockBuilder.addStatement(
@@ -163,9 +163,9 @@ sealed interface ShapeWrapper {
         CornerValueHolder {
         override fun toShape(): Shape = CutCornerShape(topStart, topEnd, bottomEnd, bottomStart)
 
-        override fun generateCode(codeBlockBuilder: CodeBlock.Builder): CodeBlock.Builder {
-            val memberName = MemberName("androidx.compose.foundation.shape", "CutCornerShape")
-            val dpMemberName = MemberName("androidx.compose.ui.unit", "dp")
+        override fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper {
+            val memberName = MemberNameWrapper.get("androidx.compose.foundation.shape", "CutCornerShape")
+            val dpMemberName = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             when (spec()) {
                 ShapeCornerSpec.All -> {
                     codeBlockBuilder.addStatement(
@@ -197,7 +197,7 @@ sealed interface ShapeWrapper {
 
     fun toShape(): Shape
 
-    fun generateCode(codeBlockBuilder: CodeBlock.Builder): CodeBlock.Builder
+    fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper
 }
 
 enum class ShapeCornerSpec {

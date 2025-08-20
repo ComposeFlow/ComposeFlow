@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.action.ActionType
@@ -154,7 +154,7 @@ sealed interface ComposeTrait : PaletteDraggable {
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     /**
      * Defines a companion state if the trait needs a state for ComposeTraits that need to hold
@@ -198,13 +198,13 @@ sealed interface ComposeTrait : PaletteDraggable {
 interface LazyListTrait : ComposeTrait {
     var defaultChildNumOfItems: Int
 
-    fun generateParamsCode(): CodeBlock
+    fun generateParamsCode(): CodeBlockWrapper
 }
 
 interface PagerTrait : ComposeTrait {
     var defaultChildNumOfItems: Int
 
-    fun generateParamsCode(): CodeBlock
+    fun generateParamsCode(): CodeBlockWrapper
 }
 
 interface LazyGridTrait : LazyListTrait {
@@ -266,7 +266,7 @@ data object EmptyTrait : ComposeTrait {
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock = CodeBlock.of("")
+    ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
     override fun defaultComposeNode(project: Project): ComposeNode? = null
 }

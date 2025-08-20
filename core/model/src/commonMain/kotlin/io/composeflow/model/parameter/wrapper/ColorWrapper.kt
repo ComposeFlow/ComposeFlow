@@ -3,8 +3,8 @@ package io.composeflow.model.parameter.wrapper
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.serializer.FallbackEnumSerializer
 import io.composeflow.serializer.LocationAwareColorSerializer
@@ -23,15 +23,15 @@ data class ColorWrapper(
     @Composable
     fun getColor(): Color? = themeColor?.getAppColor() ?: color
 
-    fun generateCode(): CodeBlock {
-        val builder = CodeBlock.builder()
+    fun generateCode(): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
         if (themeColor != null) {
             builder.add(
                 "%M.colorScheme.${themeColor.colorName}",
                 MemberHolder.Material3.MaterialTheme,
             )
         } else {
-            val colorMember = MemberName("androidx.compose.ui.graphics", "Color")
+            val colorMember = MemberNameWrapper.get("androidx.compose.ui.graphics", "Color")
             color?.let {
                 builder.add(
                     """%M(${color.asString()})""",

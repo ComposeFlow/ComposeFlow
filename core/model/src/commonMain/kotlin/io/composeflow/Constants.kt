@@ -2,11 +2,12 @@ package io.composeflow
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.PropertySpec
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import dev.gitlive.firebase.firestore.FirebaseFirestore
-import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.MemberHolderWrapper
 import kotlinx.serialization.json.Json
 
 const val ON_SCREEN_INITIALLY_LOADED = "onScreenInitiallyLoaded"
@@ -25,44 +26,44 @@ enum class ComposeScreenConstant {
 enum class ViewModelConstant {
     flowSettings {
         @OptIn(ExperimentalSettingsApi::class)
-        override fun generateProperty(): PropertySpec =
-            PropertySpec
-                .builder(flowSettings.name, FlowSettings::class)
-                .addModifiers(KModifier.PRIVATE)
+        override fun generateProperty(): PropertySpecWrapper =
+            PropertySpecWrapper
+                .builder(flowSettings.name, FlowSettings::class.asTypeNameWrapper())
+                .addModifiers(KModifierWrapper.PRIVATE)
                 .delegate(
-                    CodeBlock
+                    CodeBlockWrapper
                         .builder()
-                        .beginControlFlow("lazy")
-                        .add("%M()", MemberHolder.Koin.get)
-                        .endControlFlow()
+                        .add("lazy { ")
+                        .add("%M()", MemberHolderWrapper.Koin.get)
+                        .add(" }")
                         .build(),
                 ).build()
     },
     jsonSerializer {
-        override fun generateProperty(): PropertySpec =
-            PropertySpec
-                .builder(jsonSerializer.name, Json::class)
-                .addModifiers(KModifier.PRIVATE)
+        override fun generateProperty(): PropertySpecWrapper =
+            PropertySpecWrapper
+                .builder(jsonSerializer.name, Json::class.asTypeNameWrapper())
+                .addModifiers(KModifierWrapper.PRIVATE)
                 .delegate(
-                    CodeBlock
+                    CodeBlockWrapper
                         .builder()
-                        .add("%M()", MemberHolder.Koin.inject)
+                        .add("%M()", MemberHolderWrapper.Koin.inject)
                         .build(),
                 ).build()
     },
     firestore {
-        override fun generateProperty(): PropertySpec =
-            PropertySpec
-                .builder(firestore.name, FirebaseFirestore::class)
-                .addModifiers(KModifier.PRIVATE)
+        override fun generateProperty(): PropertySpecWrapper =
+            PropertySpecWrapper
+                .builder(firestore.name, FirebaseFirestore::class.asTypeNameWrapper())
+                .addModifiers(KModifierWrapper.PRIVATE)
                 .delegate(
-                    CodeBlock
+                    CodeBlockWrapper
                         .builder()
-                        .add("%M()", MemberHolder.Koin.inject)
+                        .add("%M()", MemberHolderWrapper.Koin.inject)
                         .build(),
                 ).build()
     },
     ;
 
-    abstract fun generateProperty(): PropertySpec
+    abstract fun generateProperty(): PropertySpecWrapper
 }

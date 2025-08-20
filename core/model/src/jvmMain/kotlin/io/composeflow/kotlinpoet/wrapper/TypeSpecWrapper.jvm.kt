@@ -1,0 +1,67 @@
+package io.composeflow.kotlinpoet.wrapper
+
+import com.squareup.kotlinpoet.TypeSpec
+
+/**
+ * JVM implementation of TypeSpecWrapper that delegates to actual KotlinPoet's TypeSpec.
+ */
+actual class TypeSpecWrapper internal constructor(private val actual: TypeSpec) {
+    actual companion object {
+        actual fun classBuilder(name: String): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.classBuilder(name))
+        actual fun classBuilder(className: ClassNameWrapper): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.classBuilder(className.toKotlinPoetClassName()))
+        actual fun objectBuilder(name: String): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.objectBuilder(name))
+        actual fun interfaceBuilder(name: String): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.interfaceBuilder(name))
+        actual fun enumBuilder(name: String): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.enumBuilder(name))
+        actual fun annotationBuilder(name: String): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.annotationBuilder(name))
+        actual fun funInterfaceBuilder(name: String): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.funInterfaceBuilder(name))
+    }
+    
+    actual val name: String? get() = actual.name
+    actual val kind: TypeSpecWrapper.Kind get() = when (actual.kind) {
+        TypeSpec.Kind.CLASS -> TypeSpecWrapper.Kind.CLASS
+        TypeSpec.Kind.OBJECT -> TypeSpecWrapper.Kind.OBJECT
+        TypeSpec.Kind.INTERFACE -> TypeSpecWrapper.Kind.INTERFACE
+        TypeSpec.Kind.ENUM -> TypeSpecWrapper.Kind.ENUM
+        TypeSpec.Kind.ANNOTATION -> TypeSpecWrapper.Kind.ANNOTATION
+    }
+    actual val modifiers: Set<KModifierWrapper> get() = actual.modifiers.map { it.toWrapper() }.toSet()
+    actual val annotations: List<AnnotationSpecWrapper> get() = actual.annotations.map { it.toWrapper() }
+    actual val propertySpecs: List<PropertySpecWrapper> get() = actual.propertySpecs.map { it.toWrapper() }
+    actual val funSpecs: List<FunSpecWrapper> get() = actual.funSpecs.map { it.toWrapper() }
+    actual val typeSpecs: List<TypeSpecWrapper> get() = actual.typeSpecs.map { it.toWrapper() }
+    
+    actual override fun toString(): String = actual.toString()
+    
+    // Internal accessor for other wrapper classes
+    internal fun toKotlinPoet(): TypeSpec = actual
+}
+
+actual class TypeSpecBuilderWrapper internal constructor(private val actual: TypeSpec.Builder) {
+    actual fun addModifiers(vararg modifiers: KModifierWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addModifiers(*modifiers.toKotlinPoet()))
+    actual fun addAnnotation(annotationSpec: AnnotationSpecWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addAnnotation(annotationSpec.toKotlinPoet()))
+    actual fun addProperty(propertySpec: PropertySpecWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addProperty(propertySpec.toKotlinPoet()))
+    actual fun addFunction(funSpec: FunSpecWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addFunction(funSpec.toKotlinPoet()))
+    actual fun addType(typeSpec: TypeSpecWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addType(typeSpec.toKotlinPoet()))
+    actual fun primaryConstructor(primaryConstructor: FunSpecWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.primaryConstructor(primaryConstructor.toKotlinPoet()))
+    actual fun addSuperinterface(superinterface: TypeNameWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addSuperinterface(superinterface.toKotlinPoet()))
+    actual fun superclass(superclass: TypeNameWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.superclass(superclass.toKotlinPoet()))
+    actual fun build(): TypeSpecWrapper = TypeSpecWrapper(actual.build())
+}
+
+// Helper function
+fun TypeSpec.toWrapper(): TypeSpecWrapper = TypeSpecWrapper(this)

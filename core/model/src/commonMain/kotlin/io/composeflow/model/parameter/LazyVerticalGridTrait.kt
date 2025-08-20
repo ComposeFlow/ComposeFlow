@@ -10,8 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
@@ -57,15 +57,15 @@ data class LazyVerticalGridTrait(
             verticalArrangement == null &&
             userScrollEnabled == null
 
-    override fun generateParamsCode(): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    override fun generateParamsCode(): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         codeBlockBuilder.add("columns = ")
         codeBlockBuilder.add(lazyGridCells.asCodeBlock())
         codeBlockBuilder.addStatement(",")
-        val dpMember = MemberName("androidx.compose.ui.unit", "dp")
+        val dpMember = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
         contentPadding?.let {
             val paddingValuesMember =
-                MemberName("androidx.compose.foundation.layout", "PaddingValues")
+                MemberNameWrapper.get("androidx.compose.foundation.layout", "PaddingValues")
             codeBlockBuilder.addStatement(
                 "contentPadding = %M(${it.value.toInt()}.%M),",
                 paddingValuesMember,
@@ -76,7 +76,7 @@ data class LazyVerticalGridTrait(
             codeBlockBuilder.addStatement("reverseLayout = $it,")
         }
         verticalArrangement?.let {
-            val arrangementMember = MemberName("androidx.compose.foundation.layout", "Arrangement")
+            val arrangementMember = MemberNameWrapper.get("androidx.compose.foundation.layout", "Arrangement")
             codeBlockBuilder.addStatement(
                 "verticalArrangement = %M.${it.name},",
                 arrangementMember,
@@ -190,9 +190,9 @@ data class LazyVerticalGridTrait(
         node: ComposeNode,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
+    ): CodeBlockWrapper {
         val lazyVerticalGridMember =
-            MemberName("androidx.compose.foundation.lazy.grid", "LazyVerticalGrid")
+            MemberNameWrapper.get("androidx.compose.foundation.lazy.grid", "LazyVerticalGrid")
         return LazyListTraitNode.generateCode(
             project = project,
             node = node,
