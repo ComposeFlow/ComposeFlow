@@ -67,7 +67,7 @@ tasks.register("runKsp") {
     }
 
     // Depend on the KSP task for the desktop target
-    dependsOn("kspKotlinDesktop")
+    dependsOn("kspKotlinJvm")
 }
 
 // Make sure the KSP tasks run
