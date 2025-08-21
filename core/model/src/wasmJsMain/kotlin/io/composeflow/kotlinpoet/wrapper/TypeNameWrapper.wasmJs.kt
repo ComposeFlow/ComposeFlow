@@ -50,5 +50,8 @@ actual class ParameterizedTypeNameWrapper(
 // Extension functions
 actual fun KClass<*>.asTypeNameWrapper(): TypeNameWrapper = ClassNameWrapper("", this.simpleName ?: "")
 
+actual fun KClass<*>.parameterizedBy(vararg typeArguments: KClass<*>): ParameterizedTypeNameWrapper =
+    ParameterizedTypeNameWrapper(ClassNameWrapper("", this.simpleName ?: ""), typeArguments.map { ClassNameWrapper("", it.simpleName ?: "") })
+
 actual fun TypeNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper = 
     ParameterizedTypeNameWrapper.get(this as ClassNameWrapper, *typeArguments)

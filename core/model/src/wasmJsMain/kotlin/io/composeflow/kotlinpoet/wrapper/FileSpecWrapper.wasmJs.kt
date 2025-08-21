@@ -26,5 +26,6 @@ actual class FileSpecBuilderWrapper {
     actual fun addImport(packageName: String, vararg names: String): FileSpecBuilderWrapper = this
     actual fun addImport(className: ClassNameWrapper, vararg names: String): FileSpecBuilderWrapper = this
     actual fun addComment(format: String, vararg args: Any): FileSpecBuilderWrapper = this
+    actual fun suppressWarningTypes(vararg types: String): FileSpecBuilderWrapper = this
     actual fun build(): FileSpecWrapper = FileSpecWrapper()
 }

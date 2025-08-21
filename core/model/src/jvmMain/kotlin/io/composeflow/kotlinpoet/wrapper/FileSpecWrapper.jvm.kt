@@ -37,6 +37,8 @@ actual class FileSpecBuilderWrapper internal constructor(private val actual: Fil
         FileSpecBuilderWrapper(actual.addImport(className.toKotlinPoetClassName(), *names))
     actual fun addComment(format: String, vararg args: Any): FileSpecBuilderWrapper = 
         FileSpecBuilderWrapper(actual.addComment(format, *args))
+    actual fun suppressWarningTypes(vararg types: String): FileSpecBuilderWrapper =
+        FileSpecBuilderWrapper(actual.suppressWarningTypes(*types))
     actual fun build(): FileSpecWrapper = FileSpecWrapper(actual.build())
 }
 

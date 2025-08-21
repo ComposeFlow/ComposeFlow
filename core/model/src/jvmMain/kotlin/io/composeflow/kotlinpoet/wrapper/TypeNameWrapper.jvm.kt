@@ -61,6 +61,9 @@ actual class ParameterizedTypeNameWrapper internal constructor(private val actua
 // Extension functions
 actual fun KClass<*>.asTypeNameWrapper(): TypeNameWrapper = this.asTypeName().toWrapper()
 
+actual fun KClass<*>.parameterizedBy(vararg typeArguments: KClass<*>): ParameterizedTypeNameWrapper =
+    ParameterizedTypeNameWrapper(this.asTypeName().parameterizedBy(*typeArguments.map { it.asTypeName() }.toTypedArray()))
+
 actual fun TypeNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper = 
     ParameterizedTypeNameWrapper.get(this as ClassNameWrapper, *typeArguments)
 

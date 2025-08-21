@@ -25,5 +25,6 @@ expect class FileSpecBuilderWrapper {
     fun addImport(packageName: String, vararg names: String): FileSpecBuilderWrapper
     fun addImport(className: ClassNameWrapper, vararg names: String): FileSpecBuilderWrapper
     fun addComment(format: String, vararg args: Any): FileSpecBuilderWrapper
+    fun suppressWarningTypes(vararg types: String): FileSpecBuilderWrapper
     fun build(): FileSpecWrapper
 }

@@ -7,7 +7,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.serializer.FallbackSealedSerializer
 import io.composeflow.serializer.LocationAwareDpSerializer
@@ -92,7 +92,8 @@ sealed interface ShapeWrapper {
         override fun toShape(): Shape = CircleShape
 
         override fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper {
-            val memberName = MemberNameWrapper.get("androidx.compose.foundation.shape", "CircleShape")
+            val memberName =
+                MemberNameWrapper.get("androidx.compose.foundation.shape", "CircleShape")
             codeBlockBuilder.addStatement("shape = %M,", memberName)
             return codeBlockBuilder
         }
@@ -117,7 +118,8 @@ sealed interface ShapeWrapper {
         override fun toShape(): Shape = RoundedCornerShape(topStart, topEnd, bottomEnd, bottomStart)
 
         override fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper {
-            val memberName = MemberNameWrapper.get("androidx.compose.foundation.shape", "RoundedCornerShape")
+            val memberName =
+                MemberNameWrapper.get("androidx.compose.foundation.shape", "RoundedCornerShape")
             val dpMemberName = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             when (spec()) {
                 ShapeCornerSpec.All -> {
@@ -164,7 +166,8 @@ sealed interface ShapeWrapper {
         override fun toShape(): Shape = CutCornerShape(topStart, topEnd, bottomEnd, bottomStart)
 
         override fun generateCode(codeBlockBuilder: CodeBlockBuilderWrapper): CodeBlockBuilderWrapper {
-            val memberName = MemberNameWrapper.get("androidx.compose.foundation.shape", "CutCornerShape")
+            val memberName =
+                MemberNameWrapper.get("androidx.compose.foundation.shape", "CutCornerShape")
             val dpMemberName = MemberNameWrapper.get("androidx.compose.ui.unit", "dp")
             when (spec()) {
                 ShapeCornerSpec.All -> {

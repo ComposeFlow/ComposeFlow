@@ -1,17 +1,18 @@
 package io.composeflow.model.project
 
 import androidx.compose.ui.geometry.Offset
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
 import io.composeflow.ON_SCREEN_INITIALLY_LOADED
 import io.composeflow.SCREEN_INITIALLY_LOADED_FLAG
 import io.composeflow.ViewModelConstant
-import io.composeflow.formatter.suppressRedundantVisibilityModifier
+import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.ComposeEditableContext
 import io.composeflow.kotlinpoet.GenerationContext
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
+import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
+import io.composeflow.kotlinpoet.wrapper.parameterizedBy
 import io.composeflow.model.action.Action
 import io.composeflow.model.action.ActionNode
 import io.composeflow.model.action.ActionType
@@ -78,10 +79,10 @@ interface CanvasEditable : StateHolder {
     fun newComposableContext(): ComposeEditableContext =
         ComposeEditableContext(
             typeSpecBuilder =
-                TypeSpec
+                TypeSpecWrapper
                     .classBuilder(viewModelFileName)
-                    .superclass(ViewModel::class)
-                    .addSuperinterface(KoinComponent::class),
+                    .superclass(ViewModel::class.asTypeNameWrapper())
+                    .addSuperinterface(KoinComponent::class.asTypeNameWrapper()),
             canvasEditable = this,
         )
 
@@ -104,7 +105,7 @@ interface CanvasEditable : StateHolder {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean = false,
-    ): FileSpec
+    ): FileSpecWrapper
 
     fun getAllActions(project: Project): List<Action> =
         getAllComposeNodes()
@@ -117,15 +118,16 @@ interface CanvasEditable : StateHolder {
             it.allActionNodes()
         }
 
-    fun hasComposeNode(node: ComposeNode): Boolean = getAllComposeNodes().any { it.fallbackId == node.fallbackId }
+    fun hasComposeNode(node: ComposeNode): Boolean =
+        getAllComposeNodes().any { it.fallbackId == node.fallbackId }
 
     fun generateViewModelFileSpec(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean = false,
-    ): FileSpec {
+    ): FileSpecWrapper {
         val fileBuilder =
-            FileSpec.builder(getPackageName(project), viewModelFileName.toKotlinFileName())
+            FileSpecWrapper.builder(getPackageName(project), viewModelFileName.toKotlinFileName())
 
         var dependsOnAppState = false
         var dependsOnListAppState = false
@@ -171,7 +173,7 @@ interface CanvasEditable : StateHolder {
                     existing = allProperties.map { it.name }.toSet(),
                 )
             context.addProperty(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         name = backingFieldName,
                         MutableStateFlow::class.parameterizedBy(Boolean::class),
@@ -180,7 +182,7 @@ interface CanvasEditable : StateHolder {
                 dryRun = dryRun,
             )
             context.addProperty(
-                PropertySpec
+                PropertySpecWrapper
                     .builder(
                         name = fieldName,
                         StateFlow::class.parameterizedBy(Boolean::class),
@@ -189,7 +191,7 @@ interface CanvasEditable : StateHolder {
                 dryRun = dryRun,
             )
             context.addFunction(
-                FunSpec
+                FunSpecWrapper
                     .builder(ON_SCREEN_INITIALLY_LOADED)
                     .addCode("$backingFieldName.value = true")
                     .build(),
