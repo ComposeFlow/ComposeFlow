@@ -398,8 +398,7 @@ sealed interface StringProperty : AssignableProperty {
         val stringResourceId: StringResourceId,
     ) : AssignablePropertyBase(),
         StringProperty {
-        override fun valueExpression(project: Project): String =
-            project.stringResourceHolder.stringResourceDefaultValue(stringResourceId).orEmpty()
+        override fun valueExpression(project: Project): String = textFromStringResource(project)
 
         override fun generateCodeBlock(
             project: Project,
@@ -423,11 +422,13 @@ sealed interface StringProperty : AssignableProperty {
             }
         }
 
-        override fun displayText(project: Project): String =
-            project.stringResourceHolder.stringResourceDefaultValue(stringResourceId).orEmpty()
+        override fun displayText(project: Project): String = textFromStringResource(project)
 
         override fun isDependent(sourceId: String): Boolean =
             stringResourceId == sourceId || super<AssignablePropertyBase>.isDependent(sourceId)
+
+        private fun textFromStringResource(project: Project): String =
+            project.stringResourceHolder.stringResourceDefaultValue(stringResourceId) ?: "[Invalid]"
     }
 
     @Composable
