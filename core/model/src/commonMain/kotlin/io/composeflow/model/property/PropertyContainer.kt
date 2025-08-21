@@ -17,43 +17,12 @@ data class PropertyContainer(
         project: Project,
         composeNode: ComposeNode,
     ): List<TrackableIssue> {
-        if (assignableProperty is ValueFromCompanionState) return emptyList()
-        val transformedType =
-            assignableProperty?.transformedValueType(project) ?: return emptyList()
+        if (assignableProperty == null || assignableProperty is ValueFromCompanionState) {
+            return emptyList()
+        }
         return buildList {
             project.findCanvasEditableHavingNodeOrNull(composeNode)?.let { canvasEditable ->
-                if (transformedType is ComposeFlowType.UnknownType) {
-                    add(
-                        TrackableIssue(
-                            destinationContext =
-                                DestinationContext.UiBuilderScreen(
-                                    canvasEditableId = canvasEditable.id,
-                                    composeNodeId = composeNode.id,
-                                ),
-                            issue =
-                                Issue.ResolvedToUnknownType(
-                                    property = assignableProperty,
-                                ),
-                        ),
-                    )
-                } else if (!acceptableType.isAbleToAssign(transformedType)) {
-                    add(
-                        TrackableIssue(
-                            destinationContext =
-                                DestinationContext.UiBuilderScreen(
-                                    canvasEditableId = canvasEditable.id,
-                                    composeNodeId = composeNode.id,
-                                ),
-                            issue =
-                                Issue.ResolvedToTypeNotAssignable(
-                                    property = assignableProperty,
-                                    acceptableType = acceptableType,
-                                ),
-                        ),
-                    )
-                }
-
-                assignableProperty.checkResourceReference(project).forEach { issue ->
+                assignableProperty.generateIssues(project, acceptableType).forEach { issue ->
                     add(
                         TrackableIssue(
                             destinationContext =
@@ -91,18 +60,3 @@ data class PropertyContainer(
         }
     }
 }
-
-private fun AssignableProperty.checkResourceReference(project: Project): List<Issue> =
-    buildList {
-        if (this@checkResourceReference is StringProperty.ValueFromStringResource) {
-            val stringResourceIds =
-                project.stringResourceHolder.stringResources
-                    .map { it.id }
-                    .toSet()
-            if (stringResourceId !in stringResourceIds) {
-                add(
-                    Issue.InvalidResourceReference(resourceType = "string"),
-                )
-            }
-        }
-    }

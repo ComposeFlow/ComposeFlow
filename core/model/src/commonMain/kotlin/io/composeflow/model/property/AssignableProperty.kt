@@ -62,6 +62,9 @@ import io.composeflow.model.project.findLocalStateOrNull
 import io.composeflow.model.project.findParameterOrNull
 import io.composeflow.model.project.findParameterOrThrow
 import io.composeflow.model.project.firebase.CollectionId
+import io.composeflow.model.project.issue.DestinationContext
+import io.composeflow.model.project.issue.Issue
+import io.composeflow.model.project.issue.TrackableIssue
 import io.composeflow.model.project.string.StringResourceId
 import io.composeflow.model.project.string.stringResourceDefaultValue
 import io.composeflow.model.project.string.updateStringResourceDefaultLocaleValue
@@ -2270,19 +2273,48 @@ fun AssignableProperty?.asBooleanValue(): Boolean =
         else -> true
     }
 
+fun AssignableProperty.generateIssues(
+    project: Project,
+    acceptableType: ComposeFlowType,
+): List<Issue> =
+    buildList {
+        val transformedValueType = transformedValueType(project)
+        if (transformedValueType is ComposeFlowType.UnknownType) {
+            add(
+                Issue.ResolvedToUnknownType(
+                    property = this@generateIssues,
+                ),
+            )
+        } else if (!acceptableType.isAbleToAssign(transformedValueType)) {
+            add(
+                Issue.ResolvedToTypeNotAssignable(
+                    property = this@generateIssues,
+                    acceptableType = acceptableType,
+                ),
+            )
+        }
+
+        if (this@generateIssues is StringProperty.ValueFromStringResource) {
+            val stringResourceIds =
+                project.stringResourceHolder.stringResources
+                    .map { it.id }
+                    .toSet()
+            if (stringResourceId !in stringResourceIds) {
+                add(
+                    Issue.InvalidResourceReference(resourceType = "string"),
+                )
+            }
+        }
+    }
+
 @Composable
 fun AssignableProperty.getErrorMessage(
     project: Project,
     acceptableType: ComposeFlowType,
 ): String? {
-    val transformedValueType = transformedValueType(project)
-    val errorText =
-        if (transformedValueType is ComposeFlowType.UnknownType) {
-            stringResource(Res.string.invalid_reference)
-        } else if (!acceptableType.isAbleToAssign(transformedValueType)) {
-            stringResource(Res.string.invalid_type)
-        } else {
-            null
+    val messages =
+        generateIssues(project, acceptableType).map { issue ->
+            issue.errorMessage(project)
         }
-    return errorText
+    return messages.joinToString().takeIf { it.isNotEmpty() }
 }
