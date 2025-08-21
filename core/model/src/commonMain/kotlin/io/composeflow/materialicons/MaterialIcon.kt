@@ -1,8 +1,8 @@
 package io.composeflow.materialicons
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -24,9 +24,9 @@ sealed interface ImageVectorHolder {
     val memberDescriptor: String
 }
 
-fun ImageVectorHolder.asCodeBlock(): CodeBlock =
-    CodeBlock.of(
+fun ImageVectorHolder.asCodeBlock(): CodeBlockWrapper =
+    CodeBlockWrapper.of(
         """%M.$memberDescriptor.%M""",
-        MemberName("androidx.compose.material.icons", "Icons"),
-        MemberName("androidx.compose.material.icons.$packageDescriptor", name),
+        MemberNameWrapper.get("androidx.compose.material.icons", "Icons"),
+        MemberNameWrapper.get("androidx.compose.material.icons.$packageDescriptor", name),
     )

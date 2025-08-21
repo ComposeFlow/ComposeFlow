@@ -1,10 +1,10 @@
 package io.composeflow.kotlinpoet
 
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 
 /**
- * Indicates the class that implements this interface is able to express itself as [CodeBlock].
+ * Indicates the class that implements this interface is able to express itself as [CodeBlockWrapper].
  */
 interface CodeConvertible {
-    fun asCodeBlock(): CodeBlock
+    fun asCodeBlock(): CodeBlockWrapper
 }

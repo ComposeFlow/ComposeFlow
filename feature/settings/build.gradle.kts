@@ -10,7 +10,6 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(project(":core:di"))
-            implementation(project(":core:icons"))
             implementation(project(":core:model"))
             implementation(project(":core:platform"))
             implementation(project(":core:ui"))

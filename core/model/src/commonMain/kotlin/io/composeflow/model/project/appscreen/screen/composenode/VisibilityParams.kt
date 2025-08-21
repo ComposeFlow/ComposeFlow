@@ -1,7 +1,7 @@
 package io.composeflow.model.project.appscreen.screen.composenode
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.enumwrapper.NodeVisibility
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
@@ -87,8 +87,8 @@ data class VisibilityParams(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val builder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
         if (!isVisibilityConditionAlwaysVisible()) {
             builder.add(
                 visibilityCondition
@@ -109,12 +109,12 @@ data class VisibilityParams(
             }
             var needsOr = false
             val isCurrentWindowWidthSizeClassMember =
-                MemberName("${COMPOSEFLOW_PACKAGE}.platform", "isCurrentWindowWidthSizeClass")
+                MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.platform", "isCurrentWindowWidthSizeClass")
             val windowWidthSizeClassMember =
-                MemberName("androidx.window.core.layout", "WindowWidthSizeClass")
+                MemberNameWrapper.get("androidx.window.core.layout", "WindowWidthSizeClass")
             if (formFactorVisibility.visibleInCompact) {
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         "%M(%M.COMPACT)",
                         isCurrentWindowWidthSizeClassMember,
                         windowWidthSizeClassMember,
@@ -128,7 +128,7 @@ data class VisibilityParams(
                     builder.add(" || ")
                 }
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         "%M(%M.MEDIUM)",
                         isCurrentWindowWidthSizeClassMember,
                         windowWidthSizeClassMember,
@@ -142,7 +142,7 @@ data class VisibilityParams(
                     builder.add(" || ")
                 }
                 builder.add(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         "%M(%M.EXPANDED)",
                         isCurrentWindowWidthSizeClassMember,
                         windowWidthSizeClassMember,

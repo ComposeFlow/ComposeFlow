@@ -1,7 +1,7 @@
 package io.composeflow.model.palette
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.MemberName
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.model.modifier.generateModifierCode
@@ -18,11 +18,11 @@ object PagerTraitNode {
         project: Project,
         node: ComposeNode,
         context: GenerationContext,
-        pagerMember: MemberName,
+        pagerMember: MemberNameWrapper,
         pagerTrait: HorizontalPagerTrait,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val itemName =
             node.trait.value
                 .iconText()
@@ -51,7 +51,7 @@ object PagerTraitNode {
         if (!childrenDependOnDynamicItems) {
             codeBlockBuilder.addStatement(
                 "val $pagerStateName = %M(pageCount = {${node.children.size}})",
-                MemberName("androidx.compose.foundation.pager", "rememberPagerState"),
+                MemberNameWrapper.get("androidx.compose.foundation.pager", "rememberPagerState"),
             )
             codeBlockBuilder.addStatement("%M(state = $pagerStateName,", pagerMember)
             codeBlockBuilder.add(
@@ -91,7 +91,7 @@ object PagerTraitNode {
             dynamicItem?.let {
                 codeBlockBuilder.add(
                     "val $pagerStateName = %M(pageCount = {",
-                    MemberName("androidx.compose.foundation.pager", "rememberPagerState"),
+                    MemberNameWrapper.get("androidx.compose.foundation.pager", "rememberPagerState"),
                 )
                 val transformedItemCodeBlock =
                     dynamicItem.transformedCodeBlock(project, context, dryRun = dryRun)
@@ -217,7 +217,7 @@ object PagerTraitNode {
             codeBlockBuilder.addStatement("},")
             codeBlockBuilder.addStatement(
                 "shape = %M",
-                MemberName("androidx.compose.foundation.shape", "CircleShape"),
+                MemberNameWrapper.get("androidx.compose.foundation.shape", "CircleShape"),
             )
             codeBlockBuilder.addStatement(")") // background
             codeBlockBuilder.addStatement(")") // Box

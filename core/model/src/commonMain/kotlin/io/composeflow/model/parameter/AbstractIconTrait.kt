@@ -9,15 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
-import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.asVariableName
 import io.composeflow.auth.LocalFirebaseIdToken
 import io.composeflow.cloud.storage.BlobInfoWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.materialicons.ImageVectorHolder
 import io.composeflow.materialicons.Outlined
 import io.composeflow.materialicons.asCodeBlock
@@ -270,7 +269,8 @@ abstract class AbstractIconTrait(
         return codeBlockBuilder.build()
     }
 
-    override fun paletteCategories(): List<TraitCategory> = listOf(TraitCategory.Common, TraitCategory.Basic)
+    override fun paletteCategories(): List<TraitCategory> =
+        listOf(TraitCategory.Common, TraitCategory.Basic)
 
     companion object {
         fun defaultTrait(): IconTrait = IconTrait(imageVectorHolder = Outlined.Add)

@@ -15,7 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.charleskorn.kaml.YamlNode
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.eachEquals
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.IdMap
@@ -664,8 +664,8 @@ data class ComposeNode(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val codeBlockBuilder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val codeBlockBuilder = CodeBlockWrapper.builder()
         val visibilityParams = visibilityParams.value
         if (visibilityParams.alwaysVisible()) {
             codeBlockBuilder.add(

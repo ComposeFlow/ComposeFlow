@@ -24,4 +24,5 @@ actual class CodeBlockBuilderWrapper {
     actual fun clear(): CodeBlockBuilderWrapper = this
     actual fun indent(): CodeBlockBuilderWrapper = this
     actual fun unindent(): CodeBlockBuilderWrapper = this
+    actual fun isEmpty(): Boolean = true
 }

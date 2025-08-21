@@ -15,7 +15,6 @@ kotlin {
             implementation(project(":core:ai"))
             implementation(project(":core:di"))
             implementation(project(":core:formatter"))
-            implementation(project(":core:icons"))
             implementation(project(":core:platform"))
             implementation(project(":core:serializer"))
             implementation(project(":core:ui"))
@@ -28,6 +27,7 @@ kotlin {
             implementation(libs.jewel.int.ui.standalone)
             implementation(libs.gitlive.firebase.firestore)
             implementation(libs.kaml)
+            implementation(compose.materialIconsExtended)
             implementation(libs.kmpauth.uihelper)
             implementation(libs.koin.core)
             // KotlinPoet moved to JVM-only dependencies

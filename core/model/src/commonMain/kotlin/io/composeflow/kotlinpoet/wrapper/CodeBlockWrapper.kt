@@ -24,4 +24,5 @@ expect class CodeBlockBuilderWrapper {
     fun clear(): CodeBlockBuilderWrapper
     fun indent(): CodeBlockBuilderWrapper
     fun unindent(): CodeBlockBuilderWrapper
+    fun isEmpty(): Boolean
 }
