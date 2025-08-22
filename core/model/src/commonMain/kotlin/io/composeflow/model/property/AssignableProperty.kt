@@ -1514,7 +1514,7 @@ data class EnumProperty(
 ) : AssignablePropertyBase(),
     AssignableProperty,
     IntrinsicProperty<EnumWrapper> {
-    override fun valueType(project: Project) = ComposeFlowType.Enum(enumClass = value.enumValue().declaringJavaClass)
+    override fun valueType(project: Project) = ComposeFlowType.Enum(enumClass = value.enumValue()::class)
 
     override fun getEnumValue() = value.enumValue()
 

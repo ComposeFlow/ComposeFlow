@@ -70,27 +70,27 @@ data class TextTrait(
             PropertyContainer(
                 "FontStyle",
                 fontStyle,
-                ComposeFlowType.Enum(enumClass = FontStyleWrapper::class.java),
+                ComposeFlowType.Enum(enumClass = FontStyleWrapper::class),
             ),
             PropertyContainer(
                 "Text decoration",
                 textDecoration,
-                ComposeFlowType.Enum(enumClass = TextDecorationWrapper::class.java),
+                ComposeFlowType.Enum(enumClass = TextDecorationWrapper::class),
             ),
             PropertyContainer(
                 "Text align",
                 textAlign,
-                ComposeFlowType.Enum(enumClass = TextAlignWrapper::class.java),
+                ComposeFlowType.Enum(enumClass = TextAlignWrapper::class),
             ),
             PropertyContainer(
                 "Overflow",
                 overflow,
-                ComposeFlowType.Enum(enumClass = TextOverflowWrapper::class.java),
+                ComposeFlowType.Enum(enumClass = TextOverflowWrapper::class),
             ),
             PropertyContainer(
                 "TextStyle",
                 textStyleWrapper,
-                ComposeFlowType.Enum(enumClass = TextStyleWrapper::class.java),
+                ComposeFlowType.Enum(enumClass = TextStyleWrapper::class),
             ),
         )
 

@@ -5,13 +5,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
+import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.FileSpecBuilderWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
+import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.font.FontFamilyWrapper
 import io.composeflow.font.FontWeightWrapper
 import io.composeflow.font.generateFontFamilyFunSpec
-import io.composeflow.formatter.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.model.enumwrapper.TextStyleWrapper
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
@@ -53,19 +56,21 @@ data class FontHolder(
         textStyleOverrides.clear()
     }
 
-    fun generateFontFile(): FileSpec {
-        val fileBuilder = FileSpec.builder(packageName = "${COMPOSEFLOW_PACKAGE}.common", "Font")
-        // TODO: Temporarily casting it as FunSpec for multiplatform compatibility
-        fileBuilder.addFunction(primaryFontFamily.generateFontFamilyFunSpec() as FunSpec)
+    fun generateFontFile(): FileSpecWrapper {
+        val fileBuilder = FileSpecWrapper.builder("${COMPOSEFLOW_PACKAGE}.common", "Font")
+        // generateFontFamilyFunSpec returns Any (FunSpec on JVM, Unit on WASM)
+        // We need platform-specific handling
+        addFontFamilyFunSpec(fileBuilder, primaryFontFamily)
+        
         if (primaryFontFamily != secondaryFontFamily) {
-            fileBuilder.addFunction(secondaryFontFamily.generateFontFamilyFunSpec() as FunSpec)
+            addFontFamilyFunSpec(fileBuilder, secondaryFontFamily)
         }
 
         val typographyFunSpecBuilder =
-            FunSpec
+            FunSpecWrapper
                 .builder("AppTypography")
-                .addAnnotation(Composable::class)
-                .returns(Typography::class)
+                .addAnnotation(AnnotationSpecWrapper.get(Composable::class))
+                .returns(Typography::class.asTypeNameWrapper())
 
         val primaryFontFamilyVariable = primaryFontFamily.fontFamilyName().lowercase()
         val secondaryFontFamilyVariable = secondaryFontFamily.fontFamilyName().lowercase()
@@ -76,7 +81,7 @@ data class FontHolder(
         }
 
         typographyFunSpecBuilder.addCode(
-            CodeBlock.of(
+            CodeBlockWrapper.of(
                 "return %M().run {",
                 MemberHolder.Material3.Typography,
             ),
@@ -91,7 +96,7 @@ data class FontHolder(
             } else {
                 textStyleOverride.fontSize?.let { fontSize ->
                     typographyFunSpecBuilder.addCode(
-                        CodeBlock.of(
+                        CodeBlockWrapper.of(
                             "fontSize = $fontSize.%M, ",
                             MemberHolder.AndroidX.Ui.sp,
                         ),
@@ -99,7 +104,7 @@ data class FontHolder(
                 }
                 textStyleOverride.fontWeight?.let { fontWeight ->
                     typographyFunSpecBuilder.addCode(
-                        CodeBlock.of(
+                        CodeBlockWrapper.of(
                             "fontWeight = %M.${fontWeight.name}, ",
                             MemberHolder.AndroidX.Ui.FontWeight,
                         ),
@@ -107,7 +112,7 @@ data class FontHolder(
                 }
                 textStyleOverride.letterSpacing?.let { letterSpacing ->
                     typographyFunSpecBuilder.addCode(
-                        CodeBlock.of(
+                        CodeBlockWrapper.of(
                             "letterSpacing = $letterSpacing.%M, ",
                             MemberHolder.AndroidX.Ui.sp,
                         ),
@@ -302,3 +307,6 @@ fun Typography.generateWithOverrides(
                 labelSmall,
             ) ?: labelSmall.copy(fontFamily = primaryFontFamily.asFontFamily()),
     )
+
+// Platform-specific helper to add font family function spec to the file builder
+internal expect fun addFontFamilyFunSpec(fileBuilder: FileSpecBuilderWrapper, fontFamily: FontFamilyWrapper)

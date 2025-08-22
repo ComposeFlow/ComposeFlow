@@ -7,38 +7,58 @@ import com.squareup.kotlinpoet.FileSpec
  */
 actual class FileSpecWrapper internal constructor(private val actual: FileSpec) {
     actual companion object {
-        actual fun builder(packageName: String, fileName: String): FileSpecBuilderWrapper = 
+        actual fun builder(packageName: String, fileName: String): FileSpecBuilderWrapper =
             FileSpecBuilderWrapper(FileSpec.builder(packageName, fileName))
     }
-    
+
     actual val packageName: String get() = actual.packageName
     actual val name: String get() = actual.name
-    actual val annotations: List<AnnotationSpecWrapper> get() = actual.annotations.map { it.toWrapper() }
+    actual val annotations: List<AnnotationSpecWrapper> get() = actual.annotations.map { AnnotationSpecWrapper(it) }
     actual val members: List<Any> get() = actual.members
-    
+
     actual override fun toString(): String = actual.toString()
-    
+
     // Internal accessor for other wrapper classes
     internal fun toKotlinPoet(): FileSpec = actual
 }
 
 actual class FileSpecBuilderWrapper internal constructor(private val actual: FileSpec.Builder) {
-    actual fun addType(typeSpec: TypeSpecWrapper): FileSpecBuilderWrapper = 
+    actual fun addType(typeSpec: TypeSpecWrapper): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addType(typeSpec.toKotlinPoet()))
-    actual fun addFunction(funSpec: FunSpecWrapper): FileSpecBuilderWrapper = 
+
+    actual fun addFunction(funSpec: FunSpecWrapper): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addFunction(funSpec.toKotlinPoet()))
-    actual fun addProperty(propertySpec: PropertySpecWrapper): FileSpecBuilderWrapper = 
+
+    actual fun addProperty(propertySpec: PropertySpecWrapper): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addProperty(propertySpec.toKotlinPoet()))
-    actual fun addAnnotation(annotationSpec: AnnotationSpecWrapper): FileSpecBuilderWrapper = 
+
+    actual fun addAnnotation(annotationSpec: AnnotationSpecWrapper): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addAnnotation(annotationSpec.toKotlinPoet()))
-    actual fun addImport(packageName: String, vararg names: String): FileSpecBuilderWrapper = 
+
+    actual fun addImport(packageName: String, vararg names: String): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addImport(packageName, *names))
-    actual fun addImport(className: ClassNameWrapper, vararg names: String): FileSpecBuilderWrapper = 
+
+    actual fun addImport(
+        className: ClassNameWrapper,
+        vararg names: String
+    ): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addImport(className.toKotlinPoetClassName(), *names))
-    actual fun addComment(format: String, vararg args: Any): FileSpecBuilderWrapper = 
-        FileSpecBuilderWrapper(actual.addComment(format, *args))
-    actual fun suppressWarningTypes(vararg types: String): FileSpecBuilderWrapper =
-        FileSpecBuilderWrapper(actual.suppressWarningTypes(*types))
+
+    actual fun addComment(format: String, vararg args: Any): FileSpecBuilderWrapper =
+        FileSpecBuilderWrapper(actual.addFileComment(format, *args))
+
+    actual fun addCode(codeBlock: CodeBlockWrapper): FileSpecBuilderWrapper =
+        FileSpecBuilderWrapper(actual.addCode(codeBlock.toKotlinPoet()))
+
+    actual fun suppressWarningTypes(vararg types: String): FileSpecBuilderWrapper {
+        // Add @file:Suppress annotation with the specified warning types
+        val suppressAnnotation =
+            AnnotationSpecWrapper.builder(ClassNameWrapper.get("kotlin", "Suppress"))
+                .addMember(types.joinToString(", ") { "\"$it\"" })
+                .build()
+        return FileSpecBuilderWrapper(actual.addAnnotation(suppressAnnotation.toKotlinPoet()))
+    }
+
     actual fun build(): FileSpecWrapper = FileSpecWrapper(actual.build())
 }
 

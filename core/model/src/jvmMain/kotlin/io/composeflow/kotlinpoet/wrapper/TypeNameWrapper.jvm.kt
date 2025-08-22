@@ -71,7 +71,7 @@ actual fun ClassNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrappe
     ParameterizedTypeNameWrapper.get(this, *typeArguments)
 
 // Helper function to create TypeNameWrapper from KotlinPoet TypeName
-fun TypeName.toWrapper(): TypeNameWrapper = when (this) {
+actual fun TypeName.toWrapper(): TypeNameWrapper = when (this) {
     is ClassName -> ClassNameWrapper(this)
     is ParameterizedTypeName -> ParameterizedTypeNameWrapper(this)
     else -> object : TypeNameWrapper(this) {
@@ -79,3 +79,5 @@ fun TypeName.toWrapper(): TypeNameWrapper = when (this) {
         override fun copy(nullable: Boolean): TypeNameWrapper = this@toWrapper.copy(nullable).toWrapper()
     }
 }
+
+actual fun ClassName.toWrapper(): ClassNameWrapper = ClassNameWrapper(this)

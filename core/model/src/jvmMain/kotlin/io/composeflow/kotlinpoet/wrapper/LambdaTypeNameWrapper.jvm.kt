@@ -6,6 +6,11 @@ import com.squareup.kotlinpoet.LambdaTypeName
  * JVM implementation of LambdaTypeNameWrapper that delegates to actual KotlinPoet's LambdaTypeName.
  */
 actual class LambdaTypeNameWrapper internal constructor(private val actual: LambdaTypeName) : TypeNameWrapper(actual) {
+    
+    override val isNullable: Boolean get() = actual.isNullable
+    
+    override fun copy(nullable: Boolean): TypeNameWrapper = 
+        LambdaTypeNameWrapper(actual.copy(nullable) as LambdaTypeName)
     actual companion object {
         actual fun get(receiver: TypeNameWrapper?, parameters: List<ParameterSpecWrapper>, returnType: TypeNameWrapper): LambdaTypeNameWrapper {
             val kotlinPoetParameters = parameters.map { it.toKotlinPoet() }
@@ -29,6 +34,6 @@ actual class LambdaTypeNameWrapper internal constructor(private val actual: Lamb
         }
     }
     
-    // Internal accessor for other wrapper classes
-    internal override fun toKotlinPoet(): LambdaTypeName = actual
+    // Internal accessor for other wrapper classes - using a different method name since toKotlinPoet() is final
+    internal fun toLambdaTypeName(): LambdaTypeName = actual
 }

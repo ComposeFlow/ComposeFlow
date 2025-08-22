@@ -31,12 +31,6 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraphBuilder
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.MemberName
-import com.squareup.kotlinpoet.ParameterSpec
 import io.composeflow.ComposeScreenConstant
 import io.composeflow.ON_SCREEN_INITIALLY_LOADED
 import io.composeflow.SCREEN_INITIALLY_LOADED_FLAG
@@ -44,11 +38,19 @@ import io.composeflow.ViewModelConstant
 import io.composeflow.asClassName
 import io.composeflow.asVariableName
 import io.composeflow.cloud.storage.asDateString
-import io.composeflow.formatter.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.FileSpecWithDirectory
 import io.composeflow.kotlinpoet.GeneratedPlace
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
+import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.materialicons.Filled
 import io.composeflow.materialicons.ImageVectorHolder
 import io.composeflow.model.action.ActionType
@@ -230,14 +232,14 @@ data class Screen(
             rootNode.value
         }
 
-    fun defaultRouteCodeBlock(): CodeBlock =
+    fun defaultRouteCodeBlock(): CodeBlockWrapper =
         if (parameters.isEmpty()) {
-            CodeBlock.of("%T.$routeName", screenRouteClass)
+            CodeBlockWrapper.of("%T.$routeName", screenRouteClass)
         } else {
-            CodeBlock.of("%T.$routeName()", screenRouteClass)
+            CodeBlockWrapper.of("%T.$routeName()", screenRouteClass)
         }
 
-    private fun asRouteClassName(): ClassName = screenRouteClass.nestedClass(routeName)
+    private fun asRouteClassName(): ClassNameWrapper = screenRouteClass.nestedClass(routeName)
 
     @Transient
     override val composableName: String = "${name.asClassName()}Screen".toKotlinFileName()
@@ -260,7 +262,8 @@ data class Screen(
     @Transient
     val sceneName: String = name.asClassName().lowercase().toKotlinFileName()
 
-    override fun getPackageName(project: Project): String = "${project.packageName}.screens.$name".toPackageName()
+    override fun getPackageName(project: Project): String =
+        "${project.packageName}.screens.$name".toPackageName()
 
     override fun getStates(project: Project): List<ReadableState> {
         val projectStates = project.getStates(project)
@@ -369,17 +372,18 @@ data class Screen(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): FileSpec {
+    ): FileSpecWrapper {
         val fileBuilder =
-            FileSpec
+            FileSpecWrapper
                 .builder(getPackageName(project), composableName)
                 .addImport("androidx.compose.runtime", "getValue")
                 .addImport("androidx.compose.runtime", "setValue")
 
-        val funSpecBuilder = FunSpec.builder(composableName).addAnnotation(Composable::class)
+        val funSpecBuilder = FunSpecWrapper.builder(composableName)
+            .addAnnotation(AnnotationSpecWrapper.get(Composable::class))
         if (parameters.isNotEmpty()) {
             funSpecBuilder.addParameter(
-                ParameterSpec
+                ParameterSpecWrapper
                     .builder(ComposeScreenConstant.arguments.name, asRouteClassName())
                     .defaultValue(defaultRouteCodeBlock())
                     .build(),
@@ -416,7 +420,7 @@ data class Screen(
 
         funSpecBuilder.addStatement(
             "val $viewModelName = %M($viewModelFileName::class)",
-            MemberName("moe.tlaster.precompose.koin", "koinViewModel"),
+            MemberNameWrapper.get("moe.tlaster.precompose.koin", "koinViewModel"),
         )
         getStates(project).forEach { state ->
             when (state) {
@@ -481,7 +485,7 @@ data class Screen(
             funSpecBuilder.addCode(it)
         }
         if (rootNode.value.actionsMap[ActionType.OnInitialLoad]?.isNotEmpty() == true) {
-            val onInitialLoadCodeBlock = CodeBlock.builder()
+            val onInitialLoadCodeBlock = CodeBlockWrapper.builder()
             rootNode.value.actionsMap[ActionType.OnInitialLoad]?.forEach {
                 onInitialLoadCodeBlock.add(it.generateCodeBlock(project, context, dryRun = dryRun))
             }
@@ -540,8 +544,8 @@ data class Screen(
             context.getCurrentComposableContext().isCoroutineScopeUsed = true
             funSpecBuilder.addStatement(
                 "val ${ComposeScreenConstant.navDrawerState.name} = %M(initialValue = %M.Closed)",
-                MemberName("androidx.compose.material3", "rememberDrawerState"),
-                MemberName("androidx.compose.material3", "DrawerValue"),
+                MemberNameWrapper.get("androidx.compose.material3", "rememberDrawerState"),
+                MemberNameWrapper.get("androidx.compose.material3", "DrawerValue"),
             )
             val navParams = navDrawer.trait.value as NavigationDrawerTrait
             navParams.navigationDrawerType.toMemberName()
@@ -560,7 +564,7 @@ data class Screen(
 
         funSpecBuilder.addStatement(
             "%M(",
-            MemberName("androidx.compose.material3", "Scaffold"),
+            MemberNameWrapper.get("androidx.compose.material3", "Scaffold"),
         )
         topAppBarNode.value?.let { topAppBarNode ->
             funSpecBuilder.addStatement("topBar = {")
@@ -576,8 +580,8 @@ data class Screen(
             if ((topAppBarNode.trait.value as TopAppBarTrait).scrollBehaviorWrapper.hasScrollBehavior()) {
                 funSpecBuilder.addStatement(
                     "modifier = %M.%M(scrollBehavior.nestedScrollConnection),",
-                    MemberName("androidx.compose.ui", "Modifier"),
-                    MemberName("androidx.compose.ui.input.nestedscroll", "nestedScroll"),
+                    MemberNameWrapper.get("androidx.compose.ui", "Modifier"),
+                    MemberNameWrapper.get("androidx.compose.ui.input.nestedscroll", "nestedScroll"),
                 )
             }
         }
@@ -596,7 +600,7 @@ data class Screen(
             fabParams.fabPositionWrapper?.let {
                 funSpecBuilder.addStatement(
                     "floatingActionButtonPosition = %M.${fabParams.fabPositionWrapper.name},",
-                    MemberName("androidx.compose.material3", "FabPosition"),
+                    MemberNameWrapper.get("androidx.compose.material3", "FabPosition"),
                 )
             }
         }
@@ -607,7 +611,7 @@ data class Screen(
             // Apply ContentPadding from Scaffold only when the screen is not part of the navigation
             // because ContentPadding is applied from the outer Scaffold if it's part of the navigation
             funSpecBuilder.addCode(
-                CodeBlock.of(
+                CodeBlockWrapper.of(
                     "%M(modifier = %M.%M(top = it.calculateTopPadding())) {",
                     MemberHolder.AndroidX.Layout.Column,
                     MemberHolder.AndroidX.Ui.Modifier,
@@ -653,8 +657,8 @@ data class Screen(
         return fileBuilder.build()
     }
 
-    fun generateArgumentsInitializationCodeBlock(project: Project): CodeBlock {
-        val builder = CodeBlock.builder()
+    fun generateArgumentsInitializationCodeBlock(project: Project): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
         val actions = getAllActions(project)
         actions.distinctBy { it.generateNavigationInitializationBlock() }.forEach {
             it.generateNavigationInitializationBlock()?.let { codeBlock ->
@@ -667,11 +671,12 @@ data class Screen(
         return builder.build()
     }
 
-    private fun generateComposeNavigationFileSpec(project: Project): FileSpec {
-        val fileBuilder = FileSpec.builder(getPackageName(project), composeNavigationName)
+    private fun generateComposeNavigationFileSpec(project: Project): FileSpecWrapper {
+        val fileBuilder = FileSpecWrapper.builder(getPackageName(project), composeNavigationName)
         val actionsDistinctByArgSpec =
             getAllActions(project).distinctBy { it.generateArgumentParameterSpec(project) }
-        val funSpecBuilder = FunSpec.builder(sceneName).receiver(NavGraphBuilder::class)
+        val funSpecBuilder =
+            FunSpecWrapper.builder(sceneName).receiver(NavGraphBuilder::class.asTypeNameWrapper())
 
         val argumentPassersString =
             buildString {
@@ -689,12 +694,12 @@ data class Screen(
 
         val paramsBlock =
             if (parameters.isNotEmpty()) {
-                CodeBlock.builder().add(
+                CodeBlockWrapper.builder().add(
                     "val arguments: $SCREEN_ROUTE.$routeName = %M(backstackEntry)",
-                    MemberName("${COMPOSEFLOW_PACKAGE}.util", "toRoute"),
+                    MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.util", "toRoute"),
                 )
             } else {
-                CodeBlock.builder()
+                CodeBlockWrapper.builder()
             }
 
         val paramsPassersString =
@@ -713,7 +718,7 @@ data class Screen(
         $composableName($paramsPassersString$argumentPassersString)
     }
             """,
-                    MemberName("androidx.navigation.compose", "composable"),
+                    MemberNameWrapper.get("androidx.navigation.compose", "composable"),
                 ).build()
         fileBuilder.addFunction(funSpec).build()
         fileBuilder.suppressRedundantVisibilityModifier()
@@ -769,9 +774,8 @@ data class Screen(
                 return
             }
         }
-        rootNode.value.findDeepestChildAtOrNull(eventPosition)?.let {
-            it.setFocus(toggleValue = isCtrlOrMetaPressed)
-        }
+        rootNode.value.findDeepestChildAtOrNull(eventPosition)
+            ?.setFocus(toggleValue = isCtrlOrMetaPressed)
     }
 
     override fun findDeepestChildAtOrNull(position: Offset): ComposeNode? {
@@ -814,7 +818,8 @@ data class Screen(
 
     override fun getContentRootNode(): ComposeNode = contentRootNode()
 
-    override fun findFocusedNodes(): List<ComposeNode> = getAllComposeNodes().filter { it.isFocused.value }
+    override fun findFocusedNodes(): List<ComposeNode> =
+        getAllComposeNodes().filter { it.isFocused.value }
 
     override fun clearIsHoveredRecursively() {
         getAllRootNodes().forEach { it?.clearIsHoveredRecursively() }

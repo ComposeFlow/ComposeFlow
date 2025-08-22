@@ -35,5 +35,6 @@ actual class FunSpecBuilderWrapper {
     actual fun returns(returnType: TypeNameWrapper): FunSpecBuilderWrapper = this
     actual fun addModifiers(vararg modifiers: KModifierWrapper): FunSpecBuilderWrapper = this
     actual fun addAnnotation(annotationSpec: AnnotationSpecWrapper): FunSpecBuilderWrapper = this
+    actual fun receiver(receiverType: TypeNameWrapper): FunSpecBuilderWrapper = this
     actual fun build(): FunSpecWrapper = FunSpecWrapper()
 }

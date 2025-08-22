@@ -66,6 +66,8 @@ actual class TypeSpecBuilderWrapper internal constructor(private val actual: Typ
         TypeSpecBuilderWrapper(actual.addInitializerBlock(block.toKotlinPoet()))
     actual fun addEnumConstant(name: String, typeSpec: TypeSpecWrapper): TypeSpecBuilderWrapper = 
         TypeSpecBuilderWrapper(actual.addEnumConstant(name, typeSpec.toKotlinPoet()))
+    actual fun addEnumConstant(name: String): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addEnumConstant(name))
     actual fun addSuperclassConstructorParameter(format: String, vararg args: Any?): TypeSpecBuilderWrapper = 
         TypeSpecBuilderWrapper(actual.addSuperclassConstructorParameter(format, *args))
     actual fun addSuperclassConstructorParameter(codeBlock: CodeBlockWrapper): TypeSpecBuilderWrapper = 

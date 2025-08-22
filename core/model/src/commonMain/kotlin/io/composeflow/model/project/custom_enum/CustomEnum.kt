@@ -3,8 +3,8 @@
 package io.composeflow.model.project.custom_enum
 
 import androidx.compose.runtime.mutableStateListOf
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.TypeSpec
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
 import io.composeflow.asClassName
 import io.composeflow.model.project.Project
 import io.composeflow.serializer.FallbackMutableStateListSerializer
@@ -28,11 +28,11 @@ data class CustomEnum(
     @Transient
     val enumName = name.asClassName()
 
-    fun asKotlinPoetClassName(project: Project): ClassName = ClassName("${project.packageName}.$ENUM_PACKAGE", enumName)
+    fun asKotlinPoetClassName(project: Project): ClassNameWrapper = ClassNameWrapper.get("${project.packageName}.$ENUM_PACKAGE", enumName)
 
-    fun generateCustomEnumSpec(): TypeSpec? {
+    fun generateCustomEnumSpec(): TypeSpecWrapper? {
         if (values.isEmpty()) return null
-        val typeSpecBuilder = TypeSpec.enumBuilder(enumName)
+        val typeSpecBuilder = TypeSpecWrapper.enumBuilder(enumName)
         values.forEach { value ->
             typeSpecBuilder.addEnumConstant(name = value)
         }

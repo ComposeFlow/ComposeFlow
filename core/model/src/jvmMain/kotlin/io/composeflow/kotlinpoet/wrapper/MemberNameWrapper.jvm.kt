@@ -22,4 +22,4 @@ actual class MemberNameWrapper internal constructor(private val actual: MemberNa
 }
 
 // Helper function to create MemberNameWrapper from KotlinPoet MemberName
-fun MemberName.toWrapper(): MemberNameWrapper = MemberNameWrapper(this)
+actual fun MemberName.toWrapper(): MemberNameWrapper = MemberNameWrapper(this)

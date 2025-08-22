@@ -118,7 +118,7 @@ data class ImageTrait(
                 contentScaleWrapper,
                 ComposeFlowType.Enum(
                     isList = false,
-                    enumClass = ContentScaleWrapper::class.java,
+                    enumClass = ContentScaleWrapper::class,
                 ),
             ),
         )

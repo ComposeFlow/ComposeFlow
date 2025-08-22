@@ -1,16 +1,16 @@
 package io.composeflow.model.project.appassets
 
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.TypeSpec
 import io.composeflow.android.generateAndroidManifestXml
 import io.composeflow.android.generateIOSInfoPlistXml
 import io.composeflow.cloud.storage.BlobInfoWrapper
 import io.composeflow.kotlinpoet.BaseDirectory
 import io.composeflow.kotlinpoet.FileSpecWithDirectory
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
+import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.platform.getAssetCacheFileFor
 import kotlinx.serialization.Serializable
@@ -33,7 +33,7 @@ data class AppAssetHolder(
         // Build MainActivity using proper KotlinPoet builders
         val mainActivityClass = buildMainActivityClass(isAndroidSplashScreenEnabled)
         val mainActivityFileSpec =
-            FileSpec
+            FileSpecWrapper
                 .builder(
                     packageName = project.packageName,
                     fileName = "MainActivity",
@@ -82,7 +82,8 @@ data class AppAssetHolder(
 
         // Add iOS Info.plist with splash screen configuration
         val isIOSSplashScreenEnabled = splashScreenInfoHolder.isIOSSplashScreenEnabled()
-        val iosInfoPlistXml = generateIOSInfoPlistXml(isSplashScreenEnabled = isIOSSplashScreenEnabled)
+        val iosInfoPlistXml =
+            generateIOSInfoPlistXml(isSplashScreenEnabled = isIOSSplashScreenEnabled)
         result["iosApp/iosApp/Info.plist"] = iosInfoPlistXml
 
         return result
@@ -114,7 +115,7 @@ data class AppAssetHolder(
             val fileExtension = blobInfo.fileName.substringAfterLast(".", "png")
             // Copy the actual image file to drawable-nodpi directory
             result[cacheFile.toFile().path] =
-                "composeApp/src/androidMain/res/drawable-nodpi/${io.composeflow.model.project.appassets.ANDROID_IC_SPLASH_IMAGE}_actual.$fileExtension"
+                "composeApp/src/androidMain/res/drawable-nodpi/${ANDROID_IC_SPLASH_IMAGE}_actual.$fileExtension"
         }
 
         // Add iOS splash screen image if present
@@ -126,22 +127,23 @@ data class AppAssetHolder(
                     blobInfoWrapper = blobInfo,
                 )
             // iOS splash screen images typically go in different locations
-            result[cacheFile.toFile().path] = "iosApp/iosApp/Assets.xcassets/SplashImage.imageset/${blobInfo.fileName}"
+            result[cacheFile.toFile().path] =
+                "iosApp/iosApp/Assets.xcassets/SplashImage.imageset/${blobInfo.fileName}"
         }
 
         return result
     }
 
-    private fun buildMainActivityClass(isAndroidSplashScreenEnabled: Boolean): TypeSpec {
+    private fun buildMainActivityClass(isAndroidSplashScreenEnabled: Boolean): TypeSpecWrapper {
         val onCreateMethod =
-            FunSpec
+            FunSpecWrapper
                 .builder("onCreate")
-                .addModifiers(KModifier.OVERRIDE)
+                .addModifiers(KModifierWrapper.OVERRIDE)
                 .addParameter(
-                    ParameterSpec
+                    ParameterSpecWrapper
                         .builder(
                             "savedInstanceState",
-                            ClassName("android.os", "Bundle").copy(nullable = true),
+                            ClassNameWrapper.get("android.os", "Bundle").copy(nullable = true),
                         ).build(),
                 ).addStatement("super.onCreate(savedInstanceState)")
                 .apply {
@@ -159,9 +161,9 @@ data class AppAssetHolder(
                     """.trimIndent(),
                 ).build()
 
-        return TypeSpec
+        return TypeSpecWrapper
             .classBuilder("MainActivity")
-            .superclass(ClassName("androidx.activity", "ComponentActivity"))
+            .superclass(ClassNameWrapper.get("androidx.activity", "ComponentActivity"))
             .addFunction(onCreateMethod)
             .build()
     }

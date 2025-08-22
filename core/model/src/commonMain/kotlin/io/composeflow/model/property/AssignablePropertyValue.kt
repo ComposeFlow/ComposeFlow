@@ -1,7 +1,7 @@
 package io.composeflow.model.property
 
 import androidx.compose.runtime.mutableStateMapOf
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.datatype.DataFieldId
 import io.composeflow.model.datatype.DataTypeId
@@ -20,7 +20,7 @@ sealed interface AssignablePropertyValue {
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock
+    ): CodeBlockWrapper
 
     fun asSimplifiedText(
         project: Project,
@@ -39,7 +39,7 @@ sealed interface AssignablePropertyValue {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock = property.transformedCodeBlock(project, context, dryRun = dryRun)
+        ): CodeBlockWrapper = property.transformedCodeBlock(project, context, dryRun = dryRun)
 
         override fun asSimplifiedText(
             project: Project,
@@ -65,9 +65,9 @@ sealed interface AssignablePropertyValue {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlock {
+        ): CodeBlockWrapper {
             val dataType = project.findDataTypeOrThrow(dataTypeId)
-            val builder = CodeBlock.builder()
+            val builder = CodeBlockWrapper.builder()
             builder.add("%T(", dataType.asKotlinPoetClassName(project))
             dataType.fields.forEach { dataField ->
                 val fieldValue =

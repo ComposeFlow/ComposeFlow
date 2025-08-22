@@ -46,6 +46,7 @@ actual class TypeSpecBuilderWrapper {
     actual fun superclass(superclass: TypeNameWrapper): TypeSpecBuilderWrapper = this
     actual fun addInitializerBlock(block: CodeBlockWrapper): TypeSpecBuilderWrapper = this
     actual fun addEnumConstant(name: String, typeSpec: TypeSpecWrapper): TypeSpecBuilderWrapper = this
+    actual fun addEnumConstant(name: String): TypeSpecBuilderWrapper = this
     actual fun addSuperclassConstructorParameter(format: String, vararg args: Any?): TypeSpecBuilderWrapper = this
     actual fun addSuperclassConstructorParameter(codeBlock: CodeBlockWrapper): TypeSpecBuilderWrapper = this
     actual fun build(): TypeSpecWrapper = TypeSpecWrapper()

@@ -10,6 +10,14 @@ import io.composeflow.kotlinpoet.wrapper.toWrapper
 import io.composeflow.model.datatype.DataTypeId
 import io.composeflow.model.datatype.EmptyDataType
 import io.composeflow.model.enumwrapper.EnumWrapper
+import io.composeflow.model.enumwrapper.TextDecorationWrapper
+import io.composeflow.model.enumwrapper.TextStyleWrapper
+import io.composeflow.model.enumwrapper.FontStyleWrapper
+import io.composeflow.model.enumwrapper.TextAlignWrapper
+import io.composeflow.model.enumwrapper.TextOverflowWrapper
+import io.composeflow.model.enumwrapper.ContentScaleWrapper
+import io.composeflow.model.enumwrapper.TextFieldColorsWrapper
+import io.composeflow.model.enumwrapper.NodeVisibility
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.findDataTypeOrNull
 import io.composeflow.model.project.findDataTypeOrThrow
@@ -31,6 +39,7 @@ import io.composeflow.serializer.ClassSerializer
 import io.composeflow.ui.propertyeditor.DropdownTextDisplayable
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.reflect.KClass
 import kotlin.uuid.Uuid
 
 @Serializable
@@ -533,13 +542,14 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
             newDataTypeId: DataTypeId,
         ): ComposeFlowType = this.copy(isList = newIsList, dataTypeId = newDataTypeId)
 
-        override fun defaultValue(): AssignableProperty = CustomDataTypeProperty.ValueFromFields(dataTypeId = dataTypeId)
+        override fun defaultValue(): AssignableProperty =
+            CustomDataTypeProperty.ValueFromFields(dataTypeId = dataTypeId)
 
         override fun isPrimitive() = false
 
         override fun asKotlinPoetTypeName(project: Project): TypeNameWrapper {
             val className =
-                dataTypeId.let { project.findDataTypeOrThrow(it).asKotlinPoetClassName(project).toWrapper() }
+                dataTypeId.let { project.findDataTypeOrThrow(it).asKotlinPoetClassName(project) }
             return if (isList) {
                 List::class.asTypeNameWrapper().parameterizedBy(className)
             } else {
@@ -554,7 +564,7 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
     data class Enum<E : kotlin.Enum<E>>(
         override val isList: Boolean = false,
         @Serializable(ClassSerializer::class)
-        val enumClass: Class<E>,
+        val enumClass: KClass<E>,
     ) : ComposeFlowType {
         override fun isAbleToAssign(
             type: ComposeFlowType,
@@ -575,10 +585,11 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
             listAware: Boolean,
         ): String {
             val typeName =
-                enumClass.name
-                    .split(".")
-                    .last()
-                    .replace("Wrapper", "")
+                (enumClass.qualifiedName ?: enumClass.simpleName)
+                    ?.split(".")
+                    ?.last()
+                    ?.replace("Wrapper", "")
+                    ?: "Enum"
             return if (listAware) {
                 if (isList) "List<$typeName>" else typeName
             } else {
@@ -588,7 +599,8 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
 
         override fun copyWith(newIsList: Boolean): ComposeFlowType = this.copy(isList = newIsList)
 
-        override fun defaultValue(): AssignableProperty = EnumProperty(enumClass.getFirstEnumValue()!! as EnumWrapper)
+        override fun defaultValue(): AssignableProperty =
+            EnumProperty(enumClass.getFirstEnumValue()!! as EnumWrapper)
 
         override fun isPrimitive() = false
 
@@ -774,7 +786,8 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
 
         override fun isPrimitive() = false
 
-        override fun asKotlinPoetTypeName(project: Project): TypeNameWrapper = Nothing::class.asTypeNameWrapper()
+        override fun asKotlinPoetTypeName(project: Project): TypeNameWrapper =
+            Nothing::class.asTypeNameWrapper()
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Unknown")
@@ -799,7 +812,20 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
     }
 }
 
-private fun <E : Enum<E>> Class<E>.getFirstEnumValue(): E? = enumConstants?.firstOrNull()
+private fun <E : Enum<E>> KClass<E>.getFirstEnumValue(): E? {
+    // Handle known EnumWrapper types
+    return when (this.simpleName) {
+        "TextDecorationWrapper" -> TextDecorationWrapper.None as? E
+        "TextStyleWrapper" -> TextStyleWrapper.DisplayLarge as? E
+        "FontStyleWrapper" -> FontStyleWrapper.Normal as? E
+        "TextAlignWrapper" -> TextAlignWrapper.Left as? E
+        "TextOverflowWrapper" -> TextOverflowWrapper.Clip as? E
+        "ContentScaleWrapper" -> ContentScaleWrapper.Crop as? E
+        "TextFieldColorsWrapper" -> TextFieldColorsWrapper.Default as? E
+        "NodeVisibility" -> NodeVisibility.AlwaysVisible as? E
+        else -> null
+    }
+}
 
 fun ComposeFlowType.convertCodeFromType(
     inputType: ComposeFlowType,

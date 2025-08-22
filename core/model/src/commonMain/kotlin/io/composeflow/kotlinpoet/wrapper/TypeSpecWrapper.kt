@@ -46,6 +46,7 @@ expect class TypeSpecBuilderWrapper {
     fun superclass(superclass: TypeNameWrapper): TypeSpecBuilderWrapper
     fun addInitializerBlock(block: CodeBlockWrapper): TypeSpecBuilderWrapper
     fun addEnumConstant(name: String, typeSpec: TypeSpecWrapper): TypeSpecBuilderWrapper
+    fun addEnumConstant(name: String): TypeSpecBuilderWrapper
     fun addSuperclassConstructorParameter(format: String, vararg args: Any?): TypeSpecBuilderWrapper
     fun addSuperclassConstructorParameter(codeBlock: CodeBlockWrapper): TypeSpecBuilderWrapper
     fun build(): TypeSpecWrapper

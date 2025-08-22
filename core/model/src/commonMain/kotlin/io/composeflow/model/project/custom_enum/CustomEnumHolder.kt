@@ -2,8 +2,8 @@
 
 package io.composeflow.model.project.custom_enum
 
-import com.squareup.kotlinpoet.FileSpec
-import io.composeflow.formatter.suppressRedundantVisibilityModifier
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.FileSpecWithDirectory
 import io.composeflow.model.project.Project
 import io.composeflow.override.mutableStateListEqualsOverrideOf
@@ -23,7 +23,7 @@ data class CustomEnumHolder(
             .mapNotNull { enum ->
                 enum.generateCustomEnumSpec()?.let {
                     val fileBuilder =
-                        FileSpec
+                        FileSpecWrapper
                             .builder("${project.packageName}.$ENUM_PACKAGE", enum.enumName)
                             .addType(it)
                     fileBuilder.suppressRedundantVisibilityModifier()

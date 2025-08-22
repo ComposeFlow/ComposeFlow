@@ -35,5 +35,6 @@ expect class FunSpecBuilderWrapper {
     fun returns(returnType: TypeNameWrapper): FunSpecBuilderWrapper
     fun addModifiers(vararg modifiers: KModifierWrapper): FunSpecBuilderWrapper
     fun addAnnotation(annotationSpec: AnnotationSpecWrapper): FunSpecBuilderWrapper
+    fun receiver(receiverType: TypeNameWrapper): FunSpecBuilderWrapper
     fun build(): FunSpecWrapper
 }

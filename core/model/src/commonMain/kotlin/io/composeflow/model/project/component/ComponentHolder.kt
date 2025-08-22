@@ -1,10 +1,11 @@
 package io.composeflow.model.project.component
 
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.MemberName
-import io.composeflow.formatter.suppressRedundantVisibilityModifier
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
+import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.FileSpecWithDirectory
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 import io.composeflow.model.project.Project
@@ -21,19 +22,19 @@ data class ComponentHolder(
 ) {
     fun generateKoinViewModelModule(project: Project): FileSpecWithDirectory {
         val fileBuilder =
-            FileSpec.builder(
+            FileSpecWrapper.builder(
                 fileName = "ViewModelModule",
                 packageName = "${COMPOSEFLOW_PACKAGE}.components",
             )
         val funSpecBuilder =
-            FunSpec
+            FunSpecWrapper
                 .builder("componentViewModelModule")
-                .returns(org.koin.core.module.Module::class)
-                .addCode("return %M {", MemberName("org.koin.dsl", "module"))
+                .returns(org.koin.core.module.Module::class.asTypeNameWrapper())
+                .addCode("return %M {", MemberNameWrapper.get("org.koin.dsl", "module"))
         components.forEach {
             funSpecBuilder.addStatement(
                 "factory { %T() } ",
-                ClassName(it.getPackageName(project), it.viewModelFileName),
+                ClassNameWrapper.get(it.getPackageName(project), it.viewModelFileName),
             )
         }
         funSpecBuilder.addCode("}")

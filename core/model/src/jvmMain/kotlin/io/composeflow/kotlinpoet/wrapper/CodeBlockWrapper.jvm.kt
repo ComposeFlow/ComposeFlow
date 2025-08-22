@@ -9,10 +9,30 @@ actual class CodeBlockWrapper internal constructor(private val actual: CodeBlock
     actual companion object {
         actual fun builder(): CodeBlockBuilderWrapper = CodeBlockBuilderWrapper(CodeBlock.builder())
         actual fun of(format: String, vararg args: Any?): CodeBlockWrapper = CodeBlockWrapper(CodeBlock.of(format, *args))
-        actual fun join(codeBlocks: Iterable<CodeBlockWrapper>, separator: String): CodeBlockWrapper = 
-            CodeBlockWrapper(CodeBlock.join(codeBlocks.map { it.actual }, separator))
-        actual fun join(codeBlocks: Iterable<CodeBlockWrapper>, separator: String, prefix: String, suffix: String): CodeBlockWrapper = 
-            CodeBlockWrapper(CodeBlock.join(codeBlocks.map { it.actual }, separator, prefix, suffix))
+        actual fun join(codeBlocks: Iterable<CodeBlockWrapper>, separator: String): CodeBlockWrapper {
+            val builder = CodeBlock.builder()
+            val codeBlockList = codeBlocks.toList()
+            codeBlockList.forEachIndexed { index, codeBlock ->
+                builder.add(codeBlock.toKotlinPoet())
+                if (index < codeBlockList.size - 1) {
+                    builder.add(separator)
+                }
+            }
+            return CodeBlockWrapper(builder.build())
+        }
+        actual fun join(codeBlocks: Iterable<CodeBlockWrapper>, separator: String, prefix: String, suffix: String): CodeBlockWrapper {
+            val builder = CodeBlock.builder()
+            builder.add(prefix)
+            val codeBlockList = codeBlocks.toList()
+            codeBlockList.forEachIndexed { index, codeBlock ->
+                builder.add(codeBlock.toKotlinPoet())
+                if (index < codeBlockList.size - 1) {
+                    builder.add(separator)
+                }
+            }
+            builder.add(suffix)
+            return CodeBlockWrapper(builder.build())
+        }
     }
     
     actual fun isEmpty(): Boolean = actual.isEmpty()
