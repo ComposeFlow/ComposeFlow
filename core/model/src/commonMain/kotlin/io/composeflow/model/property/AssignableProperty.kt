@@ -28,8 +28,6 @@ import io.composeflow.custom.composeflowicons.Firebase
 import io.composeflow.editor.validator.FloatValidator
 import io.composeflow.editor.validator.IntValidator
 import io.composeflow.editor.validator.ValidateResult
-import io.composeflow.invalid_reference
-import io.composeflow.invalid_type
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.kotlinpoet.GeneratedPlace
 import io.composeflow.kotlinpoet.GenerationContext
@@ -62,9 +60,7 @@ import io.composeflow.model.project.findLocalStateOrNull
 import io.composeflow.model.project.findParameterOrNull
 import io.composeflow.model.project.findParameterOrThrow
 import io.composeflow.model.project.firebase.CollectionId
-import io.composeflow.model.project.issue.DestinationContext
 import io.composeflow.model.project.issue.Issue
-import io.composeflow.model.project.issue.TrackableIssue
 import io.composeflow.model.project.string.StringResourceId
 import io.composeflow.model.project.string.stringResourceDefaultValue
 import io.composeflow.model.project.string.updateStringResourceDefaultLocaleValue
