@@ -2,6 +2,7 @@
 
 package io.composeflow.model.property
 
+import androidx.annotation.CallSuper
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.outlined.ColorLens
@@ -20,7 +21,6 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.MemberName
 import com.squareup.kotlinpoet.ParameterSpec
 import io.composeflow.ComposeScreenConstant
-import io.composeflow.Res
 import io.composeflow.ViewModelConstant
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Dbms
@@ -93,7 +93,6 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import org.jetbrains.compose.resources.stringResource
 import kotlin.uuid.Uuid
 
 @Serializable
@@ -251,6 +250,40 @@ sealed interface AssignableProperty {
      * with the same state ID.
      */
     fun isIdentical(other: AssignableProperty): Boolean = this == other
+
+    /**
+     * Generates validation issues for this assignable property.
+     *
+     * This method is designed to be overridden by derived classes to perform
+     * property-specific validation. Derived classes should call the super implementation
+     * and add their own validation issues to the result.
+     *
+     * @param project The project context used for validation
+     * @param acceptableType The expected type that this property should be compatible with
+     * @return List of validation issues found for this property
+     */
+    @CallSuper
+    fun generateIssues(
+        project: Project,
+        acceptableType: ComposeFlowType,
+    ): List<Issue> =
+        buildList {
+            val transformedValueType = transformedValueType(project)
+            if (transformedValueType is ComposeFlowType.UnknownType) {
+                add(
+                    Issue.ResolvedToUnknownType(
+                        property = this@AssignableProperty,
+                    ),
+                )
+            } else if (!acceptableType.isAbleToAssign(transformedValueType)) {
+                add(
+                    Issue.ResolvedToTypeNotAssignable(
+                        property = this@AssignableProperty,
+                        acceptableType = acceptableType,
+                    ),
+                )
+            }
+        }
 
     @Composable
     fun Editor(
@@ -428,6 +461,23 @@ sealed interface StringProperty : AssignableProperty {
 
         private fun textFromStringResource(project: Project): String =
             project.stringResourceHolder.stringResourceDefaultValue(stringResourceId) ?: "[Invalid]"
+
+        override fun generateIssues(
+            project: Project,
+            acceptableType: ComposeFlowType,
+        ): List<Issue> =
+            super<AssignablePropertyBase>.generateIssues(project, acceptableType) +
+                buildList {
+                    val stringResourceIds =
+                        project.stringResourceHolder.stringResources
+                            .map { it.id }
+                            .toSet()
+                    if (stringResourceId !in stringResourceIds) {
+                        add(
+                            Issue.InvalidResourceReference(resourceType = "string"),
+                        )
+                    }
+                }
     }
 
     @Composable
@@ -2267,40 +2317,6 @@ fun AssignableProperty?.asBooleanValue(): Boolean =
         is ValueFromState -> true
         BooleanProperty.Empty -> false
         else -> true
-    }
-
-fun AssignableProperty.generateIssues(
-    project: Project,
-    acceptableType: ComposeFlowType,
-): List<Issue> =
-    buildList {
-        val transformedValueType = transformedValueType(project)
-        if (transformedValueType is ComposeFlowType.UnknownType) {
-            add(
-                Issue.ResolvedToUnknownType(
-                    property = this@generateIssues,
-                ),
-            )
-        } else if (!acceptableType.isAbleToAssign(transformedValueType)) {
-            add(
-                Issue.ResolvedToTypeNotAssignable(
-                    property = this@generateIssues,
-                    acceptableType = acceptableType,
-                ),
-            )
-        }
-
-        if (this@generateIssues is StringProperty.ValueFromStringResource) {
-            val stringResourceIds =
-                project.stringResourceHolder.stringResources
-                    .map { it.id }
-                    .toSet()
-            if (stringResourceId !in stringResourceIds) {
-                add(
-                    Issue.InvalidResourceReference(resourceType = "string"),
-                )
-            }
-        }
     }
 
 @Composable
