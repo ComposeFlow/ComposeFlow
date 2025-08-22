@@ -37,7 +37,7 @@ class CodeInspectorViewModel(
                         dryRun = true,
                     )
                     val code = FormatterWrapper.formatCodeBlock(
-                        text = codeBlock.toString(),
+                        codeBlock = codeBlock,
                         withImports = false,
                         isScript = true
                     )

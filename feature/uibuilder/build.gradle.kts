@@ -17,7 +17,6 @@ kotlin {
             implementation(project(":core:analytics"))
             implementation(project(":core:config"))
             implementation(project(":core:di"))
-            implementation(project(":core:formatter"))
             implementation(project(":core:model"))
             implementation(project(":core:platform"))
             implementation(project(":core:resources"))

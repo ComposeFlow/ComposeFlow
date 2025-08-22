@@ -91,32 +91,14 @@ actual class FunSpecBuilderWrapper internal constructor(private val actual: FunS
         FunSpecBuilderWrapper(actual.addParameters(parameterSpecs.map { it.toKotlinPoet() }))
 
     actual fun addCode(format: String, vararg args: Any?): FunSpecBuilderWrapper {
-        val convertedArgs = args.map { arg ->
-            when (arg) {
-                is ClassNameWrapper -> arg.toKotlinPoetClassName()
-                is TypeNameWrapper -> arg.toKotlinPoet()
-                is MemberNameWrapper -> arg.toKotlinPoet()
-                is CodeBlockWrapper -> arg.toKotlinPoet()
-                else -> arg
-            }
-        }.toTypedArray()
-        return FunSpecBuilderWrapper(actual.addCode(format, *convertedArgs))
+        return FunSpecBuilderWrapper(actual.addCode(format, *convertArgsArray(args)))
     }
 
     actual fun addCode(codeBlock: CodeBlockWrapper): FunSpecBuilderWrapper =
         FunSpecBuilderWrapper(actual.addCode(codeBlock.toKotlinPoet()))
 
     actual fun addStatement(format: String, vararg args: Any?): FunSpecBuilderWrapper {
-        val convertedArgs = args.map { arg ->
-            when (arg) {
-                is ClassNameWrapper -> arg.toKotlinPoetClassName()
-                is TypeNameWrapper -> arg.toKotlinPoet()
-                is MemberNameWrapper -> arg.toKotlinPoet()
-                is CodeBlockWrapper -> arg.toKotlinPoet()
-                else -> arg
-            }
-        }.filterNotNull().toTypedArray()
-        return FunSpecBuilderWrapper(actual.addStatement(format, *convertedArgs))
+        return FunSpecBuilderWrapper(actual.addStatement(format, *convertArgsArray(args)))
     }
 
     actual fun returns(returnType: TypeNameWrapper): FunSpecBuilderWrapper =

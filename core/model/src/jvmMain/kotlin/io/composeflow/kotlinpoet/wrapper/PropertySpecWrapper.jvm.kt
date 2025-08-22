@@ -70,32 +70,14 @@ actual class PropertySpecWrapper internal constructor(private val actual: Proper
 
 actual class PropertySpecBuilderWrapper internal constructor(private val actual: PropertySpec.Builder) {
     actual fun initializer(format: String, vararg args: Any?): PropertySpecBuilderWrapper {
-        val convertedArgs = args.map { arg ->
-            when (arg) {
-                is ClassNameWrapper -> arg.toKotlinPoetClassName()
-                is TypeNameWrapper -> arg.toKotlinPoet()
-                is MemberNameWrapper -> arg.toKotlinPoet()
-                is CodeBlockWrapper -> arg.toKotlinPoet()
-                else -> arg
-            }
-        }.toTypedArray()
-        return PropertySpecBuilderWrapper(actual.initializer(format, *convertedArgs))
+        return PropertySpecBuilderWrapper(actual.initializer(format, *convertArgsArray(args)))
     }
 
     actual fun initializer(codeBlock: CodeBlockWrapper): PropertySpecBuilderWrapper =
         PropertySpecBuilderWrapper(actual.initializer(codeBlock.toKotlinPoet()))
 
     actual fun delegate(format: String, vararg args: Any?): PropertySpecBuilderWrapper {
-        val convertedArgs = args.map { arg ->
-            when (arg) {
-                is ClassNameWrapper -> arg.toKotlinPoetClassName()
-                is TypeNameWrapper -> arg.toKotlinPoet()
-                is MemberNameWrapper -> arg.toKotlinPoet()
-                is CodeBlockWrapper -> arg.toKotlinPoet()
-                else -> arg
-            }
-        }.toTypedArray()
-        return PropertySpecBuilderWrapper(actual.delegate(format, *convertedArgs))
+        return PropertySpecBuilderWrapper(actual.delegate(format, *convertArgsArray(args)))
     }
 
     actual fun delegate(codeBlock: CodeBlockWrapper): PropertySpecBuilderWrapper =

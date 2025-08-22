@@ -6,6 +6,7 @@ plugins {
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
     wasmJs {
         browser()
     }
@@ -14,7 +15,6 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":core:ai"))
             implementation(project(":core:di"))
-            implementation(project(":core:formatter"))
             implementation(project(":core:platform"))
             implementation(project(":core:serializer"))
             implementation(project(":core:ui"))
@@ -58,6 +58,10 @@ kotlin {
             implementation(libs.xmlutil.serialization.jvm)
             // KotlinPoet is only available on JVM
             implementation(libs.kotlinpoet)
+            // Code formatting dependencies
+            implementation(libs.compose.code.editor)
+            implementation(libs.ktlint.core)
+            implementation(libs.ktlint.ruleset.standard)
         }
         all {
             optInComposeExperimentalApis()
