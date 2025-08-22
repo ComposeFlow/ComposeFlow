@@ -50,8 +50,18 @@ actual class AnnotationSpecWrapper internal constructor(private val actual: Anno
 }
 
 actual class AnnotationSpecBuilderWrapper internal constructor(private val actual: AnnotationSpec.Builder) {
-    actual fun addMember(format: String, vararg args: Any?): AnnotationSpecBuilderWrapper =
-        AnnotationSpecBuilderWrapper(actual.addMember(format, *args.filterNotNull().toTypedArray()))
+    actual fun addMember(format: String, vararg args: Any?): AnnotationSpecBuilderWrapper {
+        val convertedArgs = args.mapNotNull { arg ->
+            when (arg) {
+                is ClassNameWrapper -> arg.toKotlinPoetClassName()
+                is TypeNameWrapper -> arg.toKotlinPoet()
+                is MemberNameWrapper -> arg.toKotlinPoet()
+                is CodeBlockWrapper -> arg.toKotlinPoet()
+                else -> arg
+            }
+        }.toTypedArray()
+        return AnnotationSpecBuilderWrapper(actual.addMember(format, *convertedArgs))
+    }
 
     actual fun addMember(codeBlock: CodeBlockWrapper): AnnotationSpecBuilderWrapper =
         AnnotationSpecBuilderWrapper(actual.addMember(codeBlock.toKotlinPoet()))

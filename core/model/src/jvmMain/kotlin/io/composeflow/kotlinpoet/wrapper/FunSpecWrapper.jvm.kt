@@ -90,14 +90,34 @@ actual class FunSpecBuilderWrapper internal constructor(private val actual: FunS
     actual fun addParameters(parameterSpecs: List<ParameterSpecWrapper>): FunSpecBuilderWrapper =
         FunSpecBuilderWrapper(actual.addParameters(parameterSpecs.map { it.toKotlinPoet() }))
 
-    actual fun addCode(format: String, vararg args: Any?): FunSpecBuilderWrapper =
-        FunSpecBuilderWrapper(actual.addCode(format, *args.filterNotNull().toTypedArray()))
+    actual fun addCode(format: String, vararg args: Any?): FunSpecBuilderWrapper {
+        val convertedArgs = args.map { arg ->
+            when (arg) {
+                is ClassNameWrapper -> arg.toKotlinPoetClassName()
+                is TypeNameWrapper -> arg.toKotlinPoet()
+                is MemberNameWrapper -> arg.toKotlinPoet()
+                is CodeBlockWrapper -> arg.toKotlinPoet()
+                else -> arg
+            }
+        }.toTypedArray()
+        return FunSpecBuilderWrapper(actual.addCode(format, *convertedArgs))
+    }
 
     actual fun addCode(codeBlock: CodeBlockWrapper): FunSpecBuilderWrapper =
         FunSpecBuilderWrapper(actual.addCode(codeBlock.toKotlinPoet()))
 
-    actual fun addStatement(format: String, vararg args: Any?): FunSpecBuilderWrapper =
-        FunSpecBuilderWrapper(actual.addStatement(format, *args.filterNotNull().toTypedArray()))
+    actual fun addStatement(format: String, vararg args: Any?): FunSpecBuilderWrapper {
+        val convertedArgs = args.map { arg ->
+            when (arg) {
+                is ClassNameWrapper -> arg.toKotlinPoetClassName()
+                is TypeNameWrapper -> arg.toKotlinPoet()
+                is MemberNameWrapper -> arg.toKotlinPoet()
+                is CodeBlockWrapper -> arg.toKotlinPoet()
+                else -> arg
+            }
+        }.filterNotNull().toTypedArray()
+        return FunSpecBuilderWrapper(actual.addStatement(format, *convertedArgs))
+    }
 
     actual fun returns(returnType: TypeNameWrapper): FunSpecBuilderWrapper =
         FunSpecBuilderWrapper(actual.returns(returnType.toKotlinPoet()))

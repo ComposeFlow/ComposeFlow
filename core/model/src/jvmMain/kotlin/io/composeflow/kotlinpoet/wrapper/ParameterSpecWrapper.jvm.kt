@@ -40,8 +40,18 @@ actual class ParameterSpecWrapper internal constructor(private val actual: Param
 }
 
 actual class ParameterSpecBuilderWrapper internal constructor(private val actual: ParameterSpec.Builder) {
-    actual fun defaultValue(format: String, vararg args: Any?): ParameterSpecBuilderWrapper = 
-        ParameterSpecBuilderWrapper(actual.defaultValue(format, *args.filterNotNull().toTypedArray()))
+    actual fun defaultValue(format: String, vararg args: Any?): ParameterSpecBuilderWrapper {
+        val convertedArgs = args.map { arg ->
+            when (arg) {
+                is ClassNameWrapper -> arg.toKotlinPoetClassName()
+                is TypeNameWrapper -> arg.toKotlinPoet()
+                is MemberNameWrapper -> arg.toKotlinPoet()
+                is CodeBlockWrapper -> arg.toKotlinPoet()
+                else -> arg
+            }
+        }.toTypedArray()
+        return ParameterSpecBuilderWrapper(actual.defaultValue(format, *convertedArgs))
+    }
     actual fun defaultValue(codeBlock: CodeBlockWrapper): ParameterSpecBuilderWrapper = 
         ParameterSpecBuilderWrapper(actual.defaultValue(codeBlock.toKotlinPoet()))
     actual fun addModifiers(vararg modifiers: KModifierWrapper): ParameterSpecBuilderWrapper = 

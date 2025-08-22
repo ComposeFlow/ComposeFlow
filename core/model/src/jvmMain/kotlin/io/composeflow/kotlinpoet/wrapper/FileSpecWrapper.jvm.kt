@@ -44,8 +44,18 @@ actual class FileSpecBuilderWrapper internal constructor(private val actual: Fil
     ): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addImport(className.toKotlinPoetClassName(), *names))
 
-    actual fun addComment(format: String, vararg args: Any): FileSpecBuilderWrapper =
-        FileSpecBuilderWrapper(actual.addFileComment(format, *args))
+    actual fun addComment(format: String, vararg args: Any): FileSpecBuilderWrapper {
+        val convertedArgs = args.map { arg ->
+            when (arg) {
+                is ClassNameWrapper -> arg.toKotlinPoetClassName()
+                is TypeNameWrapper -> arg.toKotlinPoet()
+                is MemberNameWrapper -> arg.toKotlinPoet()
+                is CodeBlockWrapper -> arg.toKotlinPoet()
+                else -> arg
+            }
+        }.toTypedArray()
+        return FileSpecBuilderWrapper(actual.addFileComment(format, *convertedArgs))
+    }
 
     actual fun addCode(codeBlock: CodeBlockWrapper): FileSpecBuilderWrapper =
         FileSpecBuilderWrapper(actual.addCode(codeBlock.toKotlinPoet()))

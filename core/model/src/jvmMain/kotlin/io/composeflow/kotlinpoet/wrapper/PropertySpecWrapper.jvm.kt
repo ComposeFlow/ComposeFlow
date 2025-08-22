@@ -69,14 +69,34 @@ actual class PropertySpecWrapper internal constructor(private val actual: Proper
 }
 
 actual class PropertySpecBuilderWrapper internal constructor(private val actual: PropertySpec.Builder) {
-    actual fun initializer(format: String, vararg args: Any?): PropertySpecBuilderWrapper =
-        PropertySpecBuilderWrapper(actual.initializer(format, *args.filterNotNull().toTypedArray()))
+    actual fun initializer(format: String, vararg args: Any?): PropertySpecBuilderWrapper {
+        val convertedArgs = args.map { arg ->
+            when (arg) {
+                is ClassNameWrapper -> arg.toKotlinPoetClassName()
+                is TypeNameWrapper -> arg.toKotlinPoet()
+                is MemberNameWrapper -> arg.toKotlinPoet()
+                is CodeBlockWrapper -> arg.toKotlinPoet()
+                else -> arg
+            }
+        }.toTypedArray()
+        return PropertySpecBuilderWrapper(actual.initializer(format, *convertedArgs))
+    }
 
     actual fun initializer(codeBlock: CodeBlockWrapper): PropertySpecBuilderWrapper =
         PropertySpecBuilderWrapper(actual.initializer(codeBlock.toKotlinPoet()))
 
-    actual fun delegate(format: String, vararg args: Any?): PropertySpecBuilderWrapper =
-        PropertySpecBuilderWrapper(actual.delegate(format, *args.filterNotNull().toTypedArray()))
+    actual fun delegate(format: String, vararg args: Any?): PropertySpecBuilderWrapper {
+        val convertedArgs = args.map { arg ->
+            when (arg) {
+                is ClassNameWrapper -> arg.toKotlinPoetClassName()
+                is TypeNameWrapper -> arg.toKotlinPoet()
+                is MemberNameWrapper -> arg.toKotlinPoet()
+                is CodeBlockWrapper -> arg.toKotlinPoet()
+                else -> arg
+            }
+        }.toTypedArray()
+        return PropertySpecBuilderWrapper(actual.delegate(format, *convertedArgs))
+    }
 
     actual fun delegate(codeBlock: CodeBlockWrapper): PropertySpecBuilderWrapper =
         PropertySpecBuilderWrapper(actual.delegate(codeBlock.toKotlinPoet()))
