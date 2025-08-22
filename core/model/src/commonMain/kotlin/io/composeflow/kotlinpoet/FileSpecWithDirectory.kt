@@ -1,9 +1,9 @@
 package io.composeflow.kotlinpoet
 
-import com.squareup.kotlinpoet.FileSpec
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
 
 data class FileSpecWithDirectory(
-    val fileSpec: FileSpec,
+    val fileSpec: FileSpecWrapper,
     val baseDirectory: BaseDirectory = BaseDirectory.CommonMainKotlin,
 )
 

@@ -38,6 +38,8 @@ actual class FunSpecBuilderWrapper internal constructor(private val actual: FunS
         FunSpecBuilderWrapper(actual.addParameter(parameterSpec.toKotlinPoet()))
     actual fun addParameter(name: String, type: TypeNameWrapper, vararg modifiers: KModifierWrapper): FunSpecBuilderWrapper = 
         FunSpecBuilderWrapper(actual.addParameter(name, type.toKotlinPoet(), *modifiers.toKotlinPoet()))
+    actual fun addParameters(parameterSpecs: List<ParameterSpecWrapper>): FunSpecBuilderWrapper = 
+        FunSpecBuilderWrapper(actual.addParameters(parameterSpecs.map { it.toKotlinPoet() }))
     actual fun addCode(format: String, vararg args: Any?): FunSpecBuilderWrapper = 
         FunSpecBuilderWrapper(actual.addCode(format, *args))
     actual fun addCode(codeBlock: CodeBlockWrapper): FunSpecBuilderWrapper = 

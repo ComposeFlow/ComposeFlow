@@ -21,6 +21,8 @@ actual class TypeSpecWrapper internal constructor(private val actual: TypeSpec) 
             TypeSpecBuilderWrapper(TypeSpec.annotationBuilder(name))
         actual fun funInterfaceBuilder(name: String): TypeSpecBuilderWrapper = 
             TypeSpecBuilderWrapper(TypeSpec.funInterfaceBuilder(name))
+        actual fun anonymousClassBuilder(): TypeSpecBuilderWrapper = 
+            TypeSpecBuilderWrapper(TypeSpec.anonymousClassBuilder())
     }
     
     actual val name: String? get() = actual.name
@@ -60,6 +62,14 @@ actual class TypeSpecBuilderWrapper internal constructor(private val actual: Typ
         TypeSpecBuilderWrapper(actual.addSuperinterface(superinterface.toKotlinPoet()))
     actual fun superclass(superclass: TypeNameWrapper): TypeSpecBuilderWrapper = 
         TypeSpecBuilderWrapper(actual.superclass(superclass.toKotlinPoet()))
+    actual fun addInitializerBlock(block: CodeBlockWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addInitializerBlock(block.toKotlinPoet()))
+    actual fun addEnumConstant(name: String, typeSpec: TypeSpecWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addEnumConstant(name, typeSpec.toKotlinPoet()))
+    actual fun addSuperclassConstructorParameter(format: String, vararg args: Any?): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addSuperclassConstructorParameter(format, *args))
+    actual fun addSuperclassConstructorParameter(codeBlock: CodeBlockWrapper): TypeSpecBuilderWrapper = 
+        TypeSpecBuilderWrapper(actual.addSuperclassConstructorParameter(codeBlock.toKotlinPoet()))
     actual fun build(): TypeSpecWrapper = TypeSpecWrapper(actual.build())
 }
 

@@ -21,6 +21,7 @@ actual class TypeSpecWrapper(
         actual fun enumBuilder(name: String): TypeSpecBuilderWrapper = TypeSpecBuilderWrapper()
         actual fun annotationBuilder(name: String): TypeSpecBuilderWrapper = TypeSpecBuilderWrapper()
         actual fun funInterfaceBuilder(name: String): TypeSpecBuilderWrapper = TypeSpecBuilderWrapper()
+        actual fun anonymousClassBuilder(): TypeSpecBuilderWrapper = TypeSpecBuilderWrapper()
     }
     
     actual enum class Kind {
@@ -43,5 +44,9 @@ actual class TypeSpecBuilderWrapper {
     actual fun primaryConstructor(primaryConstructor: FunSpecWrapper): TypeSpecBuilderWrapper = this
     actual fun addSuperinterface(superinterface: TypeNameWrapper): TypeSpecBuilderWrapper = this
     actual fun superclass(superclass: TypeNameWrapper): TypeSpecBuilderWrapper = this
+    actual fun addInitializerBlock(block: CodeBlockWrapper): TypeSpecBuilderWrapper = this
+    actual fun addEnumConstant(name: String, typeSpec: TypeSpecWrapper): TypeSpecBuilderWrapper = this
+    actual fun addSuperclassConstructorParameter(format: String, vararg args: Any?): TypeSpecBuilderWrapper = this
+    actual fun addSuperclassConstructorParameter(codeBlock: CodeBlockWrapper): TypeSpecBuilderWrapper = this
     actual fun build(): TypeSpecWrapper = TypeSpecWrapper()
 }

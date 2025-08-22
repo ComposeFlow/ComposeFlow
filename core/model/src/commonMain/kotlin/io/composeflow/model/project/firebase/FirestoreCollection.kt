@@ -2,11 +2,12 @@ package io.composeflow.model.project.firebase
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import com.squareup.kotlinpoet.AnnotationSpec
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
-import com.squareup.kotlinpoet.PropertySpec
+import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.ParameterizedTypeNameWrapper
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
+import io.composeflow.kotlinpoet.wrapper.parameterizedBy
 import io.composeflow.ViewModelConstant
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.kotlinpoet.GenerationContext
@@ -43,13 +44,13 @@ data class FirestoreCollection(
         return "${dataType.className.replaceFirstChar { it.lowercase() }}Collection"
     }
 
-    fun generateStatePropertiesToViewModel(project: Project): List<PropertySpec> {
+    fun generateStatePropertiesToViewModel(project: Project): List<PropertySpecWrapper> {
         val firestoreCollection = project.findFirestoreCollectionOrNull(id)
         val dataType = firestoreCollection?.dataTypeId?.let { project.findDataTypeOrNull(it) }
         if (dataType == null) return emptyList()
 
-        val listDataType =
-            ClassName("kotlin.collections", "List").parameterizedBy(
+        val listDataType: ParameterizedTypeNameWrapper =
+            ClassNameWrapper.get("kotlin.collections", "List").parameterizedBy(
                 dataType.asKotlinPoetClassName(project),
             )
         val queryResultType =
@@ -60,17 +61,17 @@ data class FirestoreCollection(
             ClassHolder.Coroutines.Flow.StateFlow
                 .parameterizedBy(queryResultType)
         val optInAnnotation =
-            AnnotationSpec
-                .builder(ClassName("kotlin", "OptIn"))
-                .addMember("%T::class", ClassName("kotlinx.coroutines", "ExperimentalCoroutinesApi"))
+            AnnotationSpecWrapper
+                .builder(ClassNameWrapper.get("kotlin", "OptIn"))
+                .addMember("%T::class", ClassNameWrapper.get("kotlinx.coroutines", "ExperimentalCoroutinesApi"))
                 .build()
 
         val collectionStateFlowProperty =
-            PropertySpec
+            PropertySpecWrapper
                 .builder(getReadVariableName(project), stateFlowType)
                 .addAnnotation(optInAnnotation)
                 .initializer(
-                    CodeBlock.of(
+                    CodeBlockWrapper.of(
                         """${ViewModelConstant.firestore}.collection("${firestoreCollection.name}")
         .snapshots(includeMetadataChanges = false)
         .%M { querySnapshot ->
@@ -100,8 +101,8 @@ data class FirestoreCollection(
         project: Project,
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock {
-        val builder = CodeBlock.builder()
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
         builder.addStatement(
             "val ${getReadVariableName(project)} = ${context.currentEditable.viewModelName}.${
                 getReadVariableName(

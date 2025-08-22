@@ -34,4 +34,8 @@ actual class CodeBlockBuilderWrapper internal constructor(private val actual: Co
     actual fun indent(): CodeBlockBuilderWrapper = CodeBlockBuilderWrapper(actual.indent())
     actual fun unindent(): CodeBlockBuilderWrapper = CodeBlockBuilderWrapper(actual.unindent())
     actual fun isEmpty(): Boolean = actual.isEmpty()
+    actual fun beginControlFlow(controlFlow: String, vararg args: Any?): CodeBlockBuilderWrapper = 
+        CodeBlockBuilderWrapper(actual.beginControlFlow(controlFlow, *args))
+    actual fun endControlFlow(): CodeBlockBuilderWrapper = 
+        CodeBlockBuilderWrapper(actual.endControlFlow())
 }

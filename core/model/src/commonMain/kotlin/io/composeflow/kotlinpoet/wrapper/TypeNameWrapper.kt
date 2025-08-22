@@ -40,3 +40,4 @@ expect class ParameterizedTypeNameWrapper : TypeNameWrapper {
 expect fun KClass<*>.asTypeNameWrapper(): TypeNameWrapper
 expect fun KClass<*>.parameterizedBy(vararg typeArguments: KClass<*>): ParameterizedTypeNameWrapper
 expect fun TypeNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper
+expect fun ClassNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper

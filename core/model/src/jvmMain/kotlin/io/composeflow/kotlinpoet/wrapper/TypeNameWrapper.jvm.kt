@@ -67,6 +67,9 @@ actual fun KClass<*>.parameterizedBy(vararg typeArguments: KClass<*>): Parameter
 actual fun TypeNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper = 
     ParameterizedTypeNameWrapper.get(this as ClassNameWrapper, *typeArguments)
 
+actual fun ClassNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper =
+    ParameterizedTypeNameWrapper.get(this, *typeArguments)
+
 // Helper function to create TypeNameWrapper from KotlinPoet TypeName
 fun TypeName.toWrapper(): TypeNameWrapper = when (this) {
     is ClassName -> ClassNameWrapper(this)

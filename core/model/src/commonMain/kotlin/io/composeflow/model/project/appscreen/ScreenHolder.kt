@@ -8,17 +8,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.FileSpec
-import com.squareup.kotlinpoet.FunSpec
-import com.squareup.kotlinpoet.KModifier
-import com.squareup.kotlinpoet.MemberName
-import com.squareup.kotlinpoet.ParameterSpec
-import com.squareup.kotlinpoet.PropertySpec
-import com.squareup.kotlinpoet.TypeSpec
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
+import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import io.composeflow.ViewModelConstant
-import io.composeflow.formatter.suppressRedundantVisibilityModifier
+import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.kotlinpoet.FileSpecWithDirectory
 import io.composeflow.kotlinpoet.GenerationContext
@@ -51,7 +53,8 @@ import org.koin.core.component.KoinComponent
 
 const val APP_VIEW_MODEL = "AppViewModel"
 const val SCREEN_ROUTE = "ScreenRoute"
-val screenRouteClass = ClassName(packageName = "", SCREEN_ROUTE)
+val screenRouteClass = ClassNameWrapper.get(packageName = "", SCREEN_ROUTE)
+val screenRouteClassName = ClassNameWrapper.get("", SCREEN_ROUTE)
 
 @Serializable
 @SerialName("ScreenHolder")
@@ -233,8 +236,8 @@ data class ScreenHolder(
         project: Project,
         context: GenerationContext,
     ): FileSpecWithDirectory {
-        val fileSpecBuilder = FileSpec.builder("", "AppNavHost")
-        val funSpecBuilder = FunSpec.builder("AppNavHost").addAnnotation(Composable::class)
+        val fileSpecBuilder = FileSpecWrapper.builder("", "AppNavHost")
+        val funSpecBuilder = FunSpecWrapper.builder("AppNavHost").addAnnotation(AnnotationSpecWrapper.get(Composable::class))
         val defaultScreen = screens.firstOrNull { it.isDefault.value } ?: screens.first()
         val loginScreen = getLoginScreen()
         if (loginScreen != null) {
@@ -256,12 +259,12 @@ data class ScreenHolder(
         funSpecBuilder
             .addParameters(
                 listOf(
-                    ParameterSpec
-                        .builder("navController", NavHostController::class)
+                    ParameterSpecWrapper
+                        .builder("navController", NavHostController::class.asTypeNameWrapper())
                         .build(),
-                    ParameterSpec
-                        .builder("initialRoute", screenRouteClass)
-                        .defaultValue(defaultScreen.defaultRouteCodeBlock())
+                    ParameterSpecWrapper
+                        .builder("initialRoute", screenRouteClassName)
+                        .defaultValue(CodeBlockWrapper.of(defaultScreen.defaultRouteCodeBlock().toString()))
                         .build(),
                 ),
             ).addCode(
@@ -271,13 +274,13 @@ data class ScreenHolder(
         startDestination = $initialRouteName,
     ) {
         """,
-                MemberName("androidx.navigation.compose", "NavHost"),
+                MemberNameWrapper.get("androidx.navigation.compose", "NavHost"),
             )
 
-        val codeBuilder = CodeBlock.builder()
+        val codeBuilder = CodeBlockWrapper.builder()
         screens.forEach {
-            codeBuilder.addStatement("%M(", MemberName(it.getPackageName(project), it.sceneName))
-            codeBuilder.add(it.generateArgumentsInitializationCodeBlock(project))
+            codeBuilder.addStatement("%M(", MemberNameWrapper.get(it.getPackageName(project), it.sceneName))
+            codeBuilder.add(CodeBlockWrapper.of(it.generateArgumentsInitializationCodeBlock(project).toString()))
             codeBuilder.addStatement(")")
         }
         funSpecBuilder.addCode(codeBuilder.build())
@@ -290,12 +293,12 @@ data class ScreenHolder(
 
     fun generateComposeLauncherFile(): FileSpecWithDirectory {
         val fileBuilder =
-            FileSpec
+            FileSpecWrapper
                 .builder("", "App")
                 .addImport("androidx.compose.runtime", "getValue")
                 .addImport("androidx.compose.runtime", "mutableStateOf")
                 .addImport("androidx.compose.runtime", "setValue")
-        val appFunSpecBuilder = FunSpec.builder("App").addAnnotation(Composable::class)
+        val appFunSpecBuilder = FunSpecWrapper.builder("App").addAnnotation(AnnotationSpecWrapper.get(Composable::class))
         appFunSpecBuilder.addStatement(
             """
     val appViewModel = %M($APP_VIEW_MODEL::class)
@@ -303,14 +306,14 @@ data class ScreenHolder(
     val snackbarHostState = %M { %M() }
     """,
             MemberHolder.PreCompose.koinViewModel,
-            MemberName("androidx.navigation.compose", "rememberNavController"),
-            MemberName("androidx.compose.runtime", "remember"),
-            MemberName("androidx.compose.material3", "SnackbarHostState"),
+            MemberNameWrapper.get("androidx.navigation.compose", "rememberNavController"),
+            MemberNameWrapper.get("androidx.compose.runtime", "remember"),
+            MemberNameWrapper.get("androidx.compose.material3", "SnackbarHostState"),
         )
 
         appFunSpecBuilder.addStatement(
             "val backstack by navController.%M()",
-            MemberName("androidx.navigation.compose", "currentBackStackEntryAsState"),
+            MemberNameWrapper.get("androidx.navigation.compose", "currentBackStackEntryAsState"),
         )
         appFunSpecBuilder.addStatement(
             """
@@ -320,14 +323,14 @@ data class ScreenHolder(
         }
         val isTopLevel by %M { currentDestination?.isTopLevel == true }
         """,
-            MemberName("androidx.compose.runtime", "derivedStateOf"),
-            MemberName("androidx.compose.runtime", "derivedStateOf"),
+            MemberNameWrapper.get("androidx.compose.runtime", "derivedStateOf"),
+            MemberNameWrapper.get("androidx.compose.runtime", "derivedStateOf"),
         )
 
         appFunSpecBuilder.addStatement(
             "%M.providesDefault(%M())",
-            MemberName("$COMPOSEFLOW_PACKAGE.common", "LocalUseDarkTheme"),
-            MemberName("androidx.compose.foundation", "isSystemInDarkTheme"),
+            MemberNameWrapper.get("$COMPOSEFLOW_PACKAGE.common", "LocalUseDarkTheme"),
+            MemberNameWrapper.get("androidx.compose.foundation", "isSystemInDarkTheme"),
         )
 
         appFunSpecBuilder.addStatement(
@@ -336,9 +339,9 @@ data class ScreenHolder(
     %M(snackbarHostState) {
         %M {
     """,
-            MemberName("${COMPOSEFLOW_PACKAGE}.auth", "ProvideAuthenticatedUser"),
-            MemberName("${COMPOSEFLOW_PACKAGE}.ui", "ProvideOnShowSnackbar"),
-            MemberName("${COMPOSEFLOW_PACKAGE}.common", "AppTheme"),
+            MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.auth", "ProvideAuthenticatedUser"),
+            MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.ui", "ProvideOnShowSnackbar"),
+            MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.common", "AppTheme"),
         )
 
         if (showNavigation.value) {
@@ -368,26 +371,26 @@ data class ScreenHolder(
                 },
                 layoutType = %M(isTopLevel),
                 ) {""",
-                MemberName(
+                MemberNameWrapper.get(
                     "androidx.compose.material3.adaptive.navigationsuite",
                     "NavigationSuiteScaffold",
                 ),
-                MemberName("androidx.navigation", "NavOptions"),
-                MemberName("androidx.compose.material3", "Icon"),
+                MemberNameWrapper.get("androidx.navigation", "NavOptions"),
+                MemberNameWrapper.get("androidx.compose.material3", "Icon"),
                 MemberHolder.Material3.Text,
-                MemberName("${COMPOSEFLOW_PACKAGE}.util", "calculateCustomNavSuiteType"),
+                MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.util", "calculateCustomNavSuiteType"),
             )
         }
 
         appFunSpecBuilder.addStatement(
             """
                 %M (""",
-            MemberName("androidx.compose.material3", "Scaffold"),
+            MemberNameWrapper.get("androidx.compose.material3", "Scaffold"),
         )
 
         appFunSpecBuilder.addStatement(
             "snackbarHost = { %M(snackbarHostState) }",
-            MemberName("androidx.compose.material3", "SnackbarHost"),
+            MemberNameWrapper.get("androidx.compose.material3", "SnackbarHost"),
         )
 
         appFunSpecBuilder.addStatement(
@@ -402,7 +405,7 @@ data class ScreenHolder(
 }
     """,
             MemberHolder.AndroidX.Ui.Modifier,
-            MemberName("androidx.compose.foundation.layout", "padding"),
+            MemberNameWrapper.get("androidx.compose.foundation.layout", "padding"),
             MemberHolder.AndroidX.Layout.Column,
         )
 
@@ -417,33 +420,33 @@ data class ScreenHolder(
 
     @OptIn(ExperimentalSettingsApi::class)
     fun generateAppViewModel(project: Project): FileSpecWithDirectory {
-        val fileBuilder = FileSpec.builder("", APP_VIEW_MODEL)
+        val fileBuilder = FileSpecWrapper.builder("", APP_VIEW_MODEL)
         val typeBuilder =
-            TypeSpec
+            TypeSpecWrapper
                 .classBuilder(APP_VIEW_MODEL)
-                .superclass(ViewModel::class)
-                .addSuperinterface(KoinComponent::class)
+                .superclass(ViewModel::class.asTypeNameWrapper())
+                .addSuperinterface(KoinComponent::class.asTypeNameWrapper())
         if (project.globalStateHolder
                 .getStates(project)
                 .any { it is AppState.CustomDataTypeListAppState }
         ) {
             typeBuilder.addProperty(
-                PropertySpec
-                    .builder(ViewModelConstant.jsonSerializer.name, Json::class)
-                    .addModifiers(KModifier.PRIVATE)
+                PropertySpecWrapper
+                    .builder(ViewModelConstant.jsonSerializer.name, Json::class.asTypeNameWrapper())
+                    .addModifiers(KModifierWrapper.PRIVATE)
                     .delegate(
-                        CodeBlock
+                        CodeBlockWrapper
                             .builder()
                             .add("%M()", MemberHolder.Koin.inject)
                             .build(),
                     ).build(),
             )
             typeBuilder.addProperty(
-                PropertySpec
-                    .builder(ViewModelConstant.flowSettings.name, FlowSettings::class)
-                    .addModifiers(KModifier.PRIVATE)
+                PropertySpecWrapper
+                    .builder(ViewModelConstant.flowSettings.name, FlowSettings::class.asTypeNameWrapper())
+                    .addModifiers(KModifierWrapper.PRIVATE)
                     .delegate(
-                        CodeBlock
+                        CodeBlockWrapper
                             .builder()
                             .beginControlFlow("lazy")
                             .add("%M()", MemberHolder.Koin.get)
@@ -452,7 +455,7 @@ data class ScreenHolder(
                     ).build(),
             )
 
-            val codeBlockBuilder = CodeBlock.builder()
+            val codeBlockBuilder = CodeBlockWrapper.builder()
             codeBlockBuilder.beginControlFlow(
                 "%M.%M",
                 MemberHolder.PreCompose.viewModelScope,
@@ -461,7 +464,7 @@ data class ScreenHolder(
             project.globalStateHolder.getStates(project).forEach { state ->
                 if (state is AppState.CustomDataTypeListAppState && state.defaultValue.isNotEmpty()) {
                     codeBlockBuilder.add(
-                        CodeBlock.of(
+                        CodeBlockWrapper.of(
                             """
                             ${ViewModelConstant.flowSettings.name}.putString("${state.name}",
                                  ${ViewModelConstant.jsonSerializer.name}.%M(%L)
@@ -488,22 +491,22 @@ data class ScreenHolder(
 
     fun generateKoinViewModelModule(project: Project): FileSpecWithDirectory {
         val fileBuilder =
-            FileSpec.builder(
+            FileSpecWrapper.builder(
                 fileName = "ViewModelModule",
                 packageName = "${COMPOSEFLOW_PACKAGE}.screens",
             )
         val funSpecBuilder =
-            FunSpec
+            FunSpecWrapper
                 .builder("screenViewModelModule")
-                .returns(org.koin.core.module.Module::class)
-                .addCode("return %M {", MemberName("org.koin.dsl", "module"))
+                .returns(org.koin.core.module.Module::class.asTypeNameWrapper())
+                .addCode("return %M {", MemberNameWrapper.get("org.koin.dsl", "module"))
 
-        funSpecBuilder.addStatement("factory { %T() } ", ClassName("", APP_VIEW_MODEL))
+        funSpecBuilder.addStatement("factory { %T() } ", ClassNameWrapper.get("", APP_VIEW_MODEL))
 
         screens.forEach {
             funSpecBuilder.addStatement(
                 "factory { %T() } ",
-                ClassName(it.getPackageName(project), it.viewModelFileName),
+                ClassNameWrapper.get(it.getPackageName(project), it.viewModelFileName),
             )
         }
         funSpecBuilder.addCode("}")
@@ -514,28 +517,28 @@ data class ScreenHolder(
 
     fun generateScreenRouteFileSpec(project: Project): FileSpecWithDirectory {
         val fileBuilder =
-            FileSpec.builder(
+            FileSpecWrapper.builder(
                 fileName = SCREEN_ROUTE,
                 packageName = "",
             )
 
         val routeName = "routeName"
         val screenRouteBuilder =
-            TypeSpec
+            TypeSpecWrapper
                 .interfaceBuilder(SCREEN_ROUTE)
-                .addAnnotation(ClassHolder.Kotlinx.Serialization.Serializable)
-                .addModifiers(KModifier.SEALED)
-                .addProperty(PropertySpec.builder(routeName, String::class).build())
+                .addAnnotation(AnnotationSpecWrapper.builder(ClassHolder.Kotlinx.Serialization.Serializable).build())
+                .addModifiers(KModifierWrapper.SEALED)
+                .addProperty(PropertySpecWrapper.builder(routeName, String::class.asTypeNameWrapper()).build())
                 .addFunction(
-                    FunSpec
+                    FunSpecWrapper
                         .builder("isCurrentDestination")
                         .addParameter(
                             "backStackEntry",
-                            ClassName(
+                            ClassNameWrapper.get(
                                 "androidx.navigation",
                                 "NavBackStackEntry",
                             ).copy(nullable = true),
-                        ).returns(Boolean::class)
+                        ).returns(Boolean::class.asTypeNameWrapper())
                         .addCode("""return backStackEntry?.destination?.route == $routeName""")
                         .build(),
                 )
@@ -543,16 +546,16 @@ data class ScreenHolder(
         project.screenHolder.screens.forEach { screen ->
             val typeSpecBuilder =
                 if (screen.parameters.isEmpty()) {
-                    TypeSpec.objectBuilder(screen.routeName)
+                    TypeSpecWrapper.objectBuilder(screen.routeName)
                 } else {
-                    val classBuilder = TypeSpec.classBuilder(screen.routeName)
-                    val primaryConstructorBuilder = FunSpec.constructorBuilder()
+                    val classBuilder = TypeSpecWrapper.classBuilder(screen.routeName)
+                    val primaryConstructorBuilder = FunSpecWrapper.constructorBuilder()
                     screen.parameters.forEach { parameter ->
                         primaryConstructorBuilder.addParameter(
                             parameter.generateArgumentParameterSpec(project),
                         )
                         classBuilder.addProperty(
-                            PropertySpec
+                            PropertySpecWrapper
                                 .builder(
                                     parameter.variableName,
                                     parameter.parameterType.asKotlinPoetTypeName(project),
@@ -563,13 +566,13 @@ data class ScreenHolder(
                     classBuilder.primaryConstructor(primaryConstructorBuilder.build())
                     classBuilder
                 }.apply {
-                    addModifiers(KModifier.DATA)
+                    addModifiers(KModifierWrapper.DATA)
                     addSuperinterface(screenRouteClass)
-                    addAnnotation(ClassHolder.Kotlinx.Serialization.Serializable)
+                    addAnnotation(AnnotationSpecWrapper.builder(ClassHolder.Kotlinx.Serialization.Serializable).build())
                     addProperty(
-                        PropertySpec
-                            .builder(routeName, String::class)
-                            .addModifiers(KModifier.OVERRIDE)
+                        PropertySpecWrapper
+                            .builder(routeName, String::class.asTypeNameWrapper())
+                            .addModifiers(KModifierWrapper.OVERRIDE)
                             .initializer("%S", "$SCREEN_ROUTE.${screen.routeName}")
                             .build(),
                     )
@@ -582,41 +585,41 @@ data class ScreenHolder(
         return FileSpecWithDirectory(fileBuilder.build())
     }
 
-    private fun generateScreenDestinationEnum(): TypeSpec {
+    private fun generateScreenDestinationEnum(): TypeSpecWrapper {
         val enumBuilder =
-            TypeSpec
+            TypeSpecWrapper
                 .enumBuilder("ScreenDestination")
                 .primaryConstructor(
-                    FunSpec
+                    FunSpecWrapper
                         .constructorBuilder()
-                        .addParameter("icon", ImageVector::class)
-                        .addParameter("isTopLevel", Boolean::class)
-                        .addParameter("label", String::class)
-                        .addParameter("title", String::class)
+                        .addParameter("icon", ImageVector::class.asTypeNameWrapper())
+                        .addParameter("isTopLevel", Boolean::class.asTypeNameWrapper())
+                        .addParameter("label", String::class.asTypeNameWrapper())
+                        .addParameter("title", String::class.asTypeNameWrapper())
                         .addParameter("route", screenRouteClass)
                         .build(),
                 ).addProperty(
-                    PropertySpec
-                        .builder("icon", ImageVector::class)
+                    PropertySpecWrapper
+                        .builder("icon", ImageVector::class.asTypeNameWrapper())
                         .initializer("icon")
                         .build(),
                 ).addProperty(
-                    PropertySpec
-                        .builder("isTopLevel", Boolean::class)
+                    PropertySpecWrapper
+                        .builder("isTopLevel", Boolean::class.asTypeNameWrapper())
                         .initializer("isTopLevel")
                         .build(),
                 ).addProperty(
-                    PropertySpec
-                        .builder("label", String::class)
+                    PropertySpecWrapper
+                        .builder("label", String::class.asTypeNameWrapper())
                         .initializer("label")
                         .build(),
                 ).addProperty(
-                    PropertySpec
-                        .builder("title", String::class)
+                    PropertySpecWrapper
+                        .builder("title", String::class.asTypeNameWrapper())
                         .initializer("title")
                         .build(),
                 ).addProperty(
-                    PropertySpec
+                    PropertySpecWrapper
                         .builder("route", screenRouteClass)
                         .initializer("route")
                         .build(),
@@ -630,13 +633,13 @@ data class ScreenHolder(
             }.forEach {
                 enumBuilder.addEnumConstant(
                     it.name.toKotlinFileName(),
-                    TypeSpec
+                    TypeSpecWrapper
                         .anonymousClassBuilder()
                         .addSuperclassConstructorParameter(it.icon.value.asCodeBlock())
                         .addSuperclassConstructorParameter("%L", it.showOnNavigation.value)
                         .addSuperclassConstructorParameter("%S", it.label.value)
                         .addSuperclassConstructorParameter("%S", it.title.value)
-                        .addSuperclassConstructorParameter(it.defaultRouteCodeBlock())
+                        .addSuperclassConstructorParameter(CodeBlockWrapper.of(it.defaultRouteCodeBlock().toString()))
                         .build(),
                 )
             }
@@ -644,8 +647,8 @@ data class ScreenHolder(
     }
 
     companion object {
-        fun generateCodeBlockFromScrollBehavior(scrollBehaviorWrapper: ScrollBehaviorWrapper): CodeBlock {
-            val builder = CodeBlock.builder()
+        fun generateCodeBlockFromScrollBehavior(scrollBehaviorWrapper: ScrollBehaviorWrapper): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
             when (scrollBehaviorWrapper) {
                 ScrollBehaviorWrapper.None -> { // no-op
                 }
@@ -653,7 +656,7 @@ data class ScreenHolder(
                 ScrollBehaviorWrapper.EnterAlways -> {
                     builder.addStatement(
                         "val scrollBehavior = %M()",
-                        MemberName(
+                        MemberNameWrapper.get(
                             "androidx.compose.material3.TopAppBarDefaults",
                             "enterAlwaysScrollBehavior",
                         ),
@@ -663,7 +666,7 @@ data class ScreenHolder(
                 ScrollBehaviorWrapper.ExitUntilCollapsed -> {
                     builder.addStatement(
                         "val scrollBehavior = %M()",
-                        MemberName(
+                        MemberNameWrapper.get(
                             "androidx.compose.material3.TopAppBarDefaults",
                             "exitUntilCollapsedScrollBehavior",
                         ),
@@ -673,7 +676,7 @@ data class ScreenHolder(
                 ScrollBehaviorWrapper.Pinned -> {
                     builder.addStatement(
                         "val scrollBehavior = %M()",
-                        MemberName(
+                        MemberNameWrapper.get(
                             "androidx.compose.material3.TopAppBarDefaults",
                             "pinnedScrollBehavior",
                         ),

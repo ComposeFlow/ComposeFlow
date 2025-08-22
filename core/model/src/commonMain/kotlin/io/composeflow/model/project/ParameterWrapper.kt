@@ -2,8 +2,8 @@ package io.composeflow.model.project
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.ParameterSpec
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
 import io.composeflow.asVariableName
 import io.composeflow.editor.validator.FloatValidator
 import io.composeflow.editor.validator.IntValidator
@@ -34,7 +34,7 @@ sealed interface ParameterWrapper<T> {
 
     val variableName: String
 
-    fun defaultValueAsCodeBlock(project: Project): CodeBlock
+    fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper
 
     @Serializable
     @SerialName("StringParameter")
@@ -52,7 +52,7 @@ sealed interface ParameterWrapper<T> {
         @Transient
         override val variableName: String = name.asVariableName()
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock =
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper =
             if (defaultValue.contains("\n") ||
                 defaultValue.contains("\r") ||
                 defaultValue.length >= KOTLINPOET_COLUMN_LIMIT
@@ -60,9 +60,9 @@ sealed interface ParameterWrapper<T> {
                 // It looks like Kotlinpoet's column limit is hard-coded as 100.
                 // That means a string more than 100 characters can be translated as multiline
                 // string unintentionally.
-                CodeBlock.of("\"\"\"${defaultValue}\"\"\"")
+                CodeBlockWrapper.of("\"\"\"${defaultValue}\"\"\"")
             } else {
-                CodeBlock.of("\"$defaultValue\"")
+                CodeBlockWrapper.of("\"$defaultValue\"")
             }
     }
 
@@ -82,7 +82,7 @@ sealed interface ParameterWrapper<T> {
         @Transient
         override val variableName: String = name.asVariableName()
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("$defaultValue")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("$defaultValue")
     }
 
     @Serializable
@@ -101,7 +101,7 @@ sealed interface ParameterWrapper<T> {
         @Transient
         override val variableName: String = name.asVariableName()
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("${defaultValue}f")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("${defaultValue}f")
     }
 
     @Serializable
@@ -120,11 +120,11 @@ sealed interface ParameterWrapper<T> {
         @Transient
         override val variableName: String = name.asVariableName()
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlock = CodeBlock.of("$defaultValue")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("$defaultValue")
     }
 
-    fun generateArgumentParameterSpec(project: Project): ParameterSpec =
-        ParameterSpec
+    fun generateArgumentParameterSpec(project: Project): ParameterSpecWrapper =
+        ParameterSpecWrapper
             .builder(
                 variableName,
                 parameterType.asKotlinPoetTypeName(project),

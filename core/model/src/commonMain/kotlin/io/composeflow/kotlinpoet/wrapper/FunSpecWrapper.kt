@@ -28,6 +28,7 @@ expect class FunSpecWrapper {
 expect class FunSpecBuilderWrapper {
     fun addParameter(parameterSpec: ParameterSpecWrapper): FunSpecBuilderWrapper
     fun addParameter(name: String, type: TypeNameWrapper, vararg modifiers: KModifierWrapper): FunSpecBuilderWrapper
+    fun addParameters(parameterSpecs: List<ParameterSpecWrapper>): FunSpecBuilderWrapper
     fun addCode(format: String, vararg args: Any?): FunSpecBuilderWrapper
     fun addCode(codeBlock: CodeBlockWrapper): FunSpecBuilderWrapper
     fun addStatement(format: String, vararg args: Any?): FunSpecBuilderWrapper

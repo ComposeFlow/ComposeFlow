@@ -28,6 +28,7 @@ actual class FunSpecWrapper(
 actual class FunSpecBuilderWrapper {
     actual fun addParameter(parameterSpec: ParameterSpecWrapper): FunSpecBuilderWrapper = this
     actual fun addParameter(name: String, type: TypeNameWrapper, vararg modifiers: KModifierWrapper): FunSpecBuilderWrapper = this
+    actual fun addParameters(parameterSpecs: List<ParameterSpecWrapper>): FunSpecBuilderWrapper = this
     actual fun addCode(format: String, vararg args: Any?): FunSpecBuilderWrapper = this
     actual fun addCode(codeBlock: CodeBlockWrapper): FunSpecBuilderWrapper = this
     actual fun addStatement(format: String, vararg args: Any?): FunSpecBuilderWrapper = this

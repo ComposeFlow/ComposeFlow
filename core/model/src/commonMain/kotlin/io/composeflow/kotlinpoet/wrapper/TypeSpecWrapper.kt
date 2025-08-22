@@ -13,6 +13,7 @@ expect class TypeSpecWrapper {
         fun enumBuilder(name: String): TypeSpecBuilderWrapper
         fun annotationBuilder(name: String): TypeSpecBuilderWrapper
         fun funInterfaceBuilder(name: String): TypeSpecBuilderWrapper
+        fun anonymousClassBuilder(): TypeSpecBuilderWrapper
     }
     
     val name: String?
@@ -43,5 +44,9 @@ expect class TypeSpecBuilderWrapper {
     fun primaryConstructor(primaryConstructor: FunSpecWrapper): TypeSpecBuilderWrapper
     fun addSuperinterface(superinterface: TypeNameWrapper): TypeSpecBuilderWrapper
     fun superclass(superclass: TypeNameWrapper): TypeSpecBuilderWrapper
+    fun addInitializerBlock(block: CodeBlockWrapper): TypeSpecBuilderWrapper
+    fun addEnumConstant(name: String, typeSpec: TypeSpecWrapper): TypeSpecBuilderWrapper
+    fun addSuperclassConstructorParameter(format: String, vararg args: Any?): TypeSpecBuilderWrapper
+    fun addSuperclassConstructorParameter(codeBlock: CodeBlockWrapper): TypeSpecBuilderWrapper
     fun build(): TypeSpecWrapper
 }

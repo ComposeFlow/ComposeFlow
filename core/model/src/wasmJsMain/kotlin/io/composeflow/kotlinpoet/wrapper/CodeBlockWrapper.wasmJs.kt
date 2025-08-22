@@ -25,4 +25,6 @@ actual class CodeBlockBuilderWrapper {
     actual fun indent(): CodeBlockBuilderWrapper = this
     actual fun unindent(): CodeBlockBuilderWrapper = this
     actual fun isEmpty(): Boolean = true
+    actual fun beginControlFlow(controlFlow: String, vararg args: Any?): CodeBlockBuilderWrapper = this
+    actual fun endControlFlow(): CodeBlockBuilderWrapper = this
 }

@@ -25,4 +25,6 @@ expect class CodeBlockBuilderWrapper {
     fun indent(): CodeBlockBuilderWrapper
     fun unindent(): CodeBlockBuilderWrapper
     fun isEmpty(): Boolean
+    fun beginControlFlow(controlFlow: String, vararg args: Any?): CodeBlockBuilderWrapper
+    fun endControlFlow(): CodeBlockBuilderWrapper
 }
