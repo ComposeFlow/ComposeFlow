@@ -237,7 +237,7 @@ fun ImageParamsInspector(
                 acceptableType =
                     ComposeFlowType.Enum(
                         isList = false,
-                        enumClass = ContentScaleWrapper::class.java,
+                        enumClass = ContentScaleWrapper::class,
                     ),
                 initialProperty = imageTrait.contentScaleWrapper,
                 items = ContentScaleWrapper.entries,

@@ -49,24 +49,15 @@ actual class ClassNameWrapper internal constructor(private val actual: ClassName
 actual class ParameterizedTypeNameWrapper internal constructor(private val actual: ParameterizedTypeName) : TypeNameWrapper(actual) {
     actual companion object {
         actual fun get(rawType: ClassNameWrapper, vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper {
-            // Create using internal constructor to avoid method resolution issues
             val rawClassName = rawType.toKotlinPoetClassName()
-            val typeArgsList = typeArguments.map { it.toKotlinPoet() }
+            val typeArgs = typeArguments.map { it.toKotlinPoet() }.toTypedArray()
             
-            // Use reflection to access internal constructor if needed, or create a simple implementation
-            // For now, let's use our companion's recursive approach to avoid KotlinPoet conflicts
-            return if (typeArgsList.isEmpty()) {
-                throw IllegalArgumentException("ParameterizedTypeName requires at least one type argument")
-            } else {
-                // Manually create ParameterizedTypeName using the internal API pattern from KotlinPoet
-                val parameterizedType = com.squareup.kotlinpoet.ParameterizedTypeName.get(
-                    rawClassName, 
-                    typeArgsList[0], 
-                    *typeArgsList.drop(1).toTypedArray()
-                )
-                ParameterizedTypeNameWrapper(parameterizedType)
-            }
+            // Create the ParameterizedTypeName manually since we have conflicts with extension methods
+            // First, let's try the most direct approach using the internal ParameterizedTypeName constructor
+            val parameterizedTypeName = createParameterizedTypeNameFromKotlinPoet(rawClassName, typeArgs)
+            return ParameterizedTypeNameWrapper(parameterizedTypeName)
         }
+        
     }
     
     override val isNullable: Boolean get() = actual.isNullable
@@ -97,18 +88,11 @@ actual fun KClass<*>.asTypeNameWrapper(): TypeNameWrapper = this.asTypeName().to
 
 actual fun KClass<*>.parameterizedBy(vararg typeArguments: KClass<*>): ParameterizedTypeNameWrapper {
     val baseTypeName = this.asTypeName() as com.squareup.kotlinpoet.ClassName
-    val typeArgsList = typeArguments.map { it.asTypeName() }
+    val typeArgs = typeArguments.map { it.asTypeName() as com.squareup.kotlinpoet.TypeName }.toTypedArray()
     
-    return if (typeArgsList.isEmpty()) {
-        throw IllegalArgumentException("ParameterizedTypeName requires at least one type argument")
-    } else {
-        val parameterizedType = com.squareup.kotlinpoet.ParameterizedTypeName.get(
-            baseTypeName, 
-            typeArgsList[0], 
-            *typeArgsList.drop(1).toTypedArray()
-        )
-        ParameterizedTypeNameWrapper(parameterizedType)
-    }
+    // Use the same helper method to avoid conflicts
+    val parameterizedType = createParameterizedTypeNameFromKotlinPoet(baseTypeName, typeArgs)
+    return ParameterizedTypeNameWrapper(parameterizedType)
 }
 
 actual fun TypeNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper = 
@@ -128,3 +112,4 @@ actual fun TypeName.toWrapper(): TypeNameWrapper = when (this) {
 }
 
 actual fun ClassName.toWrapper(): ClassNameWrapper = ClassNameWrapper(this)
+

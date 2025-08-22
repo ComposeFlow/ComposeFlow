@@ -160,7 +160,7 @@ fun TextParamsInspector(
             acceptableType =
                 ComposeFlowType.Enum(
                     isList = false,
-                    enumClass = TextStyleWrapper::class.java,
+                    enumClass = TextStyleWrapper::class,
                 ),
             initialProperty = textTrait.textStyleWrapper,
             items = TextStyleWrapper.entries,
@@ -194,7 +194,7 @@ fun TextParamsInspector(
                 acceptableType =
                     ComposeFlowType.Enum(
                         isList = false,
-                        enumClass = TextDecorationWrapper::class.java,
+                        enumClass = TextDecorationWrapper::class,
                     ),
                 initialProperty = textTrait.textDecoration,
                 items = TextDecorationWrapper.entries,
@@ -227,7 +227,7 @@ fun TextParamsInspector(
                 acceptableType =
                     ComposeFlowType.Enum(
                         isList = false,
-                        enumClass = FontStyleWrapper::class.java,
+                        enumClass = FontStyleWrapper::class,
                     ),
                 initialProperty = textTrait.fontStyle,
                 items = FontStyleWrapper.entries,
@@ -262,7 +262,7 @@ fun TextParamsInspector(
                 acceptableType =
                     ComposeFlowType.Enum(
                         isList = false,
-                        enumClass = TextAlignWrapper::class.java,
+                        enumClass = TextAlignWrapper::class,
                     ),
                 initialProperty = textTrait.textAlign,
                 items = TextAlignWrapper.entries,
@@ -295,7 +295,7 @@ fun TextParamsInspector(
                 acceptableType =
                     ComposeFlowType.Enum(
                         isList = false,
-                        enumClass = TextOverflowWrapper::class.java,
+                        enumClass = TextOverflowWrapper::class,
                     ),
                 initialProperty = textTrait.overflow,
                 items = TextOverflowWrapper.entries,

@@ -10,7 +10,7 @@ import io.composeflow.appbuilder.wrapper.GradleWrapper
 import io.composeflow.appbuilder.wrapper.XcodeCommandLineToolsWrapper
 import io.composeflow.auth.google.extractClientIdFromGoogleServicesJson
 import io.composeflow.di.ServiceLocator
-import io.composeflow.formatter.Formatter
+import io.composeflow.formatter.FormatterWrapper
 import io.composeflow.json.jsonSerializer
 import io.composeflow.kotlinpoet.FileSpecWithDirectory
 import io.composeflow.model.device.Device
@@ -367,16 +367,21 @@ object AppRunner {
         fileSpecs.forEach {
             try {
                 val outputDir = appDir.resolve(it.baseDirectory.directoryName)
-                if (formatCode) {
-                    val ktFile =
-                        outputDir
-                            .resolve(it.fileSpec.packageName.replace(".", File.separator))
-                            .resolve("${it.fileSpec.name}.kt")
-                    ktFile.parentFile?.mkdirs()
-                    ktFile.writeText(Formatter.format(it.fileSpec))
+                val ktFile =
+                    outputDir
+                        .resolve(it.fileSpec.packageName.replace(".", File.separator))
+                        .resolve("${it.fileSpec.name}.kt")
+                ktFile.parentFile?.mkdirs()
+                val fileContent = if (formatCode) {
+                    FormatterWrapper.format(
+                        fileName = it.fileSpec.name,
+                        text = it.fileSpec.toString(),
+                        isScript = false
+                    )
                 } else {
-                    it.fileSpec.writeTo(outputDir)
+                    it.fileSpec.toString()
                 }
+                ktFile.writeText(fileContent)
             } catch (e: Exception) {
                 Logger.e("Failed to create file: $it", e)
             }
