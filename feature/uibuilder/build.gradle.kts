@@ -99,7 +99,7 @@ tasks.register("runKsp") {
 
 // Make sure the KSP tasks run
 afterEvaluate {
-    tasks.withType<com.google.devtools.ksp.gradle.KspTask>().configureEach {
+    tasks.withType<com.google.devtools.ksp.gradle.KspAATask>().configureEach {
         // Ensure the KSP task runs
         outputs.upToDateWhen { false }
     }
