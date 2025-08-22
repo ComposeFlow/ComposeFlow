@@ -38,7 +38,7 @@ kotlin {
         // Configure KSP options
         ksp {
             // Set output directory for LLM tool JSON files
-            arg("llmToolsOutputDir", "${project.layout.buildDirectory}/generated/llm-tools")
+            arg("llmToolsOutputDir", "${project.layout.buildDirectory.get()}/generated/llm-tools")
         }
 
         commonTest.dependencies {
@@ -63,7 +63,7 @@ tasks.register("runKsp") {
 
     // Create the output directory
     doFirst {
-        mkdir("${project.layout.buildDirectory}/generated/llm-tools")
+        mkdir("${project.layout.buildDirectory.get()}/generated/llm-tools")
     }
 
     // Depend on the KSP task for the JVM target
