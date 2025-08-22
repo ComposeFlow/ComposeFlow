@@ -23,7 +23,7 @@ dependencies {
 
 // Configure KSP options
 ksp {
-    arg("llmToolsOutputDir", "${project.buildDir}/generated/llm-tools")
+    arg("llmToolsOutputDir", "${project.layout.buildDirectory}/generated/llm-tools")
 }
 
 // Configure Kotlin compiler options
@@ -52,7 +52,7 @@ tasks.register("runExample") {
 
     // Create a directory for the example output
     doFirst {
-        mkdir("${project.buildDir}/generated/llm-tools")
+        mkdir("${project.layout.buildDirectory}/generated/llm-tools")
     }
 
     // Depend on the run task
