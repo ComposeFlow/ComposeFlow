@@ -57,8 +57,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.godaddy.android.colorpicker.ClassicColorPicker
-import com.godaddy.android.colorpicker.HsvColor
+import com.github.skydoves.colorpicker.compose.HsvColorPicker
+import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
 import io.composeflow.Res
@@ -406,9 +406,15 @@ private fun ColorPickerDialog(
     onCloseClick: () -> Unit,
     onColorConfirmed: (Color) -> Unit,
 ) {
-    var currentColor by remember {
-        mutableStateOf(HsvColor.from(initialColor))
+    val controller = rememberColorPickerController()
+    
+    // Set initial color only once
+    remember(initialColor) {
+        controller.selectByColor(initialColor, fromUser = false)
     }
+    
+    // Observe the selected color
+    val selectedColor by controller.selectedColor
     PositionCustomizablePopup(
         onDismissRequest = {
             onCloseClick()
@@ -421,7 +427,7 @@ private fun ColorPickerDialog(
                 }
 
                 Key.Enter -> {
-                    onColorConfirmed(currentColor.toColor())
+                    onColorConfirmed(selectedColor)
                     onCloseClick()
                     true
                 }
@@ -435,21 +441,17 @@ private fun ColorPickerDialog(
         Surface {
             Column(modifier = Modifier.padding(16.dp)) {
                 Row {
-                    ClassicColorPicker(
-                        color = currentColor,
+                    HsvColorPicker(
+                        controller = controller,
                         modifier =
                             Modifier
                                 .width(860.dp)
                                 .height(300.dp)
                                 .padding(horizontal = 24.dp, vertical = 16.dp),
-                        showAlphaBar = false,
-                        onColorChanged = { hsvColor: HsvColor ->
-                            currentColor = hsvColor
-                        },
                     )
 
                     ColorPreviewInfo(
-                        currentColor.toColor().convert(ColorSpaces.Srgb),
+                        selectedColor.convert(ColorSpaces.Srgb),
                         showAlpha = false,
                     )
                 }
@@ -470,7 +472,7 @@ private fun ColorPickerDialog(
                                         shape = RoundedCornerShape(8.dp),
                                     ).hoverIconClickable()
                                     .clickable {
-                                        currentColor = HsvColor.from(sampleColor)
+                                        controller.selectByColor(sampleColor, fromUser = true)
                                     },
                         )
                     }
@@ -490,7 +492,7 @@ private fun ColorPickerDialog(
                     }
                     OutlinedButton(
                         onClick = {
-                            onColorConfirmed(currentColor.toColor())
+                            onColorConfirmed(selectedColor)
                             onCloseClick()
                         },
                     ) {

@@ -17,7 +17,7 @@ object LibraryData {
             Library("compose-multiplatform", "org.jetbrains.compose", "1.8.0"),
             Library("compose-navigation", "org.jetbrains.androidx.navigation", "2.8.0-alpha10"),
             Library("compose-adaptive", "org.jetbrains.compose.material3.adaptive", "1.0.0-alpha01"),
-            Library("compose-color-picker", "com.godaddy.android.colorpicker", "0.7.0"),
+            Library("compose-color-picker", "com.github.skydoves", "1.1.2"),
             Library("compose-shimmer", "com.valentinilk.shimmer", "1.3.0"),
             Library("image-loader", "io.github.qdsfdhvh", "1.10.0"),
             Library("compose-code-editor", "com.github.qawaz.compose-code-editor", "v3.1.1"),
