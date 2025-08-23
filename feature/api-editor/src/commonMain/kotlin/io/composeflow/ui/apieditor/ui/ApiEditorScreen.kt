@@ -98,9 +98,11 @@ import io.composeflow.ui.apieditor.ApiEditorViewModel
 import io.composeflow.ui.apieditor.model.ApiResponseUiState
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
-import io.composeflow.ui.jewel.NoneSelectionLazyTree
-import io.composeflow.ui.jewel.SingleSelectionLazyTree
 import io.composeflow.ui.jsonpath.createJsonTreeWithJsonPath
+import io.composeflow.ui.treeview.TreeView
+import io.composeflow.ui.treeview.node.Node
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.LaunchedEffect
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.propertyeditor.BasicDropdownPropertyEditor
@@ -110,7 +112,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.foundation.lazy.tree.rememberTreeState
 
 @Composable
 fun ApiEditorScreen(project: Project) {
@@ -1151,24 +1152,19 @@ private fun JsonPreviewPanel(
                     ).padding(8.dp),
         ) {
             val tree = createJsonTreeWithJsonPath(jsonWithJsonPath.jsonElement.toString())
-            val treeState = rememberTreeState()
-            var initiallyExpanded by remember { mutableStateOf(false) }
-            NoneSelectionLazyTree(
+            val lazyListState = rememberLazyListState()
+            
+            TreeView(
                 tree = tree,
-                treeState = treeState,
-                modifier =
-                    Modifier.onGloballyPositioned {
-                        if (!initiallyExpanded) {
-                            treeState.openNodes(tree.roots.map { it.id })
-                            initiallyExpanded = true
-                        }
-                    },
-            ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = it.data.displayName ?: "",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                listState = lazyListState,
+            )
+            
+            // Expand root nodes initially
+            LaunchedEffect(tree) {
+                tree.nodes.forEach { node ->
+                    if (node.depth == 0) {
+                        tree.expandNode(node)
+                    }
                 }
             }
         }
@@ -1181,30 +1177,22 @@ private fun JsonTreeViewer(
     onJsonElementSelected: (JsonWithJsonPath) -> Unit,
 ) {
     val tree = createJsonTreeWithJsonPath(jsonElement.toString())
-    val treeState = rememberTreeState()
-    var initiallyExpanded by remember { mutableStateOf(false) }
-    SingleSelectionLazyTree(
+    val lazyListState = rememberLazyListState()
+    
+    TreeView(
         tree = tree,
-        treeState = treeState,
-        onSelectionChange = {
-            if (it.isNotEmpty()) {
-                val element = it.first()
-                onJsonElementSelected(element.data)
-            }
+        listState = lazyListState,
+        onClick = { node: Node<JsonWithJsonPath>, _, _ ->
+            onJsonElementSelected(node.content)
         },
-        modifier =
-            Modifier.onGloballyPositioned {
-                if (!initiallyExpanded) {
-                    treeState.openNodes(tree.roots.map { it.id })
-                    initiallyExpanded = true
-                }
-            },
-    ) {
-        Row(modifier = Modifier.fillMaxWidth()) {
-            Text(
-                text = it.data.displayName ?: "",
-                style = MaterialTheme.typography.bodyMedium,
-            )
+    )
+    
+    // Expand root nodes initially
+    LaunchedEffect(tree) {
+        tree.nodes.forEach { node ->
+            if (node.depth == 0) {
+                tree.expandNode(node)
+            }
         }
     }
 }

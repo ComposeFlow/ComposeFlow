@@ -6,7 +6,8 @@ import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 object ClassHolder {
     object AndroidX {
         object Lazy {
-            val GridCells = ClassNameWrapper.get("androidx.compose.foundation.lazy.grid", "GridCells")
+            val GridCells =
+                ClassNameWrapper.get("androidx.compose.foundation.lazy.grid", "GridCells")
         }
 
         object Ui {
@@ -39,7 +40,8 @@ object ClassHolder {
 
     object ComposeFlow {
         val DataResult = ClassNameWrapper.get("$COMPOSEFLOW_PACKAGE.model", "DataResult")
-        val EventResultState = ClassNameWrapper.get("$COMPOSEFLOW_PACKAGE.model", "EventResultState")
+        val EventResultState =
+            ClassNameWrapper.get("$COMPOSEFLOW_PACKAGE.model", "EventResultState")
     }
 
     object Collections {
@@ -49,7 +51,8 @@ object ClassHolder {
     object Coroutines {
         object Flow {
             val StateFlow = ClassNameWrapper.get("kotlinx.coroutines.flow", "StateFlow")
-            val MutableStateFlow = ClassNameWrapper.get("kotlinx.coroutines.flow", "MutableStateFlow")
+            val MutableStateFlow =
+                ClassNameWrapper.get("kotlinx.coroutines.flow", "MutableStateFlow")
         }
     }
 }

@@ -7,14 +7,13 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mmk.kmpauth.uihelper.google.GoogleSignInButton
-import com.mmk.kmpauth.uihelper.google.GoogleSignInButtonIconOnly
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Google
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.model.action.ActionType
 import io.composeflow.model.modifier.ModifierWrapper
 import io.composeflow.model.modifier.generateModifierCode
@@ -25,6 +24,8 @@ import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 import io.composeflow.override.mutableStateListEqualsOverrideOf
 import io.composeflow.tooltip_google_sign_in_button_trait
 import io.composeflow.ui.CanvasNodeCallbacks
+//import io.composeflow.ui.button.GoogleSignInButton
+import io.composeflow.ui.button.GoogleSignInButtonIconOnly
 import io.composeflow.ui.modifierForCanvas
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
 import kotlinx.serialization.SerialName
@@ -135,7 +136,10 @@ data class GoogleSignInButtonTrait(
     ): CodeBlockWrapper {
         val buttonMember =
             if (iconOnly) {
-                MemberNameWrapper.get("com.mmk.kmpauth.uihelper.google", "GoogleSignInButtonIconOnly")
+                MemberNameWrapper.get(
+                    "com.mmk.kmpauth.uihelper.google",
+                    "GoogleSignInButtonIconOnly"
+                )
             } else {
                 MemberNameWrapper.get("com.mmk.kmpauth.uihelper.google", "GoogleSignInButton")
             }

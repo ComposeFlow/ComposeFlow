@@ -27,8 +27,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import io.composeflow.model.project.Project
+import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
-import org.jetbrains.jewel.ui.component.Tooltip
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -137,12 +137,7 @@ inline fun <reified T> DropdownProperty(
             }
         }
         supportToolTipText?.let {
-            Tooltip({
-                Text(
-                    it,
-                    style = MaterialTheme.typography.labelMedium,
-                )
-            }) {
+            Tooltip(it) {
                 ComposeFlowIcon(
                     imageVector = Icons.Outlined.Info,
                     contentDescription = it,

@@ -6,18 +6,29 @@ import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 /**
  * Utility objects that hold MemberName for KotlinPoet to avoid same MemberName are repeatedly
  * defined.
+ *
+ *
  */
+@Deprecated(
+    """Use MemberHolderWrapper instead if possible for supporting Multiplatform.
+        This object will be removed in the future."""
+)
 object MemberHolder {
     object AndroidX {
         object Foundation {
             val Image = MemberNameWrapper.get("androidx.compose.foundation", "Image")
             val background =
-                MemberNameWrapper.get("androidx.compose.foundation", "background", isExtension = true)
+                MemberNameWrapper.get(
+                    "androidx.compose.foundation",
+                    "background",
+                    isExtension = true
+                )
         }
 
         object Lazy {
             val items = MemberNameWrapper.get("androidx.compose.foundation.lazy", "items")
-            val itemsIndexed = MemberNameWrapper.get("androidx.compose.foundation.lazy", "itemsIndexed")
+            val itemsIndexed =
+                MemberNameWrapper.get("androidx.compose.foundation.lazy", "itemsIndexed")
             val gridItemsIndexed =
                 MemberNameWrapper.get("androidx.compose.foundation.lazy.grid", "itemsIndexed")
         }
@@ -33,21 +44,35 @@ object MemberHolder {
         }
 
         object Layout {
-            val Arrangement = MemberNameWrapper.get("androidx.compose.foundation.layout", "Arrangement")
+            val Arrangement =
+                MemberNameWrapper.get("androidx.compose.foundation.layout", "Arrangement")
             val Column = MemberNameWrapper.get("androidx.compose.foundation.layout", "Column")
             val Row = MemberNameWrapper.get("androidx.compose.foundation.layout", "Row")
             val Box = MemberNameWrapper.get("androidx.compose.foundation.layout", "Box")
             val Spacer = MemberNameWrapper.get("androidx.compose.foundation.layout", "Spacer")
             val align =
-                MemberNameWrapper.get("androidx.compose.foundation.layout", "align", isExtension = true)
+                MemberNameWrapper.get(
+                    "androidx.compose.foundation.layout",
+                    "align",
+                    isExtension = true
+                )
             val padding = MemberNameWrapper.get("androidx.compose.foundation.layout", "padding")
-            val size = MemberNameWrapper.get("androidx.compose.foundation.layout", "size", isExtension = true)
+            val size = MemberNameWrapper.get(
+                "androidx.compose.foundation.layout",
+                "size",
+                isExtension = true
+            )
             val width =
-                MemberNameWrapper.get("androidx.compose.foundation.layout", "width", isExtension = true)
+                MemberNameWrapper.get(
+                    "androidx.compose.foundation.layout",
+                    "width",
+                    isExtension = true
+                )
         }
 
         object Platform {
-            val LocalUriHandler = MemberNameWrapper.get("androidx.compose.ui.platform", "LocalUriHandler")
+            val LocalUriHandler =
+                MemberNameWrapper.get("androidx.compose.ui.platform", "LocalUriHandler")
         }
 
         object Runtime {
@@ -69,13 +94,23 @@ object MemberHolder {
 
     object ComposeFlow {
         val asErrorMessage =
-            MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "asErrorMessage", isExtension = true)
+            MemberNameWrapper.get(
+                "${COMPOSEFLOW_PACKAGE}.validator",
+                "asErrorMessage",
+                isExtension = true
+            )
         val isSuccess =
-            MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "isSuccess", isExtension = true)
-        val ValidateResult = MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "ValidateResult")
+            MemberNameWrapper.get(
+                "${COMPOSEFLOW_PACKAGE}.validator",
+                "isSuccess",
+                isExtension = true
+            )
+        val ValidateResult =
+            MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "ValidateResult")
         val LocalAuthenticatedUser =
             MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.auth", "LocalAuthenticatedUser")
-        val LocalOnShowsnackbar = MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.ui", "LocalOnShowSnackbar")
+        val LocalOnShowsnackbar =
+            MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.ui", "LocalOnShowSnackbar")
         val Res = MemberNameWrapper.get(COMPOSEFLOW_PACKAGE, "Res")
 
         object String {
@@ -100,7 +135,8 @@ object MemberHolder {
     object DateTime {
         val format = MemberNameWrapper.get("kotlinx.datetime", "format", isExtension = true)
         val plus = MemberNameWrapper.get("kotlinx.datetime", "plus", isExtension = true)
-        val toLocalDateTime = MemberNameWrapper.get("kotlinx.datetime", "toLocalDateTime", isExtension = true)
+        val toLocalDateTime =
+            MemberNameWrapper.get("kotlinx.datetime", "toLocalDateTime", isExtension = true)
         val DateTimeUnit = MemberNameWrapper.get("kotlinx.datetime", "DateTimeUnit")
         val Instant = MemberNameWrapper.get("kotlinx.datetime", "Instant")
         val LocalDateTime = MemberNameWrapper.get("kotlinx.datetime", "LocalDateTime")
@@ -110,9 +146,12 @@ object MemberHolder {
     }
 
     object JetBrains {
-        val imageResource = MemberNameWrapper.get("org.jetbrains.compose.resources", "imageResource")
-        val stringResource = MemberNameWrapper.get("org.jetbrains.compose.resources", "stringResource")
-        val vectorResource = MemberNameWrapper.get("org.jetbrains.compose.resources", "vectorResource")
+        val imageResource =
+            MemberNameWrapper.get("org.jetbrains.compose.resources", "imageResource")
+        val stringResource =
+            MemberNameWrapper.get("org.jetbrains.compose.resources", "stringResource")
+        val vectorResource =
+            MemberNameWrapper.get("org.jetbrains.compose.resources", "vectorResource")
     }
 
     object Koin {
@@ -123,8 +162,10 @@ object MemberHolder {
     object Kotlin {
         object Collection {
             val sorted = MemberNameWrapper.get("kotlin.collections", "sorted", isExtension = true)
-            val sortedBy = MemberNameWrapper.get("kotlin.collections", "sortedBy", isExtension = true)
-            val isNotEmpty = MemberNameWrapper.get("kotlin.collections", "isNotEmpty", isExtension = true)
+            val sortedBy =
+                MemberNameWrapper.get("kotlin.collections", "sortedBy", isExtension = true)
+            val isNotEmpty =
+                MemberNameWrapper.get("kotlin.collections", "isNotEmpty", isExtension = true)
             val toMutableList =
                 MemberNameWrapper.get("kotlin.collections", "toMutableList", isExtension = true)
         }
@@ -140,7 +181,8 @@ object MemberHolder {
         val CircularProgressIndicator =
             MemberNameWrapper.get("androidx.compose.material3", "CircularProgressIndicator")
         val DatePicker = MemberNameWrapper.get("androidx.compose.material3", "DatePicker")
-        val DatePickerDialog = MemberNameWrapper.get("androidx.compose.material3", "DatePickerDialog")
+        val DatePickerDialog =
+            MemberNameWrapper.get("androidx.compose.material3", "DatePickerDialog")
         val MaterialTheme = MemberNameWrapper.get("androidx.compose.material3", "MaterialTheme")
         val OutlinedButton = MemberNameWrapper.get("androidx.compose.material3", "OutlinedButton")
         val rememberDatePickerState =
@@ -159,7 +201,8 @@ object MemberHolder {
         // Using collectAsState doesn't make the js app work probably because the expected lifecycle events aren't sent as in mobile
         // Use AndroidX.Runtime.collectAsState instead
 //        val collectAsStateWithLifeCycle = MemberNameWrapper.get("moe.tlaster.precompose.flow", "collectAsStateWithLifecycle")
-        val viewModelScope = MemberNameWrapper.get("moe.tlaster.precompose.viewmodel", "viewModelScope")
+        val viewModelScope =
+            MemberNameWrapper.get("moe.tlaster.precompose.viewmodel", "viewModelScope")
         val koinViewModel = MemberNameWrapper.get("moe.tlaster.precompose.koin", "koinViewModel")
     }
 
@@ -168,10 +211,13 @@ object MemberHolder {
     }
 
     object Settings {
-        val getBooleanFlow = MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getBooleanFlow")
-        val getFloatFlow = MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getFloatFlow")
+        val getBooleanFlow =
+            MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getBooleanFlow")
+        val getFloatFlow =
+            MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getFloatFlow")
         val getIntFlow = MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getIntFlow")
         val getLongFlow = MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getLongFlow")
-        val getStringFlow = MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getStringFlow")
+        val getStringFlow =
+            MemberNameWrapper.get("com.russhwolf.settings.coroutines", "getStringFlow")
     }
 }
