@@ -124,7 +124,7 @@ data class Project(
      */
     fun generateWriteFileInstructions(): Map<String, ByteArray> =
         (stringResourceHolder.generateStringResourceFiles() + appAssetHolder.generateXmlFiles()).mapValues { (_, content) ->
-            content.toByteArray(Charsets.UTF_8)
+            content.encodeToByteArray()
         }
 
     fun getAllComposeNodes(): List<ComposeNode> =

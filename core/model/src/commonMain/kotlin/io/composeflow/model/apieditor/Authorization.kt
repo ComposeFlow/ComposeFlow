@@ -2,7 +2,7 @@ package io.composeflow.model.apieditor
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.ui.propertyeditor.DropdownItem
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -26,22 +26,22 @@ sealed interface Authorization : DropdownItem {
 
         fun makeAuthorizationHeader(): String? =
             if (username.isNotBlank() && password.isNotBlank()) {
-                val base64Encoded = Base64.encode("$username:$password".toByteArray())
+                val base64Encoded = Base64.encode("$username:$password".encodeToByteArray())
                 "Basic $base64Encoded"
             } else {
                 null
             }
 
-        override fun generateCodeBlock(): CodeBlock? =
+        override fun generateCodeBlock(): CodeBlockWrapper? =
             if (username.isNotBlank() && password.isNotBlank()) {
-                val base64Encoded = Base64.encode("$username:$password".toByteArray())
-                CodeBlock.of("Basic $base64Encoded")
+                val base64Encoded = Base64.encode("$username:$password".encodeToByteArray())
+                CodeBlockWrapper.of("Basic $base64Encoded")
             } else {
                 null
             }
     }
 
-    fun generateCodeBlock(): CodeBlock?
+    fun generateCodeBlock(): CodeBlockWrapper?
 
     companion object {
         fun entries(): List<Authorization> = listOf(BasicAuth())

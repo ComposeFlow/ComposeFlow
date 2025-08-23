@@ -28,10 +28,7 @@ object UiBuilderHelper {
                 (composeNode.trait.value is BottomAppBarTrait && currentEditable.bottomAppBarNode.value != null) ||
                 (composeNode.trait.value is NavigationDrawerTrait && currentEditable.navigationDrawerNode.value != null)
             ) {
-                return String.format(
-                    SAME_NODE_EXISTS_IN_SCREEN,
-                    composeNode.trait.value.iconText(),
-                )
+                return "${composeNode.trait.value.iconText()} is already included in the screen"
             }
         }
         return null

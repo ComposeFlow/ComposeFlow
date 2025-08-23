@@ -19,6 +19,9 @@ expect class ClassNameWrapper : TypeNameWrapper {
         fun bestGuess(classNameString: String): ClassNameWrapper
     }
     
+    override val isNullable: Boolean
+    override fun copy(nullable: Boolean): TypeNameWrapper
+    
     val packageName: String
     val simpleName: String
     val canonicalName: String
@@ -31,6 +34,9 @@ expect class ParameterizedTypeNameWrapper : TypeNameWrapper {
     companion object {
         fun get(rawType: ClassNameWrapper, vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper
     }
+    
+    override val isNullable: Boolean
+    override fun copy(nullable: Boolean): TypeNameWrapper
     
     val rawType: ClassNameWrapper
     val typeArguments: List<TypeNameWrapper>

@@ -44,10 +44,11 @@ kotlin {
             implementation(libs.jewel.int.ui.standalone)
         }
 
-        named("jvmMain") {
-            dependencies {
-                implementation(compose.desktop.common)
-            }
+        jvmMain.dependencies {
+            implementation(compose.desktop.common)
+        }
+        jvmTest.dependencies {
+            implementation(libs.kotlinx.serialization.jsonpath)
         }
         all {
             optInComposeExperimentalApis()

@@ -435,7 +435,7 @@ data class TextFieldTrait(
                             }
                         },
                     singleLine = singleLine ?: false,
-                    maxLines = maxLines ?: Integer.MAX_VALUE,
+                    maxLines = maxLines ?: Int.MAX_VALUE,
                     shape = shapeWrapper?.toShape() ?: TextFieldDefaults.shape,
                     colors = colors,
                     modifier =
@@ -497,7 +497,7 @@ data class TextFieldTrait(
                             }
                         },
                     singleLine = singleLine ?: false,
-                    maxLines = maxLines ?: Integer.MAX_VALUE,
+                    maxLines = maxLines ?: Int.MAX_VALUE,
                     shape = shapeWrapper?.toShape() ?: TextFieldDefaults.shape,
                     colors = colors,
                     modifier =

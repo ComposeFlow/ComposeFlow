@@ -114,7 +114,7 @@ data class AppAssetHolder(
             // Extract file extension from the original file name
             val fileExtension = blobInfo.fileName.substringAfterLast(".", "png")
             // Copy the actual image file to drawable-nodpi directory
-            result[cacheFile.toFile().path] =
+            result[cacheFile.path] =
                 "composeApp/src/androidMain/res/drawable-nodpi/${ANDROID_IC_SPLASH_IMAGE}_actual.$fileExtension"
         }
 
@@ -127,7 +127,7 @@ data class AppAssetHolder(
                     blobInfoWrapper = blobInfo,
                 )
             // iOS splash screen images typically go in different locations
-            result[cacheFile.toFile().path] =
+            result[cacheFile.path] =
                 "iosApp/iosApp/Assets.xcassets/SplashImage.imageset/${blobInfo.fileName}"
         }
 

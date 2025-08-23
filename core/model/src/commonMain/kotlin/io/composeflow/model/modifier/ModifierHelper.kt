@@ -4,6 +4,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 /**
+ * Platform-specific helper to create an align modifier.
+ * This is needed because BoxScope.align() requires LayoutScopeMarker which can't be accessed directly.
+ */
+expect fun createAlignModifier(alignment: Alignment): Modifier
+
+/**
  * Platform-specific helper for creating modifiers that require special handling.
  */
 expect object ModifierHelper {

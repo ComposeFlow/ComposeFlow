@@ -16,6 +16,8 @@ actual class PlatformFile(
     actual fun listFiles(): List<PlatformFile>? = file.listFiles()?.map { PlatformFile(it) }
 
     actual val name: String get() = file.name
+    
+    actual val path: String get() = file.path
 
     fun toFile(): File = file
 

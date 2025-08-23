@@ -7,9 +7,9 @@ import com.squareup.kotlinpoet.LambdaTypeName
  */
 actual class LambdaTypeNameWrapper internal constructor(private val actual: LambdaTypeName) : TypeNameWrapper(actual) {
     
-    override val isNullable: Boolean get() = actual.isNullable
+    actual override val isNullable: Boolean get() = actual.isNullable
     
-    override fun copy(nullable: Boolean): TypeNameWrapper = 
+    actual override fun copy(nullable: Boolean): TypeNameWrapper = 
         LambdaTypeNameWrapper(actual.copy(nullable) as LambdaTypeName)
     actual companion object {
         actual fun get(receiver: TypeNameWrapper?, parameters: List<ParameterSpecWrapper>, returnType: TypeNameWrapper): LambdaTypeNameWrapper {

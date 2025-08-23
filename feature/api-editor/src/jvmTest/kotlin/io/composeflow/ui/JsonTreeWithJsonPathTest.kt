@@ -8,12 +8,8 @@ import kotlinx.serialization.json.JsonArray
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import kotlin.test.Ignore
 import kotlin.test.Test
 
-// TODO: lateinit property scene has not been initialized
-//       kotlin.UninitializedPropertyAccessException: lateinit property scene has not been initialized
-@Ignore
 class JsonTreeWithJsonPathTest {
     @get:Rule
     val composeTestRule = createComposeRule()
@@ -33,7 +29,7 @@ class JsonTreeWithJsonPathTest {
                     jsonElement = jsonElement,
                     displayName = "{object}",
                 ),
-                tree.roots.first().data,
+                tree.nodes.first().content,
             )
         }
     }
@@ -50,7 +46,7 @@ class JsonTreeWithJsonPathTest {
             val jsonElement = Json.parseToJsonElement(json)
             val tree = createJsonTreeWithJsonPath(json)
 
-            val actual = tree.roots.first().data
+            val actual = tree.nodes.first().content
             assertEquals(
                 JsonWithJsonPath(
                     jsonPath = "",

@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 object FilledSerializer : FallbackEnumSerializer<Filled>(Filled::class)
 
@@ -63,8 +64,14 @@ object FilledSerializer : FallbackEnumSerializer<Filled>(Filled::class)
 @SerialName("Filled")
 @Serializable(FilledSerializer::class)
 enum class Filled(
+    @Transient
+
     override val imageVector: ImageVector,
+    @Transient
+
     override val packageDescriptor: String = "filled",
+    @Transient
+
     override val memberDescriptor: String = "Filled",
 ) : ImageVectorHolder {
 

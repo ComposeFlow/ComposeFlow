@@ -83,10 +83,14 @@ data class StateHolderImpl(
         stateId: StateId,
     ): ReadableState? = getStates(project).firstOrNull { it.id == stateId }
 
-    override fun removeState(stateId: StateId): Boolean =
-        states.removeIf {
-            it.id == stateId
+    override fun removeState(stateId: StateId): Boolean {
+        val toRemove = states.find { it.id == stateId }
+        return if (toRemove != null) {
+            states.remove(toRemove)
+        } else {
+            false
         }
+    }
 
     override fun updateState(readableState: ReadableState) {
         val index = states.indexOfFirst { it.id == readableState.id }

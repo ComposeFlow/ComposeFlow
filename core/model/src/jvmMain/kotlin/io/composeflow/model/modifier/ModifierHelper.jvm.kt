@@ -2,7 +2,24 @@ package io.composeflow.model.modifier
 
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.debugInspectorInfo
 import kotlin.reflect.full.primaryConstructor
+
+@Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
+actual fun createAlignModifier(alignment: Alignment): Modifier {
+    // Using reflection to create BoxChildDataElement because it requires LayoutScopeMarker
+    val clazz = Class.forName("androidx.compose.foundation.layout.BoxChildDataElement")
+    val constructor = clazz.constructors[0]
+    constructor.isAccessible = true
+    return constructor.newInstance(
+        alignment,
+        false,
+        debugInspectorInfo {
+            name = "align"
+            value = alignment
+        }
+    ) as Modifier
+}
 
 @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
 actual object ModifierHelper {

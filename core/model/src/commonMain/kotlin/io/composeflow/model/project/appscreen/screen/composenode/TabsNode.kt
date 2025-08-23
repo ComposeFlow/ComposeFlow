@@ -15,6 +15,7 @@ import io.composeflow.model.property.ColorProperty
 import io.composeflow.model.property.StringProperty
 import io.composeflow.override.mutableStateListEqualsOverrideOf
 import io.composeflow.swap
+import kotlinx.serialization.Transient
 
 /**
  * Interface that defines specific functionalities for TabNode

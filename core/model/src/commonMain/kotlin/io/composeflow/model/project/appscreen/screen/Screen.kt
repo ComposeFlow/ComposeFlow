@@ -303,10 +303,14 @@ data class Screen(
         stateId: StateId,
     ): ReadableState? = getStates(project).firstOrNull { it.id == stateId }
 
-    override fun removeState(stateId: StateId): Boolean =
-        stateHolderImpl.states.removeIf {
-            it.id == stateId
+    override fun removeState(stateId: StateId): Boolean {
+        val toRemove = stateHolderImpl.states.find { it.id == stateId }
+        return if (toRemove != null) {
+            stateHolderImpl.states.remove(toRemove)
+        } else {
+            false
         }
+    }
 
     override fun updateState(readableState: ReadableState) {
         val index = stateHolderImpl.states.indexOfFirst { it.id == readableState.id }

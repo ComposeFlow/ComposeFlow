@@ -24,23 +24,25 @@ data class AssetHolder(
     fun generateCopyLocalFileInstructions(
         userId: String,
         projectId: String,
-    ): Map<String, String> =
-        images.associate {
+    ): Map<String, String> {
+        val imageInstructions = images.associate {
             val cacheFile =
                 getAssetCacheFileFor(
                     userId = userId,
                     projectId = projectId,
                     blobInfoWrapper = it,
                 )
-            cacheFile.toFile().path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
-        } +
-            icons.associate {
-                val cacheFile =
-                    getAssetCacheFileFor(
-                        userId = userId,
-                        projectId = projectId,
-                        blobInfoWrapper = it,
-                    )
-                cacheFile.toFile().path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
-            }
+            cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
+        }
+        val iconInstructions = icons.associate {
+            val cacheFile =
+                getAssetCacheFileFor(
+                    userId = userId,
+                    projectId = projectId,
+                    blobInfoWrapper = it,
+                )
+            cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
+        }
+        return imageInstructions + iconInstructions
+    }
 }

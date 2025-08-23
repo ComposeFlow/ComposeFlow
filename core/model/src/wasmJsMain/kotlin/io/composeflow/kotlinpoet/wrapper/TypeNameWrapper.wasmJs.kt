@@ -15,7 +15,7 @@ actual abstract class TypeNameWrapper {
 actual class ClassNameWrapper(
     actual val packageName: String = "",
     actual val simpleName: String = "",
-    override val isNullable: Boolean = false
+    actual override val isNullable: Boolean = false
 ) : TypeNameWrapper() {
     actual companion object {
         actual fun get(packageName: String, simpleName: String, vararg simpleNames: String): ClassNameWrapper = 
@@ -30,20 +30,20 @@ actual class ClassNameWrapper(
     
     actual fun nestedClass(name: String): ClassNameWrapper = ClassNameWrapper(packageName, "$simpleName.$name")
     actual fun peerClass(name: String): ClassNameWrapper = ClassNameWrapper(packageName, name)
-    actual override fun copy(nullable: Boolean): ClassNameWrapper = ClassNameWrapper(packageName, simpleName, nullable)
+    actual override fun copy(nullable: Boolean): TypeNameWrapper = ClassNameWrapper(packageName, simpleName, nullable)
 }
 
 actual class ParameterizedTypeNameWrapper(
     actual val rawType: ClassNameWrapper = ClassNameWrapper(),
     actual val typeArguments: List<TypeNameWrapper> = emptyList(),
-    override val isNullable: Boolean = false
+    actual override val isNullable: Boolean = false
 ) : TypeNameWrapper() {
     actual companion object {
         actual fun get(rawType: ClassNameWrapper, vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper = 
             ParameterizedTypeNameWrapper(rawType, typeArguments.toList())
     }
     
-    actual override fun copy(nullable: Boolean): ParameterizedTypeNameWrapper = 
+    actual override fun copy(nullable: Boolean): TypeNameWrapper = 
         ParameterizedTypeNameWrapper(rawType, typeArguments, nullable)
 }
 

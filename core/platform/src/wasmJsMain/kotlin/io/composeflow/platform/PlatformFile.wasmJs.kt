@@ -1,9 +1,9 @@
 package io.composeflow.platform
 
 actual class PlatformFile(
-    private val path: String = "",
+    actual val path: String = "",
 ) {
-    actual fun resolve(path: String): PlatformFile = PlatformFile("$path/$path")
+    actual fun resolve(path: String): PlatformFile = PlatformFile("${this.path}/$path")
 
     actual fun mkdirs(): Boolean = true // No-op for WASM
 

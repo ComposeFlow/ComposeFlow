@@ -1014,22 +1014,7 @@ for the children of the same layout parent"""
     data class Align(
         val align: AlignmentWrapper = AlignmentWrapper.TopStart,
     ) : ModifierWrapper() {
-        @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
-        override fun toModifier(): Modifier {
-            // Creating instance using reflection because modifiers that require LayoutScopeMarker
-            // can't be instantiated outside of those scopes.
-            val clazz = Class.forName("androidx.compose.foundation.layout.BoxChildDataElement")
-            val constructor = clazz.constructors[0]
-            constructor.isAccessible = true
-            return constructor.newInstance(
-                align.alignment,
-                false,
-                debugInspectorInfo {
-                    name = "align"
-                    value = align.alignment
-                },
-            ) as Modifier
-        }
+        override fun toModifier(): Modifier = createAlignModifier(align.alignment)
 
         override fun displayName(): String = "Align"
 

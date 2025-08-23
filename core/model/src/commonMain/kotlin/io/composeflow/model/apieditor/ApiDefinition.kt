@@ -2,17 +2,16 @@ package io.composeflow.model.apieditor
 
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.intl.Locale
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
-import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
-import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
-import io.composeflow.kotlinpoet.wrapper.parameterizedBy
-import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
-import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import io.composeflow.asClassName
 import io.composeflow.asVariableName
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
+import io.composeflow.kotlinpoet.wrapper.parameterizedBy
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 import io.composeflow.model.project.issue.DestinationContext
 import io.composeflow.model.project.issue.Issue
@@ -24,12 +23,6 @@ import io.ktor.http.HttpHeaders
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.uuid.Uuid
-
-// Temporary bridge function until generateArgumentParameterSpec is converted to return wrappers
-private fun com.squareup.kotlinpoet.ParameterSpec.toParameterSpecWrapper(): io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper {
-    // For now, create a simple wrapper - this should be replaced when ApiProperty is fully converted
-    return io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper.builder(this.name, String::class.asTypeNameWrapper()).build()
-}
 
 typealias ApiId = String
 
@@ -81,13 +74,15 @@ data class ApiDefinition(
         return builder.build()
     }
 
-    private fun createApiResultFunName(): String = "create" + name.asClassName().capitalize(Locale.current) + "Result"
+    private fun createApiResultFunName(): String =
+        "create" + name.asClassName().capitalize(Locale.current) + "Result"
 
     fun callApiFunName() = "onCall${name.asClassName().capitalize(Locale.current)}Api"
 
     fun apiResultName(): String = name.asVariableName() + "Result"
 
-    private fun updateApiResultFunName(): String = "update" + name.asClassName().capitalize(Locale.current) + "Result"
+    private fun updateApiResultFunName(): String =
+        "update" + name.asClassName().capitalize(Locale.current) + "Result"
 
     fun generateInitApiResultInViewModelFunSpec(): FunSpecWrapper {
         val funSpecBuilder =
@@ -134,7 +129,7 @@ data class ApiDefinition(
                     ClassHolder.ComposeFlow.DataResult,
                 )
         parameters.forEach {
-            funSpecBuilder.addParameter(it.generateArgumentParameterSpec().toParameterSpecWrapper())
+            funSpecBuilder.addParameter(it.generateArgumentParameterSpec())
         }
         return funSpecBuilder.build()
     }
@@ -154,7 +149,7 @@ data class ApiDefinition(
                 .builder(callApiFunName())
                 .addCode("${updateApiResultFunName()}($argumentString)")
         parameters.forEach {
-            funSpecBuilder.addParameter(it.generateArgumentParameterSpec().toParameterSpecWrapper())
+            funSpecBuilder.addParameter(it.generateArgumentParameterSpec())
         }
         return funSpecBuilder.build()
     }
@@ -180,7 +175,7 @@ data class ApiDefinition(
         }
 
         parameters.forEach {
-            funSpecBuilder.addParameter(it.generateArgumentParameterSpec().toParameterSpecWrapper())
+            funSpecBuilder.addParameter(it.generateArgumentParameterSpec())
         }
 
         return funSpecBuilder.build()

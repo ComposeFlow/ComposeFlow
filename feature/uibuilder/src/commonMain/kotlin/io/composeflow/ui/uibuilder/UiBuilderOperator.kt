@@ -42,10 +42,7 @@ class UiBuilderOperator {
         val containerNode = project.screenHolder.currentEditable().findNodeById(containerNodeId)
         if (containerNode == null) {
             eventResult.errorMessages.add(
-                String.format(
-                    "Container node with ID %s not found.",
-                    containerNodeId,
-                ),
+                "Container node with ID $containerNodeId not found."
             )
             return eventResult
         }
@@ -56,10 +53,7 @@ class UiBuilderOperator {
         }
         if (!containerNode.trait.value.isDroppable()) {
             eventResult.errorMessages.add(
-                String.format(
-                    CANT_DROP_NODE,
-                    containerNode.trait.value.iconText(),
-                ),
+                "You can't drop a node to ${containerNode.trait.value.iconText()}"
             )
             return eventResult
         }

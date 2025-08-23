@@ -24,9 +24,9 @@ private class FloatValidatorInternal(
                     if (!allowLessThanZero && value <= 0) {
                         ValidateResult.Failure(MUST_BE_GREATER_THAN_ZERO)
                     } else if (value > maxValue) {
-                        ValidateResult.Failure(String.format(MUST_BE_SMALLER_THAN_FLOAT, maxValue))
+                        ValidateResult.Failure("Must be smaller than ${maxValue.toString().take(10)}")
                     } else if (value < minValue) {
-                        ValidateResult.Failure(String.format(MUST_BE_GREATER_THAN_FLOAT, minValue))
+                        ValidateResult.Failure("Must be greater than ${minValue.toString().take(10)}")
                     } else {
                         ValidateResult.Success
                     }

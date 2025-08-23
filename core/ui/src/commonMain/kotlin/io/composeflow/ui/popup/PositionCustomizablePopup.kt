@@ -23,7 +23,6 @@ import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.PopupProperties
-import androidx.compose.ui.window.rememberCursorPositionProvider
 
 /**
  * Wrapper of [Popup] with the [popupPositionProvider] can be configured instead of using the
@@ -35,7 +34,7 @@ fun PositionCustomizablePopup(
     modifier: Modifier = Modifier,
     expanded: Boolean = true,
     focusable: Boolean = true,
-    popupPositionProvider: PopupPositionProvider = rememberCursorPositionProvider(),
+    popupPositionProvider: PopupPositionProvider = rememberDefaultPopupPositionProvider(),
     scrollState: ScrollState = rememberScrollState(),
     onKeyEvent: ((KeyEvent) -> Boolean)? = null,
     content: @Composable ColumnScope.() -> Unit,

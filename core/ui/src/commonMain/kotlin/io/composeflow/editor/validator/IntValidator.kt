@@ -26,9 +26,9 @@ private class IntValidatorInternal(
                     if (!allowLessThanZero && value <= 0) {
                         ValidateResult.Failure(MUST_BE_GREATER_THAN_ZERO)
                     } else if (value > maxValue) {
-                        ValidateResult.Failure(String.format(MUST_BE_SMALLER_THAN, maxValue))
+                        ValidateResult.Failure("Must be smaller than $maxValue")
                     } else if (value < minValue) {
-                        ValidateResult.Failure(String.format(MUST_BE_GREATER_THAN, minValue))
+                        ValidateResult.Failure("Must be greater than $minValue")
                     } else {
                         ValidateResult.Success
                     }

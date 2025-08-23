@@ -1,7 +1,8 @@
 package io.composeflow.model.apieditor
 
-import com.squareup.kotlinpoet.CodeBlock
-import com.squareup.kotlinpoet.ParameterSpec
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import io.composeflow.asVariableName
 import io.composeflow.model.project.ParameterId
 import kotlinx.serialization.SerialName
@@ -11,7 +12,7 @@ import kotlin.uuid.Uuid
 
 @Serializable
 sealed interface ApiProperty {
-    fun asCodeBlock(): CodeBlock
+    fun asCodeBlock(): CodeBlockWrapper
 
     fun asStringValue(): String
 
@@ -20,7 +21,7 @@ sealed interface ApiProperty {
     data class IntrinsicValue(
         val value: String = "",
     ) : ApiProperty {
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of("\"\"\"$value\"\"\"")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("\"\"\"$value\"\"\"")
 
         override fun asStringValue(): String = value
     }
@@ -35,15 +36,15 @@ sealed interface ApiProperty {
         @Transient
         val variableName = name.asVariableName()
 
-        override fun asCodeBlock(): CodeBlock = CodeBlock.of(name)
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of(name)
 
         override fun asStringValue(): String = defaultValue
 
-        fun generateArgumentParameterSpec(): ParameterSpec =
-            ParameterSpec
+        fun generateArgumentParameterSpec(): ParameterSpecWrapper =
+            ParameterSpecWrapper
                 .builder(
                     name = name,
-                    String::class,
+                    type = String::class.asTypeNameWrapper(),
                 ).defaultValue("\"$defaultValue\"")
                 .build()
     }

@@ -1,4 +1,4 @@
-@file:Suppress("DEPRECATION") // Suppress for imports of WindowWidthSizeClass
+@file:Suppress("DEPRECATION", "EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING") // Suppress for imports of WindowWidthSizeClass
 
 package androidx.compose.material3.adaptive.navigationsuite
 
@@ -361,7 +361,8 @@ sealed interface NavigationSuiteScope {
  *
  * The [NavigationSuiteType] informs the [NavigationSuite] of what navigation component to expect.
  */
-@JvmInline
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+@kotlin.jvm.JvmInline
 value class NavigationSuiteType private constructor(
     private val description: String,
 ) {

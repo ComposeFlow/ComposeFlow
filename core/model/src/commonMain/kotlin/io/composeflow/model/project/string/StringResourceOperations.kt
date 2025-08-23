@@ -298,15 +298,19 @@ fun StringResourceHolder.updateSupportedLocales(newLocales: List<ResourceLocale>
         when {
             // If new locales are being added, mark all string resources as needing translation
             localesToAdd.isNotEmpty() -> {
-                this.stringResources.replaceAll { resource ->
+                val updatedResources = this.stringResources.map { resource ->
                     resource.copy(needsTranslationUpdate = true)
                 }
+                this.stringResources.clear()
+                this.stringResources.addAll(updatedResources)
             }
             // If only the default locale remains, clear the flags
             newLocalesWithDefault.size == 1 -> {
-                this.stringResources.replaceAll { resource ->
+                val updatedResources = this.stringResources.map { resource ->
                     resource.copy(needsTranslationUpdate = false)
                 }
+                this.stringResources.clear()
+                this.stringResources.addAll(updatedResources)
             }
         }
 
@@ -348,9 +352,11 @@ fun StringResourceHolder.setDefaultLocale(locale: ResourceLocale): List<SetDefau
         // If the default locale has actually changed and there are multiple locales,
         // set needsTranslationUpdate flag on all resources
         if (previousLocale != locale && this.isTranslatable) {
-            this.stringResources.replaceAll { resource ->
+            val updatedResources = this.stringResources.map { resource ->
                 resource.copy(needsTranslationUpdate = true)
             }
+            this.stringResources.clear()
+            this.stringResources.addAll(updatedResources)
         }
     } catch (e: Exception) {
         errors.add(

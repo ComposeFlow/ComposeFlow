@@ -1,7 +1,7 @@
 package io.composeflow.model
 
-import com.squareup.kotlinpoet.CodeBlock
 import io.composeflow.kotlinpoet.GenerationContext
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 
@@ -14,5 +14,5 @@ interface CodeGenerator {
         node: ComposeNode = ComposeNode(),
         context: GenerationContext,
         dryRun: Boolean,
-    ): CodeBlock = CodeBlock.of("")
+    ): CodeBlockWrapper = CodeBlockWrapper.of("")
 }

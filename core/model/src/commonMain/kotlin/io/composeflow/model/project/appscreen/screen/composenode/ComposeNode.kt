@@ -531,7 +531,7 @@ data class ComposeNode(
                 }
             }
         }
-        modifierList.removeIf { it is ModifierWrapper.ZIndex }
+        modifierList.removeAll { it is ModifierWrapper.ZIndex }
         modifierList.add(ModifierWrapper.ZIndex(maxZIndex + 1))
     }
 
@@ -548,7 +548,7 @@ data class ComposeNode(
                 }
             }
         }
-        modifierList.removeIf { it is ModifierWrapper.ZIndex }
+        modifierList.removeAll { it is ModifierWrapper.ZIndex }
         modifierList.add(ModifierWrapper.ZIndex(minZIndex - 1))
     }
 

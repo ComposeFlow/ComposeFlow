@@ -1,9 +1,10 @@
 package io.composeflow.model.useroperation
 
-import java.time.LocalDateTime
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 data class UndoableOperation(
     val serializedProject: String,
     val userOperation: UserOperation,
-    val date: LocalDateTime = LocalDateTime.now(),
+    val date: Instant = Clock.System.now(),
 )

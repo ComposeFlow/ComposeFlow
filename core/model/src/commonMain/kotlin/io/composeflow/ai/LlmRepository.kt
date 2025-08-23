@@ -10,7 +10,6 @@ import io.composeflow.model.project.appscreen.screen.Screen
 import io.composeflow.model.project.appscreen.screen.createCopyOfNewName
 import io.composeflow.model.project.string.ResourceLocale
 import io.composeflow.model.project.string.StringResource
-import io.composeflow.platform.getCacheDir
 import io.composeflow.serializer.decodeFromStringWithFallback
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +29,7 @@ class LlmRepository(
     private val client: LlmClient = LlmClient(),
     private val ioDispatcher: CoroutineDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.IO
+            Dispatchers.Default
         },
 ) {
     companion object {
@@ -519,58 +518,23 @@ class LlmRepository(
         retryCount: Int,
         requestId: String?,
     ) {
-        withContext(ioDispatcher) {
-            try {
-                val debugDir =
-                    getCacheDir()
-                        .resolve("debug")
-                        .resolve("success-yaml")
-                debugDir.mkdirs()
-
-                val timestamp =
-                    Clock.System
-                        .now()
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .toString()
-                        .replace(":", "-")
-                        .replace(".", "-")
-
-                val filename =
-                    buildString {
-                        append("success-yaml-")
-                        append(timestamp)
-                        requestId?.let { append("-$it") }
-                        append("-retry$retryCount")
-                        append(".yaml")
-                    }
-
-                val yamlFile = debugDir.resolve(filename).toFile()
-                val metadataFile = debugDir.resolve("$filename.metadata.txt").toFile()
-
-                // Save the successful YAML content
-                yamlFile.writeText(yamlContent)
-
-                // Save metadata about the success
-                val metadata =
-                    buildString {
-                        appendLine("Successful YAML Debug Information")
-                        appendLine("=".repeat(50))
-                        appendLine("Timestamp: $timestamp")
-                        appendLine("Request ID: ${requestId ?: "N/A"}")
-                        appendLine("Retry Count: $retryCount")
-                        appendLine("Status: Successfully deserialized")
-                        appendLine("Original Prompt:")
-                        appendLine("-".repeat(20))
-                        appendLine(promptString)
-                        appendLine("-".repeat(20))
-                    }
-                metadataFile.writeText(metadata)
-
-                Logger.i("Saved successful YAML for comparison: ${yamlFile.absolutePath}")
-            } catch (e: Exception) {
-                Logger.w("Failed to save debug success YAML file: ${e.message}")
-            }
-        }
+        if (!DEBUG_YAML) return
+        
+        val timestamp =
+            Clock.System
+                .now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .toString()
+                .replace(":", "-")
+                .replace(".", "-")
+        
+        YamlDebugger.saveSuccessYaml(
+            yamlContent = yamlContent,
+            promptString = promptString,
+            retryCount = retryCount,
+            requestId = requestId,
+            timestamp = timestamp,
+        )
     }
 
     /**
@@ -584,58 +548,24 @@ class LlmRepository(
         retryCount: Int,
         requestId: String?,
     ) {
-        withContext(ioDispatcher) {
-            try {
-                val debugDir =
-                    getCacheDir()
-                        .resolve("debug")
-                        .resolve("failed-yaml")
-                debugDir.mkdirs()
-
-                val timestamp =
-                    Clock.System
-                        .now()
-                        .toLocalDateTime(TimeZone.currentSystemDefault())
-                        .toString()
-                        .replace(":", "-")
-                        .replace(".", "-")
-
-                val filename =
-                    buildString {
-                        append("failed-yaml-")
-                        append(timestamp)
-                        requestId?.let { append("-$it") }
-                        append("-retry$retryCount")
-                        append(".yaml")
-                    }
-
-                val yamlFile = debugDir.resolve(filename).toFile()
-                val metadataFile = debugDir.resolve("$filename.metadata.txt").toFile()
-
-                // Save the failed YAML content
-                yamlFile.writeText(yamlContent)
-
-                // Save metadata about the failure
-                val metadata =
-                    buildString {
-                        appendLine("Failed YAML Debug Information")
-                        appendLine("=".repeat(50))
-                        appendLine("Timestamp: $timestamp")
-                        appendLine("Request ID: ${requestId ?: "N/A"}")
-                        appendLine("Retry Count: $retryCount")
-                        appendLine("Error Message: $errorMessage")
-                        appendLine("Original Prompt:")
-                        appendLine("-".repeat(20))
-                        appendLine(promptString)
-                        appendLine("-".repeat(20))
-                    }
-                metadataFile.writeText(metadata)
-
-                Logger.i("Saved failed YAML for debugging: ${yamlFile.absolutePath}")
-            } catch (e: Exception) {
-                Logger.w("Failed to save debug YAML file: ${e.message}")
-            }
-        }
+        if (!DEBUG_YAML) return
+        
+        val timestamp =
+            Clock.System
+                .now()
+                .toLocalDateTime(TimeZone.currentSystemDefault())
+                .toString()
+                .replace(":", "-")
+                .replace(".", "-")
+        
+        YamlDebugger.saveFailedYaml(
+            yamlContent = yamlContent,
+            promptString = promptString,
+            errorMessage = errorMessage,
+            retryCount = retryCount,
+            requestId = requestId,
+            timestamp = timestamp,
+        )
     }
 }
 

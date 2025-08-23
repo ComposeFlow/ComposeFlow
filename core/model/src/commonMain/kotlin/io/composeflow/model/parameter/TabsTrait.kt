@@ -105,7 +105,7 @@ data object TabsTrait : ComposeTrait {
                 ),
         ) {
             val tabRow = node.children.first()
-            assert(tabRow.trait.value is TabRowTrait)
+            check(tabRow.trait.value is TabRowTrait) { "First child of TabsTrait must be TabRowTrait" }
             val tabs = tabRow.children
             val tabContents = node.children.filterNot { it.trait.value is TabRowTrait }
 

@@ -40,6 +40,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 @Composable
 fun <T> TreeViewScope<T>.NodeWithLines(
@@ -188,6 +190,7 @@ private fun <T> TreeViewScope<T>.NodeContent(node: Node<T>) {
     }
 }
 
+@OptIn(ExperimentalTime::class)
 fun <T> TreeViewScope<T>.clickableNode(
     node: Node<T>,
     interactionSource: MutableInteractionSource,
@@ -211,7 +214,7 @@ fun <T> TreeViewScope<T>.clickableNode(
                         if (change.isConsumed) continue
 
                         if (change.changedToUpIgnoreConsumed()) {
-                            val now = System.currentTimeMillis()
+                            val now = Clock.System.now().toEpochMilliseconds()
                             val timeSinceLast = now - lastClickTime
 
                             val modifiers = event.keyboardModifiers
@@ -220,7 +223,7 @@ fun <T> TreeViewScope<T>.clickableNode(
 
                             clickJob?.cancel()
 
-                            if (timeSinceLast < doubleClickThreshold) {
+                            if (timeSinceLast.compareTo(doubleClickThreshold) < 0) {
                                 onDoubleClick?.invoke(node)
                                 lastClickTime = 0L
                             } else {

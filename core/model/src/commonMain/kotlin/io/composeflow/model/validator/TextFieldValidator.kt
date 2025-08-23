@@ -7,8 +7,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import com.squareup.kotlinpoet.ClassName
-import com.squareup.kotlinpoet.CodeBlock
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.Res
 import io.composeflow.allow_blank_description
 import io.composeflow.kotlinpoet.GenerationContext
@@ -104,7 +104,7 @@ sealed interface TextFieldValidator :
         override fun asCodeBlock(
             project: Project,
             context: GenerationContext,
-        ): CodeBlock {
+        ): CodeBlockWrapper {
             val argString =
                 buildString {
                     if (!allowBlank) {
@@ -117,9 +117,9 @@ sealed interface TextFieldValidator :
                         append("minLength = $minLength,\n")
                     }
                 }
-            return CodeBlock.of(
+            return CodeBlockWrapper.of(
                 "%T($argString)",
-                ClassName("${COMPOSEFLOW_PACKAGE}.validator", "StringValidator"),
+                ClassNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "StringValidator"),
             )
         }
     }
@@ -189,7 +189,7 @@ sealed interface TextFieldValidator :
         override fun asCodeBlock(
             project: Project,
             context: GenerationContext,
-        ): CodeBlock {
+        ): CodeBlockWrapper {
             val argString =
                 buildString {
                     if (!allowLessThanZero) {
@@ -202,9 +202,9 @@ sealed interface TextFieldValidator :
                         append("minValue = $minValue,\n")
                     }
                 }
-            return CodeBlock.of(
+            return CodeBlockWrapper.of(
                 "%T($argString)",
-                ClassName("${COMPOSEFLOW_PACKAGE}.validator", "IntValidator"),
+                ClassNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "IntValidator"),
             )
         }
     }
@@ -274,7 +274,7 @@ sealed interface TextFieldValidator :
         override fun asCodeBlock(
             project: Project,
             context: GenerationContext,
-        ): CodeBlock {
+        ): CodeBlockWrapper {
             val argString =
                 buildString {
                     if (!allowLessThanZero) {
@@ -287,9 +287,9 @@ sealed interface TextFieldValidator :
                         append("minValue = ${minValue}f,\n")
                     }
                 }
-            return CodeBlock.of(
+            return CodeBlockWrapper.of(
                 "%T($argString)",
-                ClassName("${COMPOSEFLOW_PACKAGE}.validator", "FloatValidator"),
+                ClassNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "FloatValidator"),
             )
         }
     }
@@ -305,10 +305,10 @@ sealed interface TextFieldValidator :
         override fun asCodeBlock(
             project: Project,
             context: GenerationContext,
-        ): CodeBlock =
-            CodeBlock.of(
+        ): CodeBlockWrapper =
+            CodeBlockWrapper.of(
                 "%T()",
-                ClassName("${COMPOSEFLOW_PACKAGE}.validator", "EmailValidator"),
+                ClassNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "EmailValidator"),
             )
     }
 

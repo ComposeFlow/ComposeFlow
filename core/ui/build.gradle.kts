@@ -20,13 +20,14 @@ kotlin {
             implementation(libs.compose.shimmer)
             implementation(libs.kotlin.result)
             implementation(libs.reorderable)
-        }
-        commonTest.dependencies {
-            implementation(kotlin("test-junit"))
+            implementation(libs.kotlin.datetime)
         }
         jvmMain.dependencies {
             implementation(libs.jewel.int.ui.standalone)
             implementation(libs.jewel.int.ui.decorated.window)
+        }
+        jvmTest.dependencies {
+            implementation(kotlin("test-junit"))
         }
     }
 }

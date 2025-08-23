@@ -3,21 +3,20 @@ package io.composeflow.model.type
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.parameterizedBy
 import io.composeflow.kotlinpoet.wrapper.TypeNameWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
-import io.composeflow.kotlinpoet.wrapper.toWrapper
+import io.composeflow.kotlinpoet.wrapper.parameterizedBy
 import io.composeflow.model.datatype.DataTypeId
 import io.composeflow.model.datatype.EmptyDataType
-import io.composeflow.model.enumwrapper.EnumWrapper
-import io.composeflow.model.enumwrapper.TextDecorationWrapper
-import io.composeflow.model.enumwrapper.TextStyleWrapper
-import io.composeflow.model.enumwrapper.FontStyleWrapper
-import io.composeflow.model.enumwrapper.TextAlignWrapper
-import io.composeflow.model.enumwrapper.TextOverflowWrapper
 import io.composeflow.model.enumwrapper.ContentScaleWrapper
-import io.composeflow.model.enumwrapper.TextFieldColorsWrapper
+import io.composeflow.model.enumwrapper.EnumWrapper
+import io.composeflow.model.enumwrapper.FontStyleWrapper
 import io.composeflow.model.enumwrapper.NodeVisibility
+import io.composeflow.model.enumwrapper.TextAlignWrapper
+import io.composeflow.model.enumwrapper.TextDecorationWrapper
+import io.composeflow.model.enumwrapper.TextFieldColorsWrapper
+import io.composeflow.model.enumwrapper.TextOverflowWrapper
+import io.composeflow.model.enumwrapper.TextStyleWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.findDataTypeOrNull
 import io.composeflow.model.project.findDataTypeOrThrow
@@ -481,9 +480,9 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
             if (isList) {
                 List::class
                     .asTypeNameWrapper()
-                    .parameterizedBy(kotlinx.datetime.Instant::class.asTypeNameWrapper())
+                    .parameterizedBy(kotlin.time.Instant::class.asTypeNameWrapper())
             } else {
-                kotlinx.datetime.Instant::class.asTypeNameWrapper()
+                kotlin.time.Instant::class.asTypeNameWrapper()
             }
 
         @Composable

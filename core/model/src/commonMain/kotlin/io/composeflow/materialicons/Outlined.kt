@@ -2080,6 +2080,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 object OutlinedSerializer : FallbackEnumSerializer<Outlined>(Outlined::class)
 

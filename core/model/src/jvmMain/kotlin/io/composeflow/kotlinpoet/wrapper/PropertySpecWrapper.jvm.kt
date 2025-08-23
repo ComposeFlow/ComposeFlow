@@ -103,6 +103,6 @@ actual class PropertySpecBuilderWrapper internal constructor(private val actual:
 }
 
 // Helper function - using explicit type to avoid ambiguity
-actual fun PropertySpec.toWrapper(): PropertySpecWrapper {
+internal fun PropertySpec.toWrapper(): PropertySpecWrapper {
     return PropertySpecWrapper(this)
 }

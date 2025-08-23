@@ -71,15 +71,17 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Helper functions for hex color conversion
+private fun Int.toHexString(): String = 
+    this.toString(16).padStart(2, '0').uppercase()
 private fun Color.toHexString(includeAlpha: Boolean = true): String {
     val alpha = (alpha * 255).toInt()
     val red = (red * 255).toInt()
     val green = (green * 255).toInt()
     val blue = (blue * 255).toInt()
     return if (includeAlpha && alpha < 255) {
-        String.format("#%02X%02X%02X%02X", alpha, red, green, blue)
+        "#${alpha.toHexString()}${red.toHexString()}${green.toHexString()}${blue.toHexString()}"
     } else {
-        String.format("#%02X%02X%02X", red, green, blue)
+        "#${red.toHexString()}${green.toHexString()}${blue.toHexString()}"
     }
 }
 

@@ -14,6 +14,8 @@ expect class PlatformFile {
     fun listFiles(): List<PlatformFile>?
 
     val name: String
+    
+    val path: String
 }
 
 expect fun getCacheDir(): PlatformFile

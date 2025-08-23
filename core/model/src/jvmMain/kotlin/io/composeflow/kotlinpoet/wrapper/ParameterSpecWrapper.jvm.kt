@@ -53,6 +53,6 @@ actual class ParameterSpecBuilderWrapper internal constructor(private val actual
 }
 
 // Helper function - using explicit type to avoid ambiguity
-actual fun ParameterSpec.toWrapper(): ParameterSpecWrapper {
+internal fun ParameterSpec.toWrapper(): ParameterSpecWrapper {
     return ParameterSpecWrapper(this)
 }

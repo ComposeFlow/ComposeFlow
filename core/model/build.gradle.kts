@@ -30,6 +30,7 @@ kotlin {
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.result)
             implementation(libs.ktor.core)
+            implementation(libs.ktor.utils)
             implementation(libs.material.kolor)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.coroutines)

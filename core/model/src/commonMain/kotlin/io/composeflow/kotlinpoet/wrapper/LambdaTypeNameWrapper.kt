@@ -14,4 +14,7 @@ expect class LambdaTypeNameWrapper : TypeNameWrapper {
         // Convenience overload with no receiver (common case)
         fun get(parameters: List<ParameterSpecWrapper>, returnType: TypeNameWrapper): LambdaTypeNameWrapper
     }
+    
+    override val isNullable: Boolean
+    override fun copy(nullable: Boolean): TypeNameWrapper
 }

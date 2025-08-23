@@ -25,21 +25,6 @@ data class StringResource(
     val needsTranslationUpdate: Boolean = false,
 )
 
-@JvmName("stringResourceOfWithLocale")
-fun stringResourceOf(
-    key: String,
-    vararg localizedValues: Pair<ResourceLocale, String>,
-    description: String? = null,
-    id: StringResourceId = Uuid.random().toString(),
-): StringResource =
-    StringResource(
-        id = id,
-        key = key,
-        description = description,
-        localizedValues = localizedValues.toMap().toMutableStateMapEqualsOverride(),
-    )
-
-@JvmName("stringResourceOfWithString")
 fun stringResourceOf(
     key: String,
     vararg localizedValues: Pair<String, String>,
