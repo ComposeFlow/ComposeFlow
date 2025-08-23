@@ -426,7 +426,7 @@ data class Component(
                 .build(),
         )
 
-        getAllActions(project).distinctBy { it.generateArgumentParameterSpec(project) }.forEach {
+        getAllActions(project).distinctBy { it.argumentName(project) }.forEach {
             it.generateArgumentParameterSpec(project)?.let { parameterSpec ->
                 funSpecBuilder.addParameter(parameterSpec)
             }

@@ -401,7 +401,9 @@ data class Screen(
             )
         }
 
-        getAllActions(project).distinctBy { it.generateArgumentParameterSpec(project) }.forEach {
+        getAllActions(project).distinctBy {
+            it.argumentName(project)
+        }.forEach {
             it.generateArgumentParameterSpec(project)?.let { parameterSpec ->
                 funSpecBuilder.addParameter(parameterSpec)
             }
@@ -664,7 +666,7 @@ data class Screen(
     fun generateArgumentsInitializationCodeBlock(project: Project): CodeBlockWrapper {
         val builder = CodeBlockWrapper.builder()
         val actions = getAllActions(project)
-        actions.distinctBy { it.generateNavigationInitializationBlock() }.forEach {
+        actions.distinctBy { it.argumentName(project) }.forEach {
             it.generateNavigationInitializationBlock()?.let { codeBlock ->
                 builder
                     .addStatement("${it.argumentName(project)} = ")
@@ -678,7 +680,7 @@ data class Screen(
     private fun generateComposeNavigationFileSpec(project: Project): FileSpecWrapper {
         val fileBuilder = FileSpecWrapper.builder(getPackageName(project), composeNavigationName)
         val actionsDistinctByArgSpec =
-            getAllActions(project).distinctBy { it.generateArgumentParameterSpec(project) }
+            getAllActions(project).distinctBy { it.argumentName(project) }
         val funSpecBuilder =
             FunSpecWrapper.builder(sceneName).receiver(NavGraphBuilder::class.asTypeNameWrapper())
 
