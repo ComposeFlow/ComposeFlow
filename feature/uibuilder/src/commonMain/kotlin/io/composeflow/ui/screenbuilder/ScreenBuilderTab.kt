@@ -79,7 +79,6 @@ import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
 import io.composeflow.ui.utils.TreeExpander
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
-import sh.calvin.reorderable.ReorderableCollectionItemScope
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
@@ -143,8 +142,7 @@ fun ScreenBuilderTab(
                         onCopyScreen = onCopyScreen,
                         onSelectScreen = onSelectScreen,
                         onScreenUpdated = onScreenUpdated,
-                        modifier = rowModifier,
-                        reorderableScope = this,
+                        modifier = rowModifier.draggableHandle(),
                     )
                 }
             }
@@ -248,7 +246,6 @@ private fun ScreenInfoPanel(
     onCopyScreen: (Screen) -> Unit,
     onScreenUpdated: (Screen) -> Unit,
     modifier: Modifier = Modifier,
-    reorderableScope: ReorderableCollectionItemScope? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Column {
@@ -264,7 +261,6 @@ private fun ScreenInfoPanel(
             onCopyScreen = onCopyScreen,
             onScreenUpdated = onScreenUpdated,
             modifier = modifier,
-            reorderableScope = reorderableScope,
         )
 
         if (expanded) {
@@ -320,7 +316,6 @@ private fun ScreenRowHeader(
     onCopyScreen: (Screen) -> Unit,
     onScreenUpdated: (Screen) -> Unit,
     modifier: Modifier = Modifier,
-    reorderableScope: ReorderableCollectionItemScope? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -368,22 +363,11 @@ private fun ScreenRowHeader(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (reorderableScope != null) {
-                with(reorderableScope) {
-                    ComposeFlowIcon(
-                        imageVector = Icons.Outlined.DragIndicator,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = null,
-                        modifier = Modifier.draggableHandle(),
-                    )
-                }
-            } else {
-                ComposeFlowIcon(
-                    imageVector = Icons.Outlined.DragIndicator,
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    contentDescription = null,
-                )
-            }
+            ComposeFlowIcon(
+                imageVector = Icons.Outlined.DragIndicator,
+                tint = MaterialTheme.colorScheme.onSurface,
+                contentDescription = null,
+            )
 
             ComposeFlowIconButton(
                 onClick = {

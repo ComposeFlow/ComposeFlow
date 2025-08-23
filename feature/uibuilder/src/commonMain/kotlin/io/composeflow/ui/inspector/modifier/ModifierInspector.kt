@@ -600,8 +600,9 @@ fun EditModifierDialog(
                     val lazyListState = rememberLazyListState()
                     val reorderableLazyListState =
                         rememberReorderableLazyListState(lazyListState) { from, to ->
-                            project.screenHolder.findFocusedNodes().firstOrNull()?.let {
-                                composeNodeCallbacks.onModifierSwapped(it, from.index, to.index)
+                            if (from.index != to.index) {
+                                // Use the composeNode that's already in scope
+                                composeNodeCallbacks.onModifierSwapped(composeNode, from.index, to.index)
                             }
                         }
                     Column {
@@ -672,11 +673,11 @@ fun EditModifierDialog(
                         ) {
                             itemsIndexed(
                                 composeNode.modifierList,
-                                key = { index, _ -> "modifier-$index" }) { i, chain ->
+                                key = { index, modifier -> modifier }) { i, chain ->
                                 ComposeFlowReorderableItem(
                                     index = i,
                                     reorderableLazyListState,
-                                    key = "modifier-$i",
+                                    key = chain,
                                 ) {
                                     ProvideModifierReorderAllowed(reorderableCollectionItemScope = this) {
                                         val onVisibilityToggleClicked = {

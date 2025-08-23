@@ -412,7 +412,9 @@ class UiBuilderOperator {
                 return result
             }
 
-            node.modifierList.swap(fromIndex, toIndex)
+            // Use move operation instead of swap for reorderable compatibility
+            val item = node.modifierList.removeAt(fromIndex)
+            node.modifierList.add(toIndex, item)
         } catch (e: Exception) {
             Logger.e(e) { "Error swapping modifiers at indices $fromIndex and $toIndex" }
             result.errorMessages.add("Error swappigng modifiers at indices $fromIndex and $toIndex: ${e.message}")

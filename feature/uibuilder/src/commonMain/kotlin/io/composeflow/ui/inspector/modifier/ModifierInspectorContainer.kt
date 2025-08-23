@@ -77,15 +77,31 @@ fun ModifierInspectorContainer(
                 .padding(end = 8.dp)
                 .animateContentSize(keyframes { durationMillis = 100 }),
     ) {
-        ModifierInspectorHeaderRow(
-            expanded = expanded,
-            wrapper = wrapper,
-            onExpandButtonClicked = { expanded = !expanded },
-            onDeleteButtonClicked = {
-                composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
-            },
-            onVisibilityToggleClicked = onVisibilityToggleClicked,
-        )
+        val reorderScope = LocalReorderableCollectionItemScope.current
+        if (reorderScope != null) {
+            with(reorderScope) {
+                ModifierInspectorHeaderRow(
+                    expanded = expanded,
+                    wrapper = wrapper,
+                    onExpandButtonClicked = { expanded = !expanded },
+                    onDeleteButtonClicked = {
+                        composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
+                    },
+                    onVisibilityToggleClicked = onVisibilityToggleClicked,
+                    modifier = Modifier.draggableHandle()
+                )
+            }
+        } else {
+            ModifierInspectorHeaderRow(
+                expanded = expanded,
+                wrapper = wrapper,
+                onExpandButtonClicked = { expanded = !expanded },
+                onDeleteButtonClicked = {
+                    composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
+                },
+                onVisibilityToggleClicked = onVisibilityToggleClicked,
+            )
+        }
 
         if (expanded) {
             content()
@@ -100,11 +116,12 @@ fun ModifierInspectorHeaderRow(
     onExpandButtonClicked: () -> Unit,
     onDeleteButtonClicked: () -> Unit,
     onVisibilityToggleClicked: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier =
-            Modifier
+            modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .clickable {
@@ -152,14 +169,11 @@ fun ModifierInspectorHeaderRow(
 
         val reorderScope = LocalReorderableCollectionItemScope.current
         if (reorderScope != null) {
-            with(reorderScope) {
-                ComposeFlowIcon(
-                    imageVector = Icons.Outlined.DragIndicator,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.draggableHandle()
-                )
-            }
+            ComposeFlowIcon(
+                imageVector = Icons.Outlined.DragIndicator,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary,
+            )
         }
 
         val removeContentDesc = stringResource(Res.string.remove_modifier)

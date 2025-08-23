@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -59,10 +60,8 @@ import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.popup.SingleTextInputDialog
 import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
 import io.composeflow.value
-import androidx.compose.foundation.lazy.rememberLazyListState
-import sh.calvin.reorderable.rememberReorderableLazyListState
-import sh.calvin.reorderable.ReorderableCollectionItemScope
 import org.jetbrains.compose.resources.stringResource
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun EnumListHeader(
@@ -306,7 +305,7 @@ private fun EnumDetailContent(
                                 onDeleteEnumDialogOpen = { index ->
                                     indexOfEnumToBeDeleted = index
                                 },
-                                reorderableScope = this,
+                                modifier = Modifier.draggableHandle()
                             )
                         }
                     }
@@ -379,9 +378,9 @@ private fun EnumFieldRow(
     index: Int,
     onEditEnumValueDialogOpen: (Int) -> Unit,
     onDeleteEnumDialogOpen: (Int) -> Unit,
-    reorderableScope: ReorderableCollectionItemScope? = null,
+    modifier: Modifier = Modifier,
 ) {
-    Column {
+    Column(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -393,20 +392,10 @@ private fun EnumFieldRow(
             )
 
             Spacer(Modifier.weight(1f))
-            if (reorderableScope != null) {
-                with(reorderableScope) {
-                    Icon(
-                        imageVector = Icons.Outlined.DragIndicator,
-                        contentDescription = "",
-                        modifier = Modifier.draggableHandle(),
-                    )
-                }
-            } else {
-                Icon(
-                    imageVector = Icons.Outlined.DragIndicator,
-                    contentDescription = "",
-                )
-            }
+            Icon(
+                imageVector = Icons.Outlined.DragIndicator,
+                contentDescription = "",
+            )
             IconButton(
                 onClick = {
                     onEditEnumValueDialogOpen(index)
