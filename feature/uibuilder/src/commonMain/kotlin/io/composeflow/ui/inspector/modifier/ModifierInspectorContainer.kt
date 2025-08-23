@@ -42,15 +42,19 @@ import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.modifier.hoverOverlay
 import io.composeflow.ui.utils.TreeExpander
 import org.jetbrains.compose.resources.stringResource
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 
-val LocalModifierReorderAllowed = compositionLocalOf { false }
+val LocalReorderableCollectionItemScope =
+    compositionLocalOf<ReorderableCollectionItemScope?> { null }
 
 @Composable
 fun ProvideModifierReorderAllowed(
-    reorderAllowed: Boolean,
+    reorderableCollectionItemScope: ReorderableCollectionItemScope,
     content: @Composable () -> Unit,
 ) {
-    CompositionLocalProvider(LocalModifierReorderAllowed providesDefault reorderAllowed) {
+    CompositionLocalProvider(
+        LocalReorderableCollectionItemScope providesDefault reorderableCollectionItemScope
+    ) {
         content()
     }
 }
@@ -146,13 +150,16 @@ fun ModifierInspectorHeaderRow(
             }
         }
 
-        val reorderAllowed = LocalModifierReorderAllowed.current
-        if (reorderAllowed) {
-            ComposeFlowIcon(
-                imageVector = Icons.Outlined.DragIndicator,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary,
-            )
+        val reorderScope = LocalReorderableCollectionItemScope.current
+        if (reorderScope != null) {
+            with(reorderScope) {
+                ComposeFlowIcon(
+                    imageVector = Icons.Outlined.DragIndicator,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.draggableHandle()
+                )
+            }
         }
 
         val removeContentDesc = stringResource(Res.string.remove_modifier)

@@ -60,7 +60,6 @@ import io.composeflow.ui.popup.SingleTextInputDialog
 import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
 import io.composeflow.value
 import androidx.compose.foundation.lazy.rememberLazyListState
-import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 import org.jetbrains.compose.resources.stringResource
@@ -292,7 +291,11 @@ private fun EnumDetailContent(
                     modifier = Modifier.heightIn(max = 800.dp),
                 ) {
                     itemsIndexed(enum.values, key = { _, value -> value }) { i, value ->
-                        ReorderableItem(reorderableLazyListState, key = value) { isDragging ->
+                        ComposeFlowReorderableItem(
+                            index = i,
+                            reorderableLazyListState = reorderableLazyListState,
+                            key = value,
+                        ) {
                             EnumFieldRow(
                                 value = value,
                                 index = i,

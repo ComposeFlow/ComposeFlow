@@ -23,13 +23,14 @@ fun LazyItemScope.ComposeFlowReorderableItem(
     index: Int,
     reorderableLazyListState: ReorderableLazyListState =
         rememberReorderableLazyListState(rememberLazyListState()) { _, _ -> },
+    key: Any? = null,
     content: @Composable ReorderableCollectionItemScope.() -> Unit,
 ) {
     ReorderableItem(
         reorderableLazyListState,
-        key = "item $index"
+        key = key ?: "item $index"
     ) { isDragging ->
-        val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
+        val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
         val backgroundModifier =
             if (isDragging) {
                 Modifier.background(
@@ -42,7 +43,7 @@ fun LazyItemScope.ComposeFlowReorderableItem(
                 Modifier
             }
         val clipShape =
-            if (isDragging) RoundedCornerShape(16.dp) else RectangleShape
+            if (isDragging) RoundedCornerShape(8.dp) else RectangleShape
         Column(
             modifier =
                 Modifier

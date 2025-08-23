@@ -212,13 +212,13 @@ private fun EditTabRowDialog(
                     modifier = Modifier,
                 ) {
                     itemsIndexed(tabs, key = { _, tab -> tab }) { i, tab ->
-                        ReorderableItem(reorderableLazyListState, key = tab) { isDragging ->
+                        ComposeFlowReorderableItem(
+                            index = i,
+                            reorderableLazyListState = reorderableLazyListState,
+                            key = tab,
+                        ) {
                             val tabTrait = tab.trait.value as TabTrait
-                            ComposeFlowReorderableItem(
-                                index = i,
-                                reorderableLazyListState = reorderableLazyListState,
-                            ) {
-                                Row(
+                            Row(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier =
@@ -256,7 +256,6 @@ private fun EditTabRowDialog(
                                         }
                                     }
                                 }
-                            }
                         }
                     }
                 }

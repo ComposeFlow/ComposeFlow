@@ -192,10 +192,11 @@ fun BrushEditDialog(
                     ) {
                         itemsIndexed(
                             editedBrush.colors,
-                            key = { _, color -> color }) { index, colorWrapper ->
+                            key = { index, color -> color }) { index, colorWrapper ->
                             ComposeFlowReorderableItem(
                                 index = index,
-                                reorderableLazyListState,
+                                reorderableLazyListState = reorderableLazyListState,
+                                key = colorWrapper,
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
