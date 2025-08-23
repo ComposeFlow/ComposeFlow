@@ -1,7 +1,6 @@
 val ktlintVersion = "1.6.0"
 val spotlessExcludedProjects =
     setOf(
-        ":core:icons",
         ":core:kxs-ts-gen-core",
     )
 
@@ -29,6 +28,7 @@ rootProject {
                     )
                     targetExclude(
                         "src/**/*main*.kt",
+                        "src/commonMain/kotlin/io/composeflow/custom/**/*.kt",
                     )
                     ktlint(ktlintVersion)
                 }

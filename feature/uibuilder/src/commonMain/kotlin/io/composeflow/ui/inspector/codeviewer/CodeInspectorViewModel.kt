@@ -31,16 +31,18 @@ class CodeInspectorViewModel(
                     CodeInspectorUiState.Loading
                 } else {
                     val parser = PrettifyParser()
-                    val codeBlock = node.generateCode(
-                        project = project,
-                        context = GenerationContext(),
-                        dryRun = true,
-                    )
-                    val code = FormatterWrapper.formatCodeBlock(
-                        codeBlock = codeBlock,
-                        withImports = false,
-                        isScript = true
-                    )
+                    val codeBlock =
+                        node.generateCode(
+                            project = project,
+                            context = GenerationContext(),
+                            dryRun = true,
+                        )
+                    val code =
+                        FormatterWrapper.formatCodeBlock(
+                            codeBlock = codeBlock,
+                            withImports = false,
+                            isScript = true,
+                        )
                     codeMap.putIfAbsent(
                         code,
                         parseCodeAsAnnotatedString(

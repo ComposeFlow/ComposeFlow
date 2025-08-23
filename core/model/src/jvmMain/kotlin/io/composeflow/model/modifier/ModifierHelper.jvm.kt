@@ -17,7 +17,7 @@ actual fun createAlignModifier(alignment: Alignment): Modifier {
         debugInspectorInfo {
             name = "align"
             value = alignment
-        }
+        },
     ) as Modifier
 }
 
@@ -30,7 +30,7 @@ actual object ModifierHelper {
             androidx.compose.foundation.layout.HorizontalAlignElement::class.primaryConstructor
         return constructor!!.call(alignment) as Modifier
     }
-    
+
     actual fun createVerticalAlignModifier(alignment: Alignment.Vertical): Modifier {
         // Creating instance using reflection because modifiers that require LayoutScopeMarker
         // such as RowScope, ColumnScope can't be instantiated outside of those scopes.
@@ -38,8 +38,11 @@ actual object ModifierHelper {
             androidx.compose.foundation.layout.VerticalAlignElement::class.primaryConstructor
         return constructor!!.call(alignment) as Modifier
     }
-    
-    actual fun createWeightModifier(weight: Float, fill: Boolean): Modifier {
+
+    actual fun createWeightModifier(
+        weight: Float,
+        fill: Boolean,
+    ): Modifier {
         // Creating instance using reflection because modifiers that require LayoutScopeMarker
         // such as RowScope, ColumnScope can't be instantiated outside of those scopes.
         val constructor =

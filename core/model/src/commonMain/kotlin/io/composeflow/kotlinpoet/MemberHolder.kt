@@ -11,7 +11,7 @@ import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
  */
 @Deprecated(
     """Use MemberHolderWrapper instead if possible for supporting Multiplatform.
-        This object will be removed in the future."""
+        This object will be removed in the future.""",
 )
 object MemberHolder {
     object AndroidX {
@@ -21,7 +21,7 @@ object MemberHolder {
                 MemberNameWrapper.get(
                     "androidx.compose.foundation",
                     "background",
-                    isExtension = true
+                    isExtension = true,
                 )
         }
 
@@ -54,19 +54,20 @@ object MemberHolder {
                 MemberNameWrapper.get(
                     "androidx.compose.foundation.layout",
                     "align",
-                    isExtension = true
+                    isExtension = true,
                 )
             val padding = MemberNameWrapper.get("androidx.compose.foundation.layout", "padding")
-            val size = MemberNameWrapper.get(
-                "androidx.compose.foundation.layout",
-                "size",
-                isExtension = true
-            )
+            val size =
+                MemberNameWrapper.get(
+                    "androidx.compose.foundation.layout",
+                    "size",
+                    isExtension = true,
+                )
             val width =
                 MemberNameWrapper.get(
                     "androidx.compose.foundation.layout",
                     "width",
-                    isExtension = true
+                    isExtension = true,
                 )
         }
 
@@ -97,13 +98,13 @@ object MemberHolder {
             MemberNameWrapper.get(
                 "${COMPOSEFLOW_PACKAGE}.validator",
                 "asErrorMessage",
-                isExtension = true
+                isExtension = true,
             )
         val isSuccess =
             MemberNameWrapper.get(
                 "${COMPOSEFLOW_PACKAGE}.validator",
                 "isSuccess",
-                isExtension = true
+                isExtension = true,
             )
         val ValidateResult =
             MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.validator", "ValidateResult")

@@ -74,15 +74,13 @@ data class ApiDefinition(
         return builder.build()
     }
 
-    private fun createApiResultFunName(): String =
-        "create" + name.asClassName().capitalize(Locale.current) + "Result"
+    private fun createApiResultFunName(): String = "create" + name.asClassName().capitalize(Locale.current) + "Result"
 
     fun callApiFunName() = "onCall${name.asClassName().capitalize(Locale.current)}Api"
 
     fun apiResultName(): String = name.asVariableName() + "Result"
 
-    private fun updateApiResultFunName(): String =
-        "update" + name.asClassName().capitalize(Locale.current) + "Result"
+    private fun updateApiResultFunName(): String = "update" + name.asClassName().capitalize(Locale.current) + "Result"
 
     fun generateInitApiResultInViewModelFunSpec(): FunSpecWrapper {
         val funSpecBuilder =

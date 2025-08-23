@@ -2,9 +2,9 @@
 
 package io.composeflow.model.project.custom_enum
 
+import io.composeflow.kotlinpoet.FileSpecWithDirectory
 import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
-import io.composeflow.kotlinpoet.FileSpecWithDirectory
 import io.composeflow.model.project.Project
 import io.composeflow.override.mutableStateListEqualsOverrideOf
 import io.composeflow.serializer.FallbackMutableStateListSerializer

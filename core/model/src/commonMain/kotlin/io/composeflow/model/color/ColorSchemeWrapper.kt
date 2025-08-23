@@ -2,8 +2,8 @@ package io.composeflow.model.color
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
-import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.ClassHolder
+import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.serializer.LocationAwareColorSerializer
 import io.composeflow.serializer.asString
 import kotlinx.serialization.SerialName

@@ -13,7 +13,6 @@ import io.composeflow.model.project.string.StringResource
 import io.composeflow.serializer.decodeFromStringWithFallback
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -519,7 +518,7 @@ class LlmRepository(
         requestId: String?,
     ) {
         if (!DEBUG_YAML) return
-        
+
         val timestamp =
             Clock.System
                 .now()
@@ -527,7 +526,7 @@ class LlmRepository(
                 .toString()
                 .replace(":", "-")
                 .replace(".", "-")
-        
+
         YamlDebugger.saveSuccessYaml(
             yamlContent = yamlContent,
             promptString = promptString,
@@ -549,7 +548,7 @@ class LlmRepository(
         requestId: String?,
     ) {
         if (!DEBUG_YAML) return
-        
+
         val timestamp =
             Clock.System
                 .now()
@@ -557,7 +556,7 @@ class LlmRepository(
                 .toString()
                 .replace(":", "-")
                 .replace(".", "-")
-        
+
         YamlDebugger.saveFailedYaml(
             yamlContent = yamlContent,
             promptString = promptString,

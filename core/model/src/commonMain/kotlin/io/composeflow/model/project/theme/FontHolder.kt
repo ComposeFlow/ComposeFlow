@@ -5,17 +5,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.sp
+import io.composeflow.font.FontFamilyWrapper
+import io.composeflow.font.FontWeightWrapper
+import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.FileSpecBuilderWrapper
+import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
-import io.composeflow.font.FontFamilyWrapper
-import io.composeflow.font.FontWeightWrapper
-import io.composeflow.font.generateFontFamilyFunSpec
-import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.model.enumwrapper.TextStyleWrapper
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 import io.composeflow.serializer.FallbackMutableStateMapSerializer
@@ -61,7 +60,7 @@ data class FontHolder(
         // generateFontFamilyFunSpec returns Any (FunSpec on JVM, Unit on WASM)
         // We need platform-specific handling
         addFontFamilyFunSpec(fileBuilder, primaryFontFamily)
-        
+
         if (primaryFontFamily != secondaryFontFamily) {
             addFontFamilyFunSpec(fileBuilder, secondaryFontFamily)
         }
@@ -309,4 +308,7 @@ fun Typography.generateWithOverrides(
     )
 
 // Platform-specific helper to add font family function spec to the file builder
-internal expect fun addFontFamilyFunSpec(fileBuilder: FileSpecBuilderWrapper, fontFamily: FontFamilyWrapper)
+internal expect fun addFontFamilyFunSpec(
+    fileBuilder: FileSpecBuilderWrapper,
+    fontFamily: FontFamilyWrapper,
+)

@@ -6,12 +6,16 @@ package io.composeflow.kotlinpoet.wrapper
  */
 expect class MemberNameWrapper {
     companion object {
-        fun get(packageName: String, simpleName: String, isExtension: Boolean = false): MemberNameWrapper
+        fun get(
+            packageName: String,
+            simpleName: String,
+            isExtension: Boolean = false,
+        ): MemberNameWrapper
     }
-    
+
     val packageName: String
     val simpleName: String
     val isExtension: Boolean
-    
+
     override fun toString(): String
 }

@@ -9,22 +9,32 @@ actual class ParameterSpecWrapper(
     actual val type: TypeNameWrapper = ClassNameWrapper(),
     actual val modifiers: Set<KModifierWrapper> = emptySet(),
     actual val annotations: List<AnnotationSpecWrapper> = emptyList(),
-    actual val defaultValue: CodeBlockWrapper? = null
+    actual val defaultValue: CodeBlockWrapper? = null,
 ) {
     actual companion object {
-        actual fun builder(name: String, type: TypeNameWrapper, vararg modifiers: KModifierWrapper): ParameterSpecBuilderWrapper = 
-            ParameterSpecBuilderWrapper()
-        actual fun unnamed(type: TypeNameWrapper): ParameterSpecWrapper = 
-            ParameterSpecWrapper(type = type)
+        actual fun builder(
+            name: String,
+            type: TypeNameWrapper,
+            vararg modifiers: KModifierWrapper,
+        ): ParameterSpecBuilderWrapper = ParameterSpecBuilderWrapper()
+
+        actual fun unnamed(type: TypeNameWrapper): ParameterSpecWrapper = ParameterSpecWrapper(type = type)
     }
-    
+
     actual override fun toString(): String = "$name: $type"
 }
 
 actual class ParameterSpecBuilderWrapper {
-    actual fun defaultValue(format: String, vararg args: Any?): ParameterSpecBuilderWrapper = this
+    actual fun defaultValue(
+        format: String,
+        vararg args: Any?,
+    ): ParameterSpecBuilderWrapper = this
+
     actual fun defaultValue(codeBlock: CodeBlockWrapper): ParameterSpecBuilderWrapper = this
+
     actual fun addModifiers(vararg modifiers: KModifierWrapper): ParameterSpecBuilderWrapper = this
+
     actual fun addAnnotation(annotationSpec: AnnotationSpecWrapper): ParameterSpecBuilderWrapper = this
+
     actual fun build(): ParameterSpecWrapper = ParameterSpecWrapper()
 }

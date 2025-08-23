@@ -8,42 +8,62 @@ import kotlin.reflect.KClass
  */
 expect abstract class TypeNameWrapper {
     abstract val isNullable: Boolean
+
     abstract fun copy(nullable: Boolean = this.isNullable): TypeNameWrapper
+
     override fun toString(): String
 }
 
 expect class ClassNameWrapper : TypeNameWrapper {
     companion object {
-        fun get(packageName: String, simpleName: String, vararg simpleNames: String): ClassNameWrapper
-        fun get(packageName: String, simpleName: String): ClassNameWrapper
+        fun get(
+            packageName: String,
+            simpleName: String,
+            vararg simpleNames: String,
+        ): ClassNameWrapper
+
+        fun get(
+            packageName: String,
+            simpleName: String,
+        ): ClassNameWrapper
+
         fun bestGuess(classNameString: String): ClassNameWrapper
     }
-    
+
     override val isNullable: Boolean
+
     override fun copy(nullable: Boolean): TypeNameWrapper
-    
+
     val packageName: String
     val simpleName: String
     val canonicalName: String
-    
+
     fun nestedClass(name: String): ClassNameWrapper
+
     fun peerClass(name: String): ClassNameWrapper
 }
 
 expect class ParameterizedTypeNameWrapper : TypeNameWrapper {
     companion object {
-        fun get(rawType: ClassNameWrapper, vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper
+        fun get(
+            rawType: ClassNameWrapper,
+            vararg typeArguments: TypeNameWrapper,
+        ): ParameterizedTypeNameWrapper
     }
-    
+
     override val isNullable: Boolean
+
     override fun copy(nullable: Boolean): TypeNameWrapper
-    
+
     val rawType: ClassNameWrapper
     val typeArguments: List<TypeNameWrapper>
 }
 
 // Extension functions
 expect fun KClass<*>.asTypeNameWrapper(): TypeNameWrapper
+
 expect fun KClass<*>.parameterizedBy(vararg typeArguments: KClass<*>): ParameterizedTypeNameWrapper
+
 expect fun TypeNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper
+
 expect fun ClassNameWrapper.parameterizedBy(vararg typeArguments: TypeNameWrapper): ParameterizedTypeNameWrapper

@@ -5,7 +5,6 @@ package io.composeflow.template
  * These are used for WASM compatibility where resource loading might not be available.
  */
 object ScreenTemplateConstants {
-    
     const val BLANK_SCREEN_TEMPLATE = """id: "blankScreen"
 name: "Blank"
 rootNode:

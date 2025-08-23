@@ -1,12 +1,12 @@
 package io.composeflow.kotlinpoet
 
+import io.composeflow.ViewModelConstant
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
-import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.TypeSpecBuilderWrapper
-import io.composeflow.ViewModelConstant
+import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
 import io.composeflow.model.project.CanvasEditable
 import io.composeflow.util.generateUniqueName
 

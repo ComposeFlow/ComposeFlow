@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -47,6 +48,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -99,15 +100,13 @@ import io.composeflow.ui.apieditor.model.ApiResponseUiState
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
 import io.composeflow.ui.jsonpath.createJsonTreeWithJsonPath
-import io.composeflow.ui.treeview.TreeView
-import io.composeflow.ui.treeview.node.Node
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.runtime.LaunchedEffect
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.propertyeditor.BasicDropdownPropertyEditor
 import io.composeflow.ui.propertyeditor.EditableTextProperty
 import io.composeflow.ui.textfield.SmallOutlinedTextField
+import io.composeflow.ui.treeview.TreeView
+import io.composeflow.ui.treeview.node.Node
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonElement
 import moe.tlaster.precompose.viewmodel.viewModel
@@ -1153,12 +1152,12 @@ private fun JsonPreviewPanel(
         ) {
             val tree = createJsonTreeWithJsonPath(jsonWithJsonPath.jsonElement.toString())
             val lazyListState = rememberLazyListState()
-            
+
             TreeView(
                 tree = tree,
                 listState = lazyListState,
             )
-            
+
             // Expand root nodes initially
             LaunchedEffect(tree) {
                 tree.nodes.forEach { node ->
@@ -1178,7 +1177,7 @@ private fun JsonTreeViewer(
 ) {
     val tree = createJsonTreeWithJsonPath(jsonElement.toString())
     val lazyListState = rememberLazyListState()
-    
+
     TreeView(
         tree = tree,
         listState = lazyListState,
@@ -1186,7 +1185,7 @@ private fun JsonTreeViewer(
             onJsonElementSelected(node.content)
         },
     )
-    
+
     // Expand root nodes initially
     LaunchedEffect(tree) {
         tree.nodes.forEach { node ->

@@ -673,7 +673,8 @@ fun EditModifierDialog(
                         ) {
                             itemsIndexed(
                                 composeNode.modifierList,
-                                key = { index, modifier -> modifier }) { i, chain ->
+                                key = { index, modifier -> modifier },
+                            ) { i, chain ->
                                 ComposeFlowReorderableItem(
                                     index = i,
                                     reorderableLazyListState,
@@ -685,7 +686,7 @@ fun EditModifierDialog(
                                             composeNodeCallbacks.onModifierUpdatedAt(
                                                 composeNode,
                                                 i,
-                                                chain
+                                                chain,
                                             )
                                         }
                                         SingleModifierInspector(

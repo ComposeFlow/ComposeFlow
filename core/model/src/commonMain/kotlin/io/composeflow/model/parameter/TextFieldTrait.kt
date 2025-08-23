@@ -222,7 +222,7 @@ data class TextFieldTrait(
             val imageVectorMember =
                 MemberNameWrapper.get(
                     "androidx.compose.material.icons.${it.packageDescriptor}",
-                    it.name
+                    it.name,
                 )
             codeBlockBuilder.addStatement(
                 """leadingIcon = { %M(imageVector = %M.${it.memberDescriptor}.%M, contentDescription = null) },""",
@@ -237,7 +237,7 @@ data class TextFieldTrait(
             val imageVectorMember =
                 MemberNameWrapper.get(
                     "androidx.compose.material.icons.${it.packageDescriptor}",
-                    it.name
+                    it.name,
                 )
             codeBlockBuilder.addStatement(
                 """trailingIcon = { %M(imageVector = %M.${it.memberDescriptor}.%M, contentDescription = null) },""",
@@ -331,7 +331,7 @@ data class TextFieldTrait(
                     ),""",
                 ClassNameWrapper.get(
                     "androidx.compose.ui.text.input",
-                    "PasswordVisualTransformation"
+                    "PasswordVisualTransformation",
                 ),
                 ClassNameWrapper.get("androidx.compose.foundation.text", "KeyboardOptions"),
                 ClassNameWrapper.get("androidx.compose.ui.text.input", "KeyboardType"),
@@ -624,8 +624,7 @@ data class TextFieldTrait(
         return codeBlockBuilder.build()
     }
 
-    private fun shouldUseTransparentIndicator(): Boolean =
-        transparentIndicator == true && textFieldType == TextFieldType.Default
+    private fun shouldUseTransparentIndicator(): Boolean = transparentIndicator == true && textFieldType == TextFieldType.Default
 
     override fun getStateValidator(): ComposeStateValidator? =
         if (enableValidator == true) {
@@ -642,12 +641,10 @@ object TextFieldTypeSerializer : FallbackEnumSerializer<TextFieldType>(
 @Serializable(TextFieldTypeSerializer::class)
 enum class TextFieldType {
     Default {
-        override fun toMemberName(): MemberNameWrapper =
-            MemberNameWrapper.get("androidx.compose.material3", "TextField")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "TextField")
     },
     Outlined {
-        override fun toMemberName(): MemberNameWrapper =
-            MemberNameWrapper.get("androidx.compose.material3", "OutlinedTextField")
+        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.material3", "OutlinedTextField")
     },
     ;
 

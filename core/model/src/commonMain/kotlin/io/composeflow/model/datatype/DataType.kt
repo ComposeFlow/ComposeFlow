@@ -2,6 +2,7 @@ package io.composeflow.model.datatype
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
+import io.composeflow.asClassName
 import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
@@ -11,7 +12,6 @@ import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
-import io.composeflow.asClassName
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.findDataTypeOrNull
 import io.composeflow.model.project.firebase.FirestoreCollection
@@ -24,7 +24,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlin.uuid.Uuid
-
 
 const val DATA_TYPE_PACKAGE = "datatype"
 const val FIRESTORE_DOCUMENT_ID = "documentId"
@@ -66,8 +65,7 @@ data class DataType(
     fun asKotlinPoetClassName(project: Project): ClassNameWrapper =
         ClassNameWrapper.get("${project.packageName}.$DATA_TYPE_PACKAGE", name.asClassName())
 
-    fun findDataFieldOrNullByVariableName(fieldName: String): DataField? =
-        fields.find { it.variableName == fieldName }
+    fun findDataFieldOrNullByVariableName(fieldName: String): DataField? = fields.find { it.variableName == fieldName }
 
     fun findDataFieldOrNull(dataFieldId: String): DataField? = fields.find { it.id == dataFieldId }
 

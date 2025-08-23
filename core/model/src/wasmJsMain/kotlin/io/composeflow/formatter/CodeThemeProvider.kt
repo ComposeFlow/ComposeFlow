@@ -1,7 +1,6 @@
 package io.composeflow.formatter
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 
 // Stub for wasmJs - no code editor theme support

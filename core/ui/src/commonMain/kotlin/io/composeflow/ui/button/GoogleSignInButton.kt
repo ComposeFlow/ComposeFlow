@@ -30,7 +30,7 @@ import org.jetbrains.compose.resources.painterResource
 enum class GoogleButtonMode {
     Light,
     Dark,
-    Neutral
+    Neutral,
 }
 
 @Composable
@@ -43,31 +43,36 @@ fun GoogleSignInButton(
     fontSize: TextUnit = 14.sp,
     enabled: Boolean = true,
 ) {
-    val backgroundColor = when (mode) {
-        GoogleButtonMode.Light -> Color.White
-        GoogleButtonMode.Dark -> Color(0xFF131314)
-        GoogleButtonMode.Neutral -> Color(0xFFF2F2F2)
-    }
+    val backgroundColor =
+        when (mode) {
+            GoogleButtonMode.Light -> Color.White
+            GoogleButtonMode.Dark -> Color(0xFF131314)
+            GoogleButtonMode.Neutral -> Color(0xFFF2F2F2)
+        }
 
-    val contentColor = when (mode) {
-        GoogleButtonMode.Light -> Color(0xFF3C4043)
-        GoogleButtonMode.Dark -> Color(0xFFE3E3E3)
-        GoogleButtonMode.Neutral -> Color(0xFF3C4043)
-    }
+    val contentColor =
+        when (mode) {
+            GoogleButtonMode.Light -> Color(0xFF3C4043)
+            GoogleButtonMode.Dark -> Color(0xFFE3E3E3)
+            GoogleButtonMode.Neutral -> Color(0xFF3C4043)
+        }
 
-    val borderStroke = when (mode) {
-        GoogleButtonMode.Light -> BorderStroke(
-            width = 1.dp,
-            color = Color(0xFF747775),
-        )
+    val borderStroke =
+        when (mode) {
+            GoogleButtonMode.Light ->
+                BorderStroke(
+                    width = 1.dp,
+                    color = Color(0xFF747775),
+                )
 
-        GoogleButtonMode.Dark -> BorderStroke(
-            width = 1.dp,
-            color = Color(0xFF8E918F),
-        )
+            GoogleButtonMode.Dark ->
+                BorderStroke(
+                    width = 1.dp,
+                    color = Color(0xFF8E918F),
+                )
 
-        GoogleButtonMode.Neutral -> null
-    }
+            GoogleButtonMode.Neutral -> null
+        }
 
     val horizontalPadding = 16.dp
     val iconTextPadding = 12.dp
@@ -77,12 +82,13 @@ fun GoogleSignInButton(
         modifier = modifier,
         enabled = enabled,
         shape = shape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor,
-            contentColor = contentColor,
-            disabledContainerColor = backgroundColor.copy(alpha = 0.6f),
-            disabledContentColor = contentColor.copy(alpha = 0.6f),
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = backgroundColor,
+                contentColor = contentColor,
+                disabledContainerColor = backgroundColor.copy(alpha = 0.6f),
+                disabledContentColor = contentColor.copy(alpha = 0.6f),
+            ),
         border = borderStroke,
         contentPadding = PaddingValues(horizontal = horizontalPadding),
     ) {
@@ -115,35 +121,40 @@ fun GoogleSignInButtonIconOnly(
     buttonSize: Dp = 40.dp,
     enabled: Boolean = true,
 ) {
-    val backgroundColor = when (mode) {
-        GoogleButtonMode.Light -> Color.White
-        GoogleButtonMode.Dark -> Color(0xFF131314)
-        GoogleButtonMode.Neutral -> Color(0xFFF2F2F2)
-    }
+    val backgroundColor =
+        when (mode) {
+            GoogleButtonMode.Light -> Color.White
+            GoogleButtonMode.Dark -> Color(0xFF131314)
+            GoogleButtonMode.Neutral -> Color(0xFFF2F2F2)
+        }
 
-    val borderStroke = when (mode) {
-        GoogleButtonMode.Light -> BorderStroke(
-            width = 1.dp,
-            color = Color(0xFF747775),
-        )
+    val borderStroke =
+        when (mode) {
+            GoogleButtonMode.Light ->
+                BorderStroke(
+                    width = 1.dp,
+                    color = Color(0xFF747775),
+                )
 
-        GoogleButtonMode.Dark -> BorderStroke(
-            width = 1.dp,
-            color = Color(0xFF8E918F),
-        )
+            GoogleButtonMode.Dark ->
+                BorderStroke(
+                    width = 1.dp,
+                    color = Color(0xFF8E918F),
+                )
 
-        GoogleButtonMode.Neutral -> null
-    }
+            GoogleButtonMode.Neutral -> null
+        }
 
     Button(
         onClick = onClick,
         modifier = modifier.size(buttonSize),
         enabled = enabled,
         shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor,
-            disabledContainerColor = backgroundColor.copy(alpha = 0.6f),
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = backgroundColor,
+                disabledContainerColor = backgroundColor.copy(alpha = 0.6f),
+            ),
         border = borderStroke,
         contentPadding = PaddingValues(0.dp),
     ) {

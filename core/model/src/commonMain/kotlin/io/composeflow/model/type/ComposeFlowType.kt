@@ -541,8 +541,7 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
             newDataTypeId: DataTypeId,
         ): ComposeFlowType = this.copy(isList = newIsList, dataTypeId = newDataTypeId)
 
-        override fun defaultValue(): AssignableProperty =
-            CustomDataTypeProperty.ValueFromFields(dataTypeId = dataTypeId)
+        override fun defaultValue(): AssignableProperty = CustomDataTypeProperty.ValueFromFields(dataTypeId = dataTypeId)
 
         override fun isPrimitive() = false
 
@@ -598,8 +597,7 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
 
         override fun copyWith(newIsList: Boolean): ComposeFlowType = this.copy(isList = newIsList)
 
-        override fun defaultValue(): AssignableProperty =
-            EnumProperty(enumClass.getFirstEnumValue()!! as EnumWrapper)
+        override fun defaultValue(): AssignableProperty = EnumProperty(enumClass.getFirstEnumValue()!! as EnumWrapper)
 
         override fun isPrimitive() = false
 
@@ -785,8 +783,7 @@ sealed interface ComposeFlowType : DropdownTextDisplayable {
 
         override fun isPrimitive() = false
 
-        override fun asKotlinPoetTypeName(project: Project): TypeNameWrapper =
-            Nothing::class.asTypeNameWrapper()
+        override fun asKotlinPoetTypeName(project: Project): TypeNameWrapper = Nothing::class.asTypeNameWrapper()
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("Unknown")

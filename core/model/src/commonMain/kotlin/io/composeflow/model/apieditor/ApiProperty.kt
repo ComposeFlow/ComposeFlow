@@ -1,9 +1,9 @@
 package io.composeflow.model.apieditor
 
+import io.composeflow.asVariableName
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
-import io.composeflow.asVariableName
 import io.composeflow.model.project.ParameterId
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

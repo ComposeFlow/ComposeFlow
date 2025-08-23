@@ -67,8 +67,7 @@ sealed interface ReadableState {
         context: GenerationContext,
     ): String = getUniqueIdentifier(context).asVariableName()
 
-    fun getFlowName(context: GenerationContext): String =
-        getUniqueIdentifier(context).asVariableName() + "Flow"
+    fun getFlowName(context: GenerationContext): String = getUniqueIdentifier(context).asVariableName() + "Flow"
 
     /**
      * [asNonList] If set to true, returns the result type with [ComposeFlowType.isList] = false regardless of the
@@ -125,8 +124,7 @@ sealed interface WriteableState : ReadableState {
         context: GenerationContext,
     ): List<PropertySpecWrapper>
 
-    fun getValidateResultName(context: GenerationContext): String =
-        getUniqueIdentifier(context).asVariableName() + "ValidateResult"
+    fun getValidateResultName(context: GenerationContext): String = getUniqueIdentifier(context).asVariableName() + "ValidateResult"
 }
 
 @Serializable
@@ -288,7 +286,8 @@ sealed interface ListAppState {
         return FunSpecWrapper
             .builder(functionName)
             .addParameter(
-                ParameterSpecWrapper.builder(name = indexToRemove, Int::class.asTypeNameWrapper())
+                ParameterSpecWrapper
+                    .builder(name = indexToRemove, Int::class.asTypeNameWrapper())
                     .build(),
             ).addCode(
                 """
@@ -317,7 +316,8 @@ sealed interface ListAppState {
         return FunSpecWrapper
             .builder(functionName)
             .addParameter(
-                ParameterSpecWrapper.builder(name = indexToUpdate, Int::class.asTypeNameWrapper())
+                ParameterSpecWrapper
+                    .builder(name = indexToUpdate, Int::class.asTypeNameWrapper())
                     .build(),
             ).addCode(
                 """
@@ -450,7 +450,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.asTypeNameWrapper()
+                        MutableStateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(String::class.asTypeNameWrapper()),
                     ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow("$defaultValue")""")
@@ -459,7 +460,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(String::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
@@ -557,7 +559,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.asTypeNameWrapper()
+                        MutableStateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Float::class.asTypeNameWrapper()),
                     ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow(${defaultValue}f)""")
@@ -566,7 +569,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Float::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
@@ -665,7 +669,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.asTypeNameWrapper()
+                        MutableStateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Boolean::class.asTypeNameWrapper()),
                     ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow($defaultValue)""")
@@ -674,7 +679,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Boolean::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
@@ -779,7 +785,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         "_${getFlowName(context)}",
-                        MutableStateFlow::class.asTypeNameWrapper()
+                        MutableStateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Int::class.asTypeNameWrapper()),
                     ).addModifiers(KModifierWrapper.PRIVATE)
                     .initializer("""MutableStateFlow($defaultValue)""")
@@ -788,7 +795,8 @@ sealed interface ScreenState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Int::class.asTypeNameWrapper()),
                     ).initializer("""_${getFlowName(context)}""")
                     .build()
@@ -985,10 +993,10 @@ sealed interface ScreenState<T> : State<T> {
                 .builder(getUpdateMethodName(context))
                 .addParameter(
                     "newValue",
-                    List::class.asTypeNameWrapper()
-                        .parameterizedBy(String::class.asTypeNameWrapper())
-                )
-                .addStatement("_$flowName.value = newValue")
+                    List::class
+                        .asTypeNameWrapper()
+                        .parameterizedBy(String::class.asTypeNameWrapper()),
+                ).addStatement("_$flowName.value = newValue")
                 .build()
         }
 
@@ -1179,7 +1187,8 @@ sealed interface AppState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(String::class.asTypeNameWrapper()),
                     ).initializer(
                         """
@@ -1280,7 +1289,8 @@ sealed interface AppState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Int::class.asTypeNameWrapper()),
                     ).initializer(
                         """
@@ -1381,7 +1391,8 @@ sealed interface AppState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Float::class.asTypeNameWrapper()),
                     ).initializer(
                         """
@@ -1496,7 +1507,8 @@ sealed interface AppState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Boolean::class.asTypeNameWrapper()),
                     ).initializer(
                         """
@@ -1597,7 +1609,8 @@ sealed interface AppState<T> : State<T> {
                 PropertySpecWrapper
                     .builder(
                         getFlowName(context),
-                        StateFlow::class.asTypeNameWrapper()
+                        StateFlow::class
+                            .asTypeNameWrapper()
                             .parameterizedBy(Instant::class.asTypeNameWrapper()),
                     ).initializer(
                         CodeBlockWrapper.of(
@@ -2589,8 +2602,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlockWrapper =
-            CodeBlockWrapper.of("""($AUTHENTICATED_USER?.displayName ?: "Invalid display name")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.displayName ?: "Invalid display name")""")
 
         override fun valueType(
             project: Project,
@@ -2609,8 +2621,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlockWrapper =
-            CodeBlockWrapper.of("""($AUTHENTICATED_USER?.email ?: "Invalid email")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.email ?: "Invalid email")""")
 
         override fun valueType(
             project: Project,
@@ -2629,8 +2640,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlockWrapper =
-            CodeBlockWrapper.of("""($AUTHENTICATED_USER?.phoneNumber ?: "Invalid phone number")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.phoneNumber ?: "Invalid phone number")""")
 
         override fun valueType(
             project: Project,
@@ -2649,8 +2659,7 @@ sealed interface AuthenticatedUserState : ReadableState {
             project: Project,
             context: GenerationContext,
             dryRun: Boolean,
-        ): CodeBlockWrapper =
-            CodeBlockWrapper.of("""($AUTHENTICATED_USER?.photoURL ?: "Invalid photo url")""")
+        ): CodeBlockWrapper = CodeBlockWrapper.of("""($AUTHENTICATED_USER?.photoURL ?: "Invalid photo url")""")
 
         override fun valueType(
             project: Project,

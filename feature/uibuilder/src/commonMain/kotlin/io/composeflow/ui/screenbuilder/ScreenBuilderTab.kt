@@ -119,7 +119,8 @@ fun ScreenBuilderTab(
         ) {
             itemsIndexed(
                 items = project.screenHolder.screens,
-                key = { _, screen -> screen }) { i, screen ->
+                key = { _, screen -> screen },
+            ) { i, screen ->
                 ComposeFlowReorderableItem(
                     index = i,
                     reorderableLazyListState = reorderableLazyListState,

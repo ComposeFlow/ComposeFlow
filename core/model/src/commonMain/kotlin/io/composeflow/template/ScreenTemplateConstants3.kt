@@ -5,7 +5,6 @@ package io.composeflow.template
  * Split into a separate file due to size constraints.
  */
 object ScreenTemplateConstants3 {
-    
     const val SETTINGS_SCREEN_TEMPLATE = """id: "settingsRoot"
 name: "Settings"
 rootNode:

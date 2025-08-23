@@ -1,8 +1,8 @@
 package io.composeflow.model.project.appscreen.screen.composenode
 
+import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
-import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.enumwrapper.NodeVisibility
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 import io.composeflow.model.project.CanvasEditable

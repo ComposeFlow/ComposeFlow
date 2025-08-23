@@ -407,12 +407,12 @@ private fun ColorPickerDialog(
     onColorConfirmed: (Color) -> Unit,
 ) {
     val controller = rememberColorPickerController()
-    
+
     // Set initial color only once
     remember(initialColor) {
         controller.selectByColor(initialColor, fromUser = false)
     }
-    
+
     // Observe the selected color
     val selectedColor by controller.selectedColor
     PositionCustomizablePopup(

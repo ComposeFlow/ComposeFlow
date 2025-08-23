@@ -10,36 +10,36 @@ actual enum class KModifierWrapper {
     PROTECTED,
     PRIVATE,
     INTERNAL,
-    
+
     // Inheritance modifiers
     FINAL,
     OPEN,
     ABSTRACT,
     SEALED,
-    
+
     // Function modifiers
     OVERRIDE,
     INLINE,
     INFIX,
     OPERATOR,
     SUSPEND,
-    
+
     // Property modifiers
     CONST,
     LATEINIT,
-    
+
     // Parameter modifiers
     VARARG,
     NOINLINE,
     CROSSINLINE,
-    
+
     // Platform modifiers
     EXPECT,
     ACTUAL,
-    
+
     // Data class modifiers
     DATA,
-    
+
     // Other modifiers
     INNER,
     ENUM,
@@ -47,7 +47,8 @@ actual enum class KModifierWrapper {
     FUN,
     COMPANION,
     EXTERNAL,
-    TAILREC;
-    
+    TAILREC,
+    ;
+
     actual override fun toString(): String = name.lowercase()
 }

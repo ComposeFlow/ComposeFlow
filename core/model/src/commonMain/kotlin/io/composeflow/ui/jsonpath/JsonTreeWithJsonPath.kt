@@ -2,10 +2,10 @@ package io.composeflow.ui.jsonpath
 
 import androidx.compose.runtime.Composable
 import io.composeflow.model.apieditor.JsonWithJsonPath
-import io.composeflow.ui.treeview.tree.Tree
-import io.composeflow.ui.treeview.tree.TreeScope
 import io.composeflow.ui.treeview.node.Branch
 import io.composeflow.ui.treeview.node.Leaf
+import io.composeflow.ui.treeview.tree.Tree
+import io.composeflow.ui.treeview.tree.TreeScope
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonNull
@@ -41,15 +41,16 @@ private fun TreeScope.jsonPrimitiveNode(
     jsonPrimitive: JsonWithJsonPath,
 ) {
     Leaf(
-        content = jsonPrimitive
-            .copy(displayName = "${getFormattedKey(key)}${getFormattedValue(jsonPrimitive.jsonElement as JsonPrimitive)}"),
+        content =
+            jsonPrimitive
+                .copy(displayName = "${getFormattedKey(key)}${getFormattedValue(jsonPrimitive.jsonElement as JsonPrimitive)}"),
         key = jsonPrimitive.jsonPath.ifEmpty { "root" } + "_leaf_" + key.orEmpty(),
         customName = { node ->
             androidx.compose.material3.Text(
                 text = node.content.displayName ?: "",
                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
             )
-        }
+        },
     )
 }
 
@@ -66,7 +67,7 @@ private fun TreeScope.jsonObjectNode(
                 text = node.content.displayName ?: "",
                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
             )
-        }
+        },
     ) {
         (jsonObject.jsonElement as JsonObject).entries.forEach { (key, jsonElement) ->
             val parentPath = if (jsonObject.jsonPath.isEmpty()) "" else "${jsonObject.jsonPath}."
@@ -89,7 +90,7 @@ private fun TreeScope.jsonArrayNode(
                 text = node.content.displayName ?: "",
                 style = androidx.compose.material3.MaterialTheme.typography.bodySmall,
             )
-        }
+        },
     ) {
         (jsonArray.jsonElement as JsonArray).forEachIndexed { index, jsonElement ->
             val path = "${jsonArray.jsonPath}[$index]"

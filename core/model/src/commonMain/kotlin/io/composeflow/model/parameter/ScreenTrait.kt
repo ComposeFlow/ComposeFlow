@@ -1,11 +1,11 @@
 package io.composeflow.model.parameter
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Smartphone
 import io.composeflow.kotlinpoet.GenerationContext
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.model.action.ActionType
 import io.composeflow.model.palette.TraitCategory
 import io.composeflow.model.project.Project

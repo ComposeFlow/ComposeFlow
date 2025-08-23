@@ -8,6 +8,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
+import io.composeflow.ViewModelConstant
+import io.composeflow.kotlinpoet.ClassHolder
+import io.composeflow.kotlinpoet.FileSpecWithDirectory
+import io.composeflow.kotlinpoet.GenerationContext
+import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
@@ -17,14 +23,8 @@ import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
-import io.composeflow.kotlinpoet.wrapper.AnnotationSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
-import io.composeflow.ViewModelConstant
 import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
-import io.composeflow.kotlinpoet.ClassHolder
-import io.composeflow.kotlinpoet.FileSpecWithDirectory
-import io.composeflow.kotlinpoet.GenerationContext
-import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.materialicons.Filled
 import io.composeflow.materialicons.asCodeBlock
 import io.composeflow.model.datatype.generateCodeBlock
@@ -534,10 +534,11 @@ data class ScreenHolder(
                         .builder("isCurrentDestination")
                         .addParameter(
                             "backStackEntry",
-                            ClassNameWrapper.get(
-                                "androidx.navigation",
-                                "NavBackStackEntry",
-                            ).copy(nullable = true),
+                            ClassNameWrapper
+                                .get(
+                                    "androidx.navigation",
+                                    "NavBackStackEntry",
+                                ).copy(nullable = true),
                         ).returns(Boolean::class.asTypeNameWrapper())
                         .addCode("""return backStackEntry?.destination?.route == $routeName""")
                         .build(),

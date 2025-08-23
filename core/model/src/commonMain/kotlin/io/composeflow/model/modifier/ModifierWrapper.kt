@@ -29,15 +29,14 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import io.composeflow.kotlinpoet.GenerationContext
+import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
-import io.composeflow.kotlinpoet.GenerationContext
-import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.model.action.ActionType
 import io.composeflow.model.parameter.BoxTrait
 import io.composeflow.model.parameter.ColumnTrait
@@ -1044,9 +1043,7 @@ for the children of the same layout parent"""
     data class AlignHorizontal(
         val align: AlignmentHorizontalWrapper = AlignmentHorizontalWrapper.Start,
     ) : ModifierWrapper() {
-        override fun toModifier(): Modifier {
-            return ModifierHelper.createHorizontalAlignModifier(align.alignment)
-        }
+        override fun toModifier(): Modifier = ModifierHelper.createHorizontalAlignModifier(align.alignment)
 
         override fun displayName(): String = "Align horizontal"
 
@@ -1075,9 +1072,7 @@ for the children of the same layout parent"""
     data class AlignVertical(
         val align: AlignmentVerticalWrapper = AlignmentVerticalWrapper.Top,
     ) : ModifierWrapper() {
-        override fun toModifier(): Modifier {
-            return ModifierHelper.createVerticalAlignModifier(align.alignment)
-        }
+        override fun toModifier(): Modifier = ModifierHelper.createVerticalAlignModifier(align.alignment)
 
         override fun displayName(): String = "Align vertical"
 
@@ -1107,9 +1102,7 @@ for the children of the same layout parent"""
         val weight: Float = 1f,
         val fill: Boolean = true,
     ) : ModifierWrapper() {
-        override fun toModifier(): Modifier {
-            return ModifierHelper.createWeightModifier(weight, fill)
-        }
+        override fun toModifier(): Modifier = ModifierHelper.createWeightModifier(weight, fill)
 
         override fun displayName(): String = "Weight"
 

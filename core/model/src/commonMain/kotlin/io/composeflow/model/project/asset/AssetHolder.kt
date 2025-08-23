@@ -25,24 +25,26 @@ data class AssetHolder(
         userId: String,
         projectId: String,
     ): Map<String, String> {
-        val imageInstructions = images.associate {
-            val cacheFile =
-                getAssetCacheFileFor(
-                    userId = userId,
-                    projectId = projectId,
-                    blobInfoWrapper = it,
-                )
-            cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
-        }
-        val iconInstructions = icons.associate {
-            val cacheFile =
-                getAssetCacheFileFor(
-                    userId = userId,
-                    projectId = projectId,
-                    blobInfoWrapper = it,
-                )
-            cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
-        }
+        val imageInstructions =
+            images.associate {
+                val cacheFile =
+                    getAssetCacheFileFor(
+                        userId = userId,
+                        projectId = projectId,
+                        blobInfoWrapper = it,
+                    )
+                cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
+            }
+        val iconInstructions =
+            icons.associate {
+                val cacheFile =
+                    getAssetCacheFileFor(
+                        userId = userId,
+                        projectId = projectId,
+                        blobInfoWrapper = it,
+                    )
+                cacheFile.path to "composeApp/src/commonMain/composeResources/drawable/${it.fileName.asVariableName()}"
+            }
         return imageInstructions + iconInstructions
     }
 }

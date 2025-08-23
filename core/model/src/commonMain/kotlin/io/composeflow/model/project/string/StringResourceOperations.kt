@@ -298,17 +298,19 @@ fun StringResourceHolder.updateSupportedLocales(newLocales: List<ResourceLocale>
         when {
             // If new locales are being added, mark all string resources as needing translation
             localesToAdd.isNotEmpty() -> {
-                val updatedResources = this.stringResources.map { resource ->
-                    resource.copy(needsTranslationUpdate = true)
-                }
+                val updatedResources =
+                    this.stringResources.map { resource ->
+                        resource.copy(needsTranslationUpdate = true)
+                    }
                 this.stringResources.clear()
                 this.stringResources.addAll(updatedResources)
             }
             // If only the default locale remains, clear the flags
             newLocalesWithDefault.size == 1 -> {
-                val updatedResources = this.stringResources.map { resource ->
-                    resource.copy(needsTranslationUpdate = false)
-                }
+                val updatedResources =
+                    this.stringResources.map { resource ->
+                        resource.copy(needsTranslationUpdate = false)
+                    }
                 this.stringResources.clear()
                 this.stringResources.addAll(updatedResources)
             }
@@ -352,9 +354,10 @@ fun StringResourceHolder.setDefaultLocale(locale: ResourceLocale): List<SetDefau
         // If the default locale has actually changed and there are multiple locales,
         // set needsTranslationUpdate flag on all resources
         if (previousLocale != locale && this.isTranslatable) {
-            val updatedResources = this.stringResources.map { resource ->
-                resource.copy(needsTranslationUpdate = true)
-            }
+            val updatedResources =
+                this.stringResources.map { resource ->
+                    resource.copy(needsTranslationUpdate = true)
+                }
             this.stringResources.clear()
             this.stringResources.addAll(updatedResources)
         }

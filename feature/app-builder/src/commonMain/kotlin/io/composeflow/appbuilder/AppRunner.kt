@@ -372,15 +372,16 @@ object AppRunner {
                         .resolve(it.fileSpec.packageName.replace(".", File.separator))
                         .resolve("${it.fileSpec.name}.kt")
                 ktFile.parentFile?.mkdirs()
-                val fileContent = if (formatCode) {
-                    FormatterWrapper.format(
-                        fileName = it.fileSpec.name,
-                        text = it.fileSpec.toString(),
-                        isScript = false
-                    )
-                } else {
-                    it.fileSpec.toString()
-                }
+                val fileContent =
+                    if (formatCode) {
+                        FormatterWrapper.format(
+                            fileName = it.fileSpec.name,
+                            text = it.fileSpec.toString(),
+                            isScript = false,
+                        )
+                    } else {
+                        it.fileSpec.toString()
+                    }
                 ktFile.writeText(fileContent)
             } catch (e: Exception) {
                 Logger.e("Failed to create file: $it", e)

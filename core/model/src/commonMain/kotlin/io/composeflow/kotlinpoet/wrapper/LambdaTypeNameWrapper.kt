@@ -6,15 +6,23 @@ package io.composeflow.kotlinpoet.wrapper
  */
 expect class LambdaTypeNameWrapper : TypeNameWrapper {
     companion object {
-        fun get(receiver: TypeNameWrapper?, parameters: List<ParameterSpecWrapper>, returnType: TypeNameWrapper): LambdaTypeNameWrapper
-        
+        fun get(
+            receiver: TypeNameWrapper?,
+            parameters: List<ParameterSpecWrapper>,
+            returnType: TypeNameWrapper,
+        ): LambdaTypeNameWrapper
+
         // Convenience overload with no receiver and empty parameters (common for simple lambdas)
         fun get(returnType: TypeNameWrapper): LambdaTypeNameWrapper
-        
+
         // Convenience overload with no receiver (common case)
-        fun get(parameters: List<ParameterSpecWrapper>, returnType: TypeNameWrapper): LambdaTypeNameWrapper
+        fun get(
+            parameters: List<ParameterSpecWrapper>,
+            returnType: TypeNameWrapper,
+        ): LambdaTypeNameWrapper
     }
-    
+
     override val isNullable: Boolean
+
     override fun copy(nullable: Boolean): TypeNameWrapper
 }

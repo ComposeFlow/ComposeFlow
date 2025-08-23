@@ -262,8 +262,7 @@ data class Screen(
     @Transient
     val sceneName: String = name.asClassName().lowercase().toKotlinFileName()
 
-    override fun getPackageName(project: Project): String =
-        "${project.packageName}.screens.$name".toPackageName()
+    override fun getPackageName(project: Project): String = "${project.packageName}.screens.$name".toPackageName()
 
     override fun getStates(project: Project): List<ReadableState> {
         val projectStates = project.getStates(project)
@@ -383,8 +382,10 @@ data class Screen(
                 .addImport("androidx.compose.runtime", "getValue")
                 .addImport("androidx.compose.runtime", "setValue")
 
-        val funSpecBuilder = FunSpecWrapper.builder(composableName)
-            .addAnnotation(AnnotationSpecWrapper.get(Composable::class))
+        val funSpecBuilder =
+            FunSpecWrapper
+                .builder(composableName)
+                .addAnnotation(AnnotationSpecWrapper.get(Composable::class))
         if (parameters.isNotEmpty()) {
             funSpecBuilder.addParameter(
                 ParameterSpecWrapper
@@ -401,13 +402,14 @@ data class Screen(
             )
         }
 
-        getAllActions(project).distinctBy {
-            it.argumentName(project)
-        }.forEach {
-            it.generateArgumentParameterSpec(project)?.let { parameterSpec ->
-                funSpecBuilder.addParameter(parameterSpec)
+        getAllActions(project)
+            .distinctBy {
+                it.argumentName(project)
+            }.forEach {
+                it.generateArgumentParameterSpec(project)?.let { parameterSpec ->
+                    funSpecBuilder.addParameter(parameterSpec)
+                }
             }
-        }
 
         if (getAllActions(project).any { it.hasSuspendFunction() }) {
             context.getCurrentComposableContext().isCoroutineScopeUsed = true
@@ -780,7 +782,8 @@ data class Screen(
                 return
             }
         }
-        rootNode.value.findDeepestChildAtOrNull(eventPosition)
+        rootNode.value
+            .findDeepestChildAtOrNull(eventPosition)
             ?.setFocus(toggleValue = isCtrlOrMetaPressed)
     }
 
@@ -824,8 +827,7 @@ data class Screen(
 
     override fun getContentRootNode(): ComposeNode = contentRootNode()
 
-    override fun findFocusedNodes(): List<ComposeNode> =
-        getAllComposeNodes().filter { it.isFocused.value }
+    override fun findFocusedNodes(): List<ComposeNode> = getAllComposeNodes().filter { it.isFocused.value }
 
     override fun clearIsHoveredRecursively() {
         getAllRootNodes().forEach { it?.clearIsHoveredRecursively() }

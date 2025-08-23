@@ -7,12 +7,15 @@ package io.composeflow.kotlinpoet.wrapper
 actual class MemberNameWrapper(
     actual val packageName: String = "",
     actual val simpleName: String = "",
-    actual val isExtension: Boolean = false
+    actual val isExtension: Boolean = false,
 ) {
     actual companion object {
-        actual fun get(packageName: String, simpleName: String, isExtension: Boolean): MemberNameWrapper = 
-            MemberNameWrapper(packageName, simpleName, isExtension)
+        actual fun get(
+            packageName: String,
+            simpleName: String,
+            isExtension: Boolean,
+        ): MemberNameWrapper = MemberNameWrapper(packageName, simpleName, isExtension)
     }
-    
+
     actual override fun toString(): String = "$packageName.$simpleName"
 }

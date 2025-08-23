@@ -2,9 +2,9 @@ package io.composeflow.model.datatype
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
+import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
-import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.findDataTypeOrNull
 import io.composeflow.model.project.firebase.CollectionId

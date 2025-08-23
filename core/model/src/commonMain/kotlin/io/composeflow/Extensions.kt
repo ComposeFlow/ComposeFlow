@@ -78,7 +78,10 @@ fun <T> List<T>.eachEquals(
 
 fun String.removeLineBreak() = this.replace("\r\n|\r|\n".toRegex(), "")
 
-fun <K, V> MutableMap<K, V>.copyAsMutableStateMap(): MutableMap<K, V> = mutableStateMapOf<K, V>().apply { putAll(this@copyAsMutableStateMap) }
+fun <K, V> MutableMap<K, V>.copyAsMutableStateMap(): MutableMap<K, V> =
+    mutableStateMapOf<K, V>().apply {
+        putAll(this@copyAsMutableStateMap)
+    }
 
 fun String.asClassName() =
     this

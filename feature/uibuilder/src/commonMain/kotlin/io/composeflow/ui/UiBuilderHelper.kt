@@ -1,7 +1,6 @@
 package io.composeflow.ui
 
 import io.composeflow.model.palette.Constraint.Companion.ONLY_SCREEN_IS_ALLOWED
-import io.composeflow.model.palette.Constraint.Companion.SAME_NODE_EXISTS_IN_SCREEN
 import io.composeflow.model.palette.TraitCategory
 import io.composeflow.model.parameter.BottomAppBarTrait
 import io.composeflow.model.parameter.FabTrait

@@ -16,14 +16,17 @@ actual object ModifierHelper {
         // The actual alignment will be handled during code generation
         return Modifier
     }
-    
+
     actual fun createVerticalAlignModifier(alignment: Alignment.Vertical): Modifier {
         // For WASM, we return an empty modifier since we can't create scope-specific modifiers
         // The actual alignment will be handled during code generation
         return Modifier
     }
-    
-    actual fun createWeightModifier(weight: Float, fill: Boolean): Modifier {
+
+    actual fun createWeightModifier(
+        weight: Float,
+        fill: Boolean,
+    ): Modifier {
         // For WASM, we return an empty modifier since we can't create scope-specific modifiers
         // The actual weight will be handled during code generation
         return Modifier

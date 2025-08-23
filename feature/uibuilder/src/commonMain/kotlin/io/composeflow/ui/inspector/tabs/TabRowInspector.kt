@@ -42,7 +42,6 @@ import io.composeflow.ui.modifier.hoverOverlay
 import io.composeflow.ui.popup.PositionCustomizablePopup
 import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
 import org.jetbrains.compose.resources.stringResource
-import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
@@ -219,43 +218,43 @@ private fun EditTabRowDialog(
                         ) {
                             val tabTrait = tab.trait.value as TabTrait
                             Row(
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier =
-                                        Modifier
-                                            .hoverOverlay()
-                                            .fillMaxWidth()
-                                            .height(42.dp)
-                                            .padding(start = 16.dp),
-                                ) {
-                                    Text(
-                                        text = tabTrait.text?.displayText(project) ?: "",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.secondary,
-                                    )
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier =
+                                    Modifier
+                                        .hoverOverlay()
+                                        .fillMaxWidth()
+                                        .height(42.dp)
+                                        .padding(start = 16.dp),
+                            ) {
+                                Text(
+                                    text = tabTrait.text?.displayText(project) ?: "",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = MaterialTheme.colorScheme.secondary,
+                                )
 
-                                    if (tabs.size > 1) {
-                                        Spacer(Modifier.weight(1f))
+                                if (tabs.size > 1) {
+                                    Spacer(Modifier.weight(1f))
+                                    ComposeFlowIcon(
+                                        imageVector = Icons.Outlined.DragIndicator,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.draggableHandle(),
+                                    )
+                                    ComposeFlowIconButton(
+                                        onClick = {
+                                            tabContainer?.removeTab(i)
+                                        },
+                                        modifier = Modifier.hoverIconClickable(),
+                                    ) {
                                         ComposeFlowIcon(
-                                            imageVector = Icons.Outlined.DragIndicator,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.draggableHandle(),
+                                            imageVector = Icons.Outlined.Delete,
+                                            contentDescription = stringResource(Res.string.delete_tab),
+                                            tint = MaterialTheme.colorScheme.error,
                                         )
-                                        ComposeFlowIconButton(
-                                            onClick = {
-                                                tabContainer?.removeTab(i)
-                                            },
-                                            modifier = Modifier.hoverIconClickable(),
-                                        ) {
-                                            ComposeFlowIcon(
-                                                imageVector = Icons.Outlined.Delete,
-                                                contentDescription = stringResource(Res.string.delete_tab),
-                                                tint = MaterialTheme.colorScheme.error,
-                                            )
-                                        }
                                     }
                                 }
+                            }
                         }
                     }
                 }

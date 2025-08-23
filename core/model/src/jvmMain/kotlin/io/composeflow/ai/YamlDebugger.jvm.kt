@@ -13,7 +13,7 @@ internal actual object YamlDebugger {
         timestamp: String,
     ) {
         if (!DEBUG_YAML) return
-        
+
         withContext(Dispatchers.IO) {
             try {
                 val debugDir =
@@ -66,7 +66,7 @@ internal actual object YamlDebugger {
         timestamp: String,
     ) {
         if (!DEBUG_YAML) return
-        
+
         withContext(Dispatchers.IO) {
             try {
                 val debugDir =

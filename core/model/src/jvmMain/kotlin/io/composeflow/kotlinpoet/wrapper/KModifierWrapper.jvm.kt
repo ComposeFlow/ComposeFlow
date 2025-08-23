@@ -5,7 +5,9 @@ import com.squareup.kotlinpoet.KModifier
 /**
  * JVM implementation of KModifierWrapper that delegates to actual KotlinPoet's KModifier.
  */
-actual enum class KModifierWrapper(private val actual: KModifier) {
+actual enum class KModifierWrapper(
+    private val actual: KModifier,
+) {
     // Visibility modifiers
     PUBLIC(KModifier.PUBLIC),
     PROTECTED(KModifier.PROTECTED),
@@ -48,7 +50,8 @@ actual enum class KModifierWrapper(private val actual: KModifier) {
     FUN(KModifier.FUN),
     COMPANION(KModifier.COMPANION),
     EXTERNAL(KModifier.EXTERNAL),
-    TAILREC(KModifier.TAILREC);
+    TAILREC(KModifier.TAILREC),
+    ;
 
     actual override fun toString(): String = actual.toString()
 
@@ -57,14 +60,10 @@ actual enum class KModifierWrapper(private val actual: KModifier) {
 }
 
 // Helper functions
-fun KModifier.toWrapper(): KModifierWrapper =
-    KModifierWrapper.entries.first { it.toKotlinPoet() == this }
+fun KModifier.toWrapper(): KModifierWrapper = KModifierWrapper.entries.first { it.toKotlinPoet() == this }
 
-fun Iterable<KModifierWrapper>.toKotlinPoet(): Array<KModifier> =
-    this.map { it.toKotlinPoet() }.toTypedArray()
+fun Iterable<KModifierWrapper>.toKotlinPoet(): Array<KModifier> = this.map { it.toKotlinPoet() }.toTypedArray()
 
-fun Set<KModifierWrapper>.toKotlinPoet(): Array<KModifier> =
-    this.map { it.toKotlinPoet() }.toTypedArray()
+fun Set<KModifierWrapper>.toKotlinPoet(): Array<KModifier> = this.map { it.toKotlinPoet() }.toTypedArray()
 
-fun Array<KModifierWrapper>.toKotlinPoet(): Array<KModifier> =
-    this.map { it.toKotlinPoet() }.toTypedArray()
+fun Array<KModifierWrapper>.toKotlinPoet(): Array<KModifier> = this.map { it.toKotlinPoet() }.toTypedArray()

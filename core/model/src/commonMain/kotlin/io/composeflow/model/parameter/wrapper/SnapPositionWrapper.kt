@@ -13,17 +13,20 @@ enum class SnapPositionWrapper {
     Start {
         override fun toSnapPosition(): SnapPosition = SnapPosition.Start
 
-        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.foundation.gestures.snapping.SnapPosition", "Start")
+        override fun toMemberName(): MemberNameWrapper =
+            MemberNameWrapper.get("androidx.compose.foundation.gestures.snapping.SnapPosition", "Start")
     },
     Center {
         override fun toSnapPosition(): SnapPosition = SnapPosition.Center
 
-        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.foundation.gestures.snapping.SnapPosition", "Center")
+        override fun toMemberName(): MemberNameWrapper =
+            MemberNameWrapper.get("androidx.compose.foundation.gestures.snapping.SnapPosition", "Center")
     },
     End {
         override fun toSnapPosition(): SnapPosition = SnapPosition.End
 
-        override fun toMemberName(): MemberNameWrapper = MemberNameWrapper.get("androidx.compose.foundation.gestures.snapping.SnapPosition", "End")
+        override fun toMemberName(): MemberNameWrapper =
+            MemberNameWrapper.get("androidx.compose.foundation.gestures.snapping.SnapPosition", "End")
     },
     ;
 

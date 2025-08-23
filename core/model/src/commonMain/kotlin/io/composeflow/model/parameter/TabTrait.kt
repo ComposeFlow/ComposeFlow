@@ -3,10 +3,10 @@ package io.composeflow.model.parameter
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Notes
 import androidx.compose.ui.graphics.vector.ImageVector
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.materialicons.ImageVectorHolder
 import io.composeflow.model.modifier.generateModifierCode
 import io.composeflow.model.palette.TraitCategory

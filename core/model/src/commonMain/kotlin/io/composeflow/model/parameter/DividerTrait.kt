@@ -1,9 +1,9 @@
 package io.composeflow.model.parameter
 
 import androidx.compose.ui.unit.Dp
+import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
-import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.model.palette.TraitCategory
 import io.composeflow.model.project.Project
 import io.composeflow.model.property.AssignableProperty

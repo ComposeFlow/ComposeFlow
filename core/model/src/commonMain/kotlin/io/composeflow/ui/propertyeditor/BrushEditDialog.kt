@@ -192,7 +192,8 @@ fun BrushEditDialog(
                     ) {
                         itemsIndexed(
                             editedBrush.colors,
-                            key = { index, color -> color }) { index, colorWrapper ->
+                            key = { index, color -> color },
+                        ) { index, colorWrapper ->
                             ComposeFlowReorderableItem(
                                 index = index,
                                 reorderableLazyListState = reorderableLazyListState,
@@ -212,7 +213,7 @@ fun BrushEditDialog(
                                             updatedColors[index] =
                                                 ColorWrapper(
                                                     color = newColor,
-                                                    themeColor = null
+                                                    themeColor = null,
                                                 )
                                             editedBrush =
                                                 editedBrush.copy(colors = updatedColors)
@@ -223,7 +224,7 @@ fun BrushEditDialog(
                                             updatedColors[index] =
                                                 ColorWrapper(
                                                     color = null,
-                                                    themeColor = themeColor
+                                                    themeColor = themeColor,
                                                 )
                                             editedBrush =
                                                 editedBrush.copy(colors = updatedColors)
@@ -305,7 +306,6 @@ fun BrushEditDialog(
         }
     }
 }
-
 
 @Composable
 private fun BrushParametersSection(

@@ -1,8 +1,8 @@
 package io.composeflow.model.property
 
 import androidx.compose.runtime.mutableStateMapOf
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.GenerationContext
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.model.datatype.DataFieldId
 import io.composeflow.model.datatype.DataTypeId
 import io.composeflow.model.project.Project

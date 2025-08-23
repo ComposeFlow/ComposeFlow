@@ -53,7 +53,7 @@ fun ProvideModifierReorderAllowed(
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
-        LocalReorderableCollectionItemScope providesDefault reorderableCollectionItemScope
+        LocalReorderableCollectionItemScope providesDefault reorderableCollectionItemScope,
     ) {
         content()
     }
@@ -88,7 +88,7 @@ fun ModifierInspectorContainer(
                         composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
                     },
                     onVisibilityToggleClicked = onVisibilityToggleClicked,
-                    modifier = Modifier.draggableHandle()
+                    modifier = Modifier.draggableHandle(),
                 )
             }
         } else {

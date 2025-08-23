@@ -172,11 +172,9 @@ sealed interface StateOperation {
         @Composable
         override fun displayName(): String = stringResource(Res.string.set_value)
 
-        override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
-            readProperty.getDependentComposeNodes(project)
+        override fun getDependentComposeNodes(project: Project): List<ComposeNode> = readProperty.getDependentComposeNodes(project)
 
-        override fun getAssignableProperties(): List<AssignableProperty> =
-            readProperty.getAssignableProperties()
+        override fun getAssignableProperties(): List<AssignableProperty> = readProperty.getAssignableProperties()
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString(displayName())
@@ -440,7 +438,7 @@ sealed interface StateOperationForDataType : StateOperation {
                     getUpdateMethodName(
                         project = project,
                         context = context,
-                        writeState = writeState
+                        writeState = writeState,
                     ),
                 )
 
@@ -461,7 +459,8 @@ sealed interface StateOperationForDataType : StateOperation {
                                 }
                         }
 
-                        readProperty.generateParameterSpec(project)
+                        readProperty
+                            .generateParameterSpec(project)
                             ?.let { paramSpec: ParameterSpecWrapper ->
                                 funSpecBuilder.addParameter(paramSpec)
                             }
@@ -504,11 +503,9 @@ sealed interface StateOperationForList : StateOperation {
         DropdownItem {
         override fun isDependent(sourceId: String): Boolean = readProperty.isDependent(sourceId)
 
-        override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
-            readProperty.getDependentComposeNodes(project)
+        override fun getDependentComposeNodes(project: Project): List<ComposeNode> = readProperty.getDependentComposeNodes(project)
 
-        override fun getAssignableProperties(): List<AssignableProperty> =
-            readProperty.getAssignableProperties()
+        override fun getAssignableProperties(): List<AssignableProperty> = readProperty.getAssignableProperties()
 
         override fun getUpdateMethodParamsAsString(
             project: Project,
@@ -668,7 +665,7 @@ sealed interface StateOperationForList : StateOperation {
                     getUpdateMethodName(
                         project = project,
                         context = context,
-                        writeState = writeState
+                        writeState = writeState,
                     ),
                 )
 
@@ -689,7 +686,8 @@ sealed interface StateOperationForList : StateOperation {
                             )
                         }
 
-                        readProperty.generateParameterSpec(project)
+                        readProperty
+                            .generateParameterSpec(project)
                             ?.let { paramSpec: ParameterSpecWrapper ->
                                 funSpecBuilder.addParameter(paramSpec)
                             }
@@ -737,11 +735,9 @@ sealed interface StateOperationForList : StateOperation {
             readProperty.isDependent(sourceId) ||
                 indexProperty.isDependent(sourceId)
 
-        override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
-            readProperty.getDependentComposeNodes(project)
+        override fun getDependentComposeNodes(project: Project): List<ComposeNode> = readProperty.getDependentComposeNodes(project)
 
-        override fun getAssignableProperties(): List<AssignableProperty> =
-            readProperty.getAssignableProperties()
+        override fun getAssignableProperties(): List<AssignableProperty> = readProperty.getAssignableProperties()
 
         override fun getUpdateMethodName(
             project: Project,
@@ -810,10 +806,12 @@ sealed interface StateOperationForList : StateOperation {
                                     codeBlock = codeBlock,
                                 ),
                     )
-                val finalFunSpec = readProperty.generateParameterSpec(project)
-                    ?.let { paramSpec: ParameterSpecWrapper ->
-                        baseFunSpec.toBuilder().addParameter(paramSpec).build()
-                    } ?: baseFunSpec
+                val finalFunSpec =
+                    readProperty
+                        .generateParameterSpec(project)
+                        ?.let { paramSpec: ParameterSpecWrapper ->
+                            baseFunSpec.toBuilder().addParameter(paramSpec).build()
+                        } ?: baseFunSpec
                 context.addFunction(
                     finalFunSpec,
                     dryRun,
@@ -912,13 +910,14 @@ sealed interface StateOperationForList : StateOperation {
                         getUpdateMethodName(
                             project = project,
                             context = context,
-                            writeState = writeState
+                            writeState = writeState,
                         ),
                     ).addParameter(
-                        ParameterSpecWrapper.builder(
-                            name = indexToUpdate,
-                            Int::class.asTypeNameWrapper()
-                        ).build(),
+                        ParameterSpecWrapper
+                            .builder(
+                                name = indexToUpdate,
+                                Int::class.asTypeNameWrapper(),
+                            ).build(),
                     )
 
             val item = "item"
@@ -964,7 +963,8 @@ sealed interface StateOperationForList : StateOperation {
                             context,
                             dryRun = dryRun,
                         )
-                        properties.assignableProperty.generateParameterSpec(project)
+                        properties.assignableProperty
+                            .generateParameterSpec(project)
                             ?.let { paramSpec: ParameterSpecWrapper ->
                                 funSpecBuilder.addParameter(paramSpec)
                             }

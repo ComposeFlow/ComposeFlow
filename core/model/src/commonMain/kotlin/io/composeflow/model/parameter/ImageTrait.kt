@@ -17,9 +17,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.CodeBlockBuilderWrapper
-import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import com.valentinilk.shimmer.shimmer
 import io.composeflow.Res
 import io.composeflow.asVariableName
@@ -28,6 +25,8 @@ import io.composeflow.cloud.storage.BlobInfoWrapper
 import io.composeflow.image_from_network
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.model.enumwrapper.ContentScaleWrapper
 import io.composeflow.model.modifier.ModifierWrapper
 import io.composeflow.model.modifier.generateModifierCode

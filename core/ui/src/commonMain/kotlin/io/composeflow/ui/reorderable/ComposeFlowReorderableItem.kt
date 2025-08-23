@@ -28,7 +28,7 @@ fun LazyItemScope.ComposeFlowReorderableItem(
 ) {
     ReorderableItem(
         reorderableLazyListState,
-        key = key ?: "item $index"
+        key = key ?: "item $index",
     ) { isDragging ->
         val elevation = animateDpAsState(if (isDragging) 8.dp else 0.dp)
         val backgroundModifier =

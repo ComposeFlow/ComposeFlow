@@ -49,7 +49,6 @@ import io.composeflow.model.project.ParameterId
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.SCREEN_ROUTE
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
-import io.composeflow.model.project.appscreen.screenRouteClass
 import io.composeflow.model.project.component.COMPONENT_KEY_NAME
 import io.composeflow.model.project.component.Component
 import io.composeflow.model.project.component.ComponentId
@@ -92,7 +91,6 @@ import kotlinx.serialization.Transient
 import org.jetbrains.compose.resources.stringResource
 import kotlin.time.Instant
 import kotlin.uuid.Uuid
-
 
 typealias ActionId = String
 
@@ -318,8 +316,7 @@ sealed interface Navigation : Action {
             return builder.build()
         }
 
-        override fun argumentName(project: Project): String =
-            ComposeScreenConstant.onNavigateToRoute.name
+        override fun argumentName(project: Project): String = ComposeScreenConstant.onNavigateToRoute.name
 
         override fun generateArgumentParameterSpec(project: Project): ParameterSpecWrapper =
             argumentName(project).let { argumentName ->
@@ -328,9 +325,10 @@ sealed interface Navigation : Action {
                         argumentName,
                         LambdaTypeNameWrapper.get(
                             receiver = null,
-                            parameters = listOf(
-                                ParameterSpecWrapper.unnamed(ClassNameWrapper.get("", SCREEN_ROUTE))
-                            ),
+                            parameters =
+                                listOf(
+                                    ParameterSpecWrapper.unnamed(ClassNameWrapper.get("", SCREEN_ROUTE)),
+                                ),
                             returnType = UNIT,
                         ),
                     ).build()
@@ -347,8 +345,7 @@ sealed interface Navigation : Action {
             return builder.build()
         }
 
-        override fun isDependent(sourceId: String): Boolean =
-            paramsMap.any { it.value.isDependent(sourceId) }
+        override fun isDependent(sourceId: String): Boolean = paramsMap.any { it.value.isDependent(sourceId) }
 
         override fun asActionNode(actionNodeId: ActionNodeId?): ActionNode =
             ActionNode.Simple(id = actionNodeId ?: Uuid.random().toString(), action = this)
@@ -383,8 +380,7 @@ sealed interface Navigation : Action {
             return builder.build()
         }
 
-        override fun argumentName(project: Project): String =
-            ComposeScreenConstant.onNavigateBack.name
+        override fun argumentName(project: Project): String = ComposeScreenConstant.onNavigateBack.name
 
         override fun generateArgumentParameterSpec(project: Project): ParameterSpecWrapper =
             argumentName(project).let { argumentName ->
@@ -640,8 +636,7 @@ data class CallApi(
         }
     }
 
-    override fun isDependent(sourceId: String): Boolean =
-        paramsMap.any { it.value.isDependent(sourceId) }
+    override fun isDependent(sourceId: String): Boolean = paramsMap.any { it.value.isDependent(sourceId) }
 
     override fun generateActionTriggerCodeBlock(
         project: Project,
@@ -824,7 +819,7 @@ data class ShowConfirmationDialog(
         builder.add("message = ")
         builder.add(
             message?.transformedCodeBlock(project, context, dryRun = dryRun) ?: CodeBlockWrapper.of(
-                ""
+                "",
             ),
         )
         builder.addStatement(",")
@@ -971,7 +966,7 @@ sealed interface ShowModalWithComponent : ShowModal {
         paramsMap: MutableMap<
             ParameterId,
             AssignableProperty,
-            >,
+        >,
     ): ShowModalWithComponent
 
     fun findComponentOrNull(project: Project): Component? =
@@ -1035,8 +1030,7 @@ data class ShowCustomDialog(
     @Transient
     val dialogOpenVariableName: String = "openCustomDialog",
 ) : ShowModalWithComponent {
-    override fun copy(paramsMap: MutableMap<ParameterId, AssignableProperty>): ShowModalWithComponent =
-        this.copy(paramsMap = paramsMap)
+    override fun copy(paramsMap: MutableMap<ParameterId, AssignableProperty>): ShowModalWithComponent = this.copy(paramsMap = paramsMap)
 
     override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
         paramsMap.entries.flatMap {
@@ -1152,8 +1146,7 @@ data class ShowBottomSheet(
     @Transient
     val bottomSheetOpenVariableName: String = "openBottomSheet",
 ) : ShowModalWithComponent {
-    override fun copy(paramsMap: MutableMap<ParameterId, AssignableProperty>): ShowModalWithComponent =
-        this.copy(paramsMap = paramsMap)
+    override fun copy(paramsMap: MutableMap<ParameterId, AssignableProperty>): ShowModalWithComponent = this.copy(paramsMap = paramsMap)
 
     override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
         paramsMap.entries.flatMap {
@@ -1322,9 +1315,11 @@ data class ShowNavigationDrawer(
                     }
                 } != null
             }
-        if (screenHavingThisAction?.navigationDrawerNode?.value == null) return CodeBlockWrapper.of(
-            ""
-        )
+        if (screenHavingThisAction?.navigationDrawerNode?.value == null) {
+            return CodeBlockWrapper.of(
+                "",
+            )
+        }
 
         val builder = CodeBlockWrapper.builder()
         screenHavingThisAction.let {
@@ -1804,7 +1799,7 @@ sealed interface DateOrTimePicker : Action {
                 composableContext.addComposeFileVariable(
                     id = "$id-$timePickerStateName",
                     initialIdentifier =
-                        timePickerStateName,
+                    timePickerStateName,
                     dryRun = dryRun,
                 )
             val rememberedStateName =
@@ -1969,12 +1964,12 @@ sealed interface DateOrTimePicker : Action {
                     MemberNameWrapper.get(
                         "${COMPOSEFLOW_PACKAGE}.util",
                         "setHour",
-                        isExtension = true
+                        isExtension = true,
                     ),
                     MemberNameWrapper.get(
                         "${COMPOSEFLOW_PACKAGE}.util",
                         "setMinute",
-                        isExtension = true
+                        isExtension = true,
                     ),
                     MemberHolderWrapper.Material3.Text,
                     MemberHolderWrapper.JetBrains.stringResource,
@@ -2018,8 +2013,7 @@ sealed interface Share : Action {
         @Transient
         val uriHandlerName: String = "uriHandler",
     ) : Share {
-        override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
-            url.getDependentComposeNodes(project)
+        override fun getDependentComposeNodes(project: Project): List<ComposeNode> = url.getDependentComposeNodes(project)
 
         override fun generateIssues(project: Project): List<Issue> =
             buildList {
@@ -2150,7 +2144,7 @@ sealed interface Auth : Action {
             """,
                 MemberNameWrapper.get(
                     "com.mmk.kmpauth.firebase.google",
-                    "GoogleButtonUiContainerFirebase"
+                    "GoogleButtonUiContainerFirebase",
                 ),
             )
             builder.add(insideContent)
@@ -2275,18 +2269,18 @@ sealed interface Auth : Action {
                 FunSpecWrapper
                     .builder(signInStateViewModelFunName)
                     .addParameter(
-                        ParameterSpecWrapper.builder(
-                            "email",
-                            String::class.asTypeNameWrapper()
-                        ).build()
-                    )
-                    .addParameter(
-                        ParameterSpecWrapper.builder(
-                            "password",
-                            String::class.asTypeNameWrapper()
-                        ).build()
-                    )
-                    .addCode(
+                        ParameterSpecWrapper
+                            .builder(
+                                "email",
+                                String::class.asTypeNameWrapper(),
+                            ).build(),
+                    ).addParameter(
+                        ParameterSpecWrapper
+                            .builder(
+                                "password",
+                                String::class.asTypeNameWrapper(),
+                            ).build(),
+                    ).addCode(
                         """%M.%M {
             _$signInStateName.value = %T.Loading
             try {
@@ -2509,18 +2503,18 @@ sealed interface Auth : Action {
                 FunSpecWrapper
                     .builder(createStateViewModelFunName)
                     .addParameter(
-                        ParameterSpecWrapper.builder(
-                            "email",
-                            String::class.asTypeNameWrapper()
-                        ).build()
-                    )
-                    .addParameter(
-                        ParameterSpecWrapper.builder(
-                            "password",
-                            String::class.asTypeNameWrapper()
-                        ).build()
-                    )
-                    .addCode(
+                        ParameterSpecWrapper
+                            .builder(
+                                "email",
+                                String::class.asTypeNameWrapper(),
+                            ).build(),
+                    ).addParameter(
+                        ParameterSpecWrapper
+                            .builder(
+                                "password",
+                                String::class.asTypeNameWrapper(),
+                            ).build(),
+                    ).addCode(
                         """%M.%M {
             _$createStateName.value = %T.Loading
             try {
@@ -3188,7 +3182,7 @@ sealed interface FirestoreAction : Action {
             filterExpression?.let {
                 funSpecBuilder.addStatement(".where {")
                 funSpecBuilder.addCode(
-                    it.generateCodeBlock(project, context, dryRun = dryRun)
+                    it.generateCodeBlock(project, context, dryRun = dryRun),
                 )
                 funSpecBuilder.addStatement("}")
 

@@ -17,15 +17,15 @@ data class DataTypeHolder(
     val dataTypes: MutableList<DataType> = mutableStateListEqualsOverrideOf(),
 ) {
     fun generateDataTypeFiles(project: Project): List<FileSpecWithDirectory> =
-        dataTypes.mapNotNull { dataType ->
-            dataType.generateDataClassSpec(project)?.let {
-                FileSpecWrapper
-                    .builder("${project.packageName}.$DATA_TYPE_PACKAGE", dataType.className)
-                    .addType(it)
-                    .build()
-            }
-        }
-            .map {
+        dataTypes
+            .mapNotNull { dataType ->
+                dataType.generateDataClassSpec(project)?.let {
+                    FileSpecWrapper
+                        .builder("${project.packageName}.$DATA_TYPE_PACKAGE", dataType.className)
+                        .addType(it)
+                        .build()
+                }
+            }.map {
                 FileSpecWithDirectory(it)
             }
 }

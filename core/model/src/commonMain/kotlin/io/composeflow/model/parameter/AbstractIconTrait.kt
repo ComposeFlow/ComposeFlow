@@ -269,8 +269,7 @@ abstract class AbstractIconTrait(
         return codeBlockBuilder.build()
     }
 
-    override fun paletteCategories(): List<TraitCategory> =
-        listOf(TraitCategory.Common, TraitCategory.Basic)
+    override fun paletteCategories(): List<TraitCategory> = listOf(TraitCategory.Common, TraitCategory.Basic)
 
     companion object {
         fun defaultTrait(): IconTrait = IconTrait(imageVectorHolder = Outlined.Add)

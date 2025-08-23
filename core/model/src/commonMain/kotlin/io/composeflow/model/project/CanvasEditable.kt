@@ -4,7 +4,6 @@ import androidx.compose.ui.geometry.Offset
 import io.composeflow.ON_SCREEN_INITIALLY_LOADED
 import io.composeflow.SCREEN_INITIALLY_LOADED_FLAG
 import io.composeflow.ViewModelConstant
-import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.kotlinpoet.ComposeEditableContext
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
@@ -13,6 +12,7 @@ import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import io.composeflow.kotlinpoet.wrapper.parameterizedBy
+import io.composeflow.kotlinpoet.wrapper.suppressRedundantVisibilityModifier
 import io.composeflow.model.action.Action
 import io.composeflow.model.action.ActionNode
 import io.composeflow.model.action.ActionType
@@ -118,8 +118,7 @@ interface CanvasEditable : StateHolder {
             it.allActionNodes()
         }
 
-    fun hasComposeNode(node: ComposeNode): Boolean =
-        getAllComposeNodes().any { it.fallbackId == node.fallbackId }
+    fun hasComposeNode(node: ComposeNode): Boolean = getAllComposeNodes().any { it.fallbackId == node.fallbackId }
 
     fun generateViewModelFileSpec(
         project: Project,

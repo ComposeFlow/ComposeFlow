@@ -137,7 +137,7 @@ data class GoogleSignInButtonTrait(
             if (iconOnly) {
                 MemberNameWrapper.get(
                     "com.mmk.kmpauth.uihelper.google",
-                    "GoogleSignInButtonIconOnly"
+                    "GoogleSignInButtonIconOnly",
                 )
             } else {
                 MemberNameWrapper.get("com.mmk.kmpauth.uihelper.google", "GoogleSignInButton")

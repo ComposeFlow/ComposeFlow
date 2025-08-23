@@ -14,8 +14,12 @@ expect object FormatterWrapper {
      * @param isScript Whether this is a Kotlin script (.kts) file
      * @return The formatted Kotlin code
      */
-    fun format(fileName: String?, text: String, isScript: Boolean = false): String
-    
+    fun format(
+        fileName: String?,
+        text: String,
+        isScript: Boolean = false,
+    ): String
+
     /**
      * Format code block text, optionally including imports.
      * @param text The Kotlin code to format
@@ -23,8 +27,12 @@ expect object FormatterWrapper {
      * @param isScript Whether this is a Kotlin script (.kts) file
      * @return The formatted Kotlin code
      */
-    fun formatCodeBlock(text: String, withImports: Boolean = false, isScript: Boolean = true): String
-    
+    fun formatCodeBlock(
+        text: String,
+        withImports: Boolean = false,
+        isScript: Boolean = true,
+    ): String
+
     /**
      * Format a code block, optionally including imports.
      * @param codeBlock The code block to format
@@ -32,5 +40,9 @@ expect object FormatterWrapper {
      * @param isScript Whether this is a Kotlin script (.kts) file
      * @return The formatted Kotlin code
      */
-    fun formatCodeBlock(codeBlock: CodeBlockWrapper, withImports: Boolean = false, isScript: Boolean = true): String
+    fun formatCodeBlock(
+        codeBlock: CodeBlockWrapper,
+        withImports: Boolean = false,
+        isScript: Boolean = true,
+    ): String
 }

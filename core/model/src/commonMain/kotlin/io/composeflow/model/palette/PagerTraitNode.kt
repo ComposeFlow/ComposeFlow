@@ -1,9 +1,9 @@
 package io.composeflow.model.palette
 
-import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
-import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
+import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
+import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.model.modifier.generateModifierCode
 import io.composeflow.model.parameter.HorizontalPagerTrait
 import io.composeflow.model.parameter.lazylist.LazyListChildParams

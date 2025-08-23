@@ -53,10 +53,11 @@ enum class TextDecorationWrapper(
         return entries as EnumEntries<E>
     }
 
-    override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of(
-        "%M.$name",
-        MemberNameWrapper.get("androidx.compose.ui.text.style", "TextDecoration")
-    )
+    override fun asCodeBlock(): CodeBlockWrapper =
+        CodeBlockWrapper.of(
+            "%M.$name",
+            MemberNameWrapper.get("androidx.compose.ui.text.style", "TextDecoration"),
+        )
 
     object TextDecorationWrapperSerializer :
         FallbackEnumSerializer<TextDecorationWrapper>(TextDecorationWrapper::class)
@@ -256,8 +257,7 @@ enum class TextStyleWrapper(
         return entries as EnumEntries<E>
     }
 
-    override fun asCodeBlock(): CodeBlockWrapper =
-        CodeBlockWrapper.of("%M.typography.$styleName", MemberHolder.Material3.MaterialTheme)
+    override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("%M.typography.$styleName", MemberHolder.Material3.MaterialTheme)
 
     object TextStyleWrapperSerializer :
         FallbackEnumSerializer<TextStyleWrapper>(TextStyleWrapper::class)
@@ -279,10 +279,11 @@ enum class FontStyleWrapper(
         return entries as EnumEntries<E>
     }
 
-    override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of(
-        "%M.$name",
-        MemberNameWrapper.get("androidx.compose.ui.text.font", "FontStyle")
-    )
+    override fun asCodeBlock(): CodeBlockWrapper =
+        CodeBlockWrapper.of(
+            "%M.$name",
+            MemberNameWrapper.get("androidx.compose.ui.text.font", "FontStyle"),
+        )
 
     object FontStyleWrapperSerializer :
         FallbackEnumSerializer<FontStyleWrapper>(FontStyleWrapper::class)
@@ -308,10 +309,11 @@ enum class TextAlignWrapper(
         return entries as EnumEntries<E>
     }
 
-    override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of(
-        "%M.$name",
-        MemberNameWrapper.get("androidx.compose.ui.text.style", "TextAlign")
-    )
+    override fun asCodeBlock(): CodeBlockWrapper =
+        CodeBlockWrapper.of(
+            "%M.$name",
+            MemberNameWrapper.get("androidx.compose.ui.text.style", "TextAlign"),
+        )
 
     object TextAlignWrapperSerializer :
         FallbackEnumSerializer<TextAlignWrapper>(TextAlignWrapper::class)
@@ -334,10 +336,11 @@ enum class TextOverflowWrapper(
         return entries as EnumEntries<E>
     }
 
-    override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of(
-        "%M.$name",
-        MemberNameWrapper.get("androidx.compose.ui.text.style", "TextOverflow")
-    )
+    override fun asCodeBlock(): CodeBlockWrapper =
+        CodeBlockWrapper.of(
+            "%M.$name",
+            MemberNameWrapper.get("androidx.compose.ui.text.style", "TextOverflow"),
+        )
 
     object TextOverflowWrapperSerializer :
         FallbackEnumSerializer<TextOverflowWrapper>(TextOverflowWrapper::class)
@@ -364,10 +367,11 @@ enum class ContentScaleWrapper(
         return entries as EnumEntries<E>
     }
 
-    override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of(
-        "%M.$name",
-        MemberNameWrapper.get("androidx.compose.ui.layout", "ContentScale")
-    )
+    override fun asCodeBlock(): CodeBlockWrapper =
+        CodeBlockWrapper.of(
+            "%M.$name",
+            MemberNameWrapper.get("androidx.compose.ui.layout", "ContentScale"),
+        )
 
     object ContentScaleWrapperSerializer :
         FallbackEnumSerializer<ContentScaleWrapper>(ContentScaleWrapper::class)
@@ -387,16 +391,16 @@ enum class TextFieldColorsWrapper : EnumWrapper {
         return entries as EnumEntries<E>
     }
 
-    override fun asCodeBlock(): CodeBlockWrapper =
-        CodeBlockWrapper.of("%M.colors()", toMemberName())
+    override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("%M.colors()", toMemberName())
 
     fun toMemberName(): MemberNameWrapper =
         when (this) {
             Default -> MemberNameWrapper.get("androidx.compose.material3", "TextFieldDefaults")
-            Outlined -> MemberNameWrapper.get(
-                "androidx.compose.material3",
-                "OutlinedTextFieldDefaults"
-            )
+            Outlined ->
+                MemberNameWrapper.get(
+                    "androidx.compose.material3",
+                    "OutlinedTextFieldDefaults",
+                )
         }
 
     object TextFieldColorsWrapperSerializer :

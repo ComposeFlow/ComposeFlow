@@ -43,7 +43,6 @@ class LeafNode<T>
         SelectableNode by SelectableNodeHandler(),
         HoverableNode by HoverableNodeHandler()
 
-
 class BranchNode<T>
     @OptIn(ExperimentalUuidApi::class)
     internal constructor(

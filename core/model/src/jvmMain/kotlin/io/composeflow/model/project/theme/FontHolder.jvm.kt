@@ -8,7 +8,7 @@ import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
 
 internal actual fun addFontFamilyFunSpec(
     fileBuilder: FileSpecBuilderWrapper,
-    fontFamily: FontFamilyWrapper
+    fontFamily: FontFamilyWrapper,
 ) {
     val fontFunSpec = fontFamily.generateFontFamilyFunSpec()
     if (fontFunSpec is FunSpec) {

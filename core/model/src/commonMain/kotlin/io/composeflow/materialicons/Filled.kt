@@ -65,16 +65,12 @@ object FilledSerializer : FallbackEnumSerializer<Filled>(Filled::class)
 @Serializable(FilledSerializer::class)
 enum class Filled(
     @Transient
-
     override val imageVector: ImageVector,
     @Transient
-
     override val packageDescriptor: String = "filled",
     @Transient
-
     override val memberDescriptor: String = "Filled",
 ) : ImageVectorHolder {
-
     AccountBox(Icons.Filled.AccountBox),
     AccountCircle(Icons.Filled.AccountCircle),
     AddCircle(Icons.Filled.AddCircle),

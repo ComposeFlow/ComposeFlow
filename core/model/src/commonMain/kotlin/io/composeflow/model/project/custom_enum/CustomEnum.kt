@@ -3,9 +3,9 @@
 package io.composeflow.model.project.custom_enum
 
 import androidx.compose.runtime.mutableStateListOf
+import io.composeflow.asClassName
 import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
 import io.composeflow.kotlinpoet.wrapper.TypeSpecWrapper
-import io.composeflow.asClassName
 import io.composeflow.model.project.Project
 import io.composeflow.serializer.FallbackMutableStateListSerializer
 import kotlinx.serialization.SerialName

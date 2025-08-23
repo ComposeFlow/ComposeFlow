@@ -305,7 +305,7 @@ private fun EnumDetailContent(
                                 onDeleteEnumDialogOpen = { index ->
                                     indexOfEnumToBeDeleted = index
                                 },
-                                modifier = Modifier.draggableHandle()
+                                modifier = Modifier.draggableHandle(),
                             )
                         }
                     }

@@ -71,8 +71,8 @@ import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
 // Helper functions for hex color conversion
-private fun Int.toHexString(): String = 
-    this.toString(16).padStart(2, '0').uppercase()
+private fun Int.toHexString(): String = this.toString(16).padStart(2, '0').uppercase()
+
 private fun Color.toHexString(includeAlpha: Boolean = true): String {
     val alpha = (alpha * 255).toInt()
     val red = (red * 255).toInt()
@@ -85,8 +85,8 @@ private fun Color.toHexString(includeAlpha: Boolean = true): String {
     }
 }
 
-private fun String.toColorOrNull(): Color? {
-    return try {
+private fun String.toColorOrNull(): Color? =
+    try {
         val hex = if (startsWith("#")) substring(1) else this
 
         when (hex.length) {
@@ -112,7 +112,6 @@ private fun String.toColorOrNull(): Color? {
     } catch (e: Exception) {
         null
     }
-}
 
 @Composable
 fun ColorPropertyEditor(
@@ -232,11 +231,12 @@ private fun ColorPropertyDialog(
         },
     ) {
         Box(
-            modifier = Modifier
-                .size(
-                    width = 800.dp,
-                    height = if (includeThemeColor) 900.dp else 480.dp
-                )
+            modifier =
+                Modifier
+                    .size(
+                        width = 800.dp,
+                        height = if (includeThemeColor) 900.dp else 480.dp,
+                    ),
         ) {
             ColorPropertyDialogContent(
                 initialColor = initialColor,
@@ -307,33 +307,35 @@ fun ColorPropertyDialogContent(
 
                 // Alpha slider
                 Column(
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
                 ) {
                     Text(
                         text = "Alpha",
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(bottom = 4.dp),
                     )
 
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         AlphaSlider(
                             controller = controller,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(24.dp)
-                                .padding(end = 16.dp),
+                            modifier =
+                                Modifier
+                                    .weight(1f)
+                                    .height(24.dp)
+                                    .padding(end = 16.dp),
                         )
 
                         // Alpha tile to show the color with transparency
                         AlphaTile(
                             controller = controller,
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                            modifier =
+                                Modifier
+                                    .size(48.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
                         )
                     }
                 }

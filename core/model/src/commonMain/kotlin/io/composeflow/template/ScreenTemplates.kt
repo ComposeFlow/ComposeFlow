@@ -68,8 +68,7 @@ object ScreenTemplates {
 
     // When creating new Screen from a template, replace Uuids with random ones while keeping the
     // relationships to keep the referenced statuses.
-    fun createNewScreen(screenTemplatePair: ScreenTemplatePair): Screen =
-        loadScreenTemplate(screenTemplatePair.resourcePath)
+    fun createNewScreen(screenTemplatePair: ScreenTemplatePair): Screen = loadScreenTemplate(screenTemplatePair.resourcePath)
 
     private fun loadScreenTemplate(fileName: String): Screen {
         val yamlContent = ResourceLoader.loadResourceAsText(fileName)
