@@ -27,9 +27,7 @@ kotlin {
             implementation(libs.gitlive.firebase.firestore)
             implementation(libs.kaml)
             implementation(compose.materialIconsExtended)
-//            implementation(libs.kmpauth.uihelper)
             implementation(libs.koin.core)
-            // KotlinPoet moved to JVM-only dependencies
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.serialization.jsonpath)
             implementation(libs.kotlin.datetime)

@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.mmk.kmpauth.uihelper.google.GoogleSignInButton
 import io.composeflow.Res
 import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.custom.composeflowicons.Google
@@ -24,7 +23,7 @@ import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 import io.composeflow.override.mutableStateListEqualsOverrideOf
 import io.composeflow.tooltip_google_sign_in_button_trait
 import io.composeflow.ui.CanvasNodeCallbacks
-//import io.composeflow.ui.button.GoogleSignInButton
+import io.composeflow.ui.button.GoogleSignInButton
 import io.composeflow.ui.button.GoogleSignInButtonIconOnly
 import io.composeflow.ui.modifierForCanvas
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
