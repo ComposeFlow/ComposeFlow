@@ -39,7 +39,7 @@ okhttp = "5.1.0"
 paging-multiplatform = "3.3.0-alpha02-0.5.1"
 posthog = "1.2.0"
 precompose = "1.6.2"
-reorderable = "0.9.6"
+reorderable = "3.0.0"
 roborazzi = "1.46.1"
 sentry = "8.17.0"
 sentry-jvm-gradle = "5.8.0"
@@ -84,7 +84,7 @@ compose-color-picker = { module = "com.github.skydoves:colorpicker-compose", ver
 compose-image-loader = "io.github.qdsfdhvh:image-loader:1.10.0"
 paging-common = { module = "app.cash.paging:paging-common", version.ref = "paging-multiplatform" }
 paging-compose = { module = "app.cash.paging:paging-compose-common", version.ref = "paging-multiplatform" }
-reorderable = { module = "org.burnoutcrew.composereorderable:reorderable", version.ref = "reorderable" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
 richeditor-compose = "com.mohamedrejeb.richeditor:richeditor-compose:1.0.0-rc13"
 
 # Data
@@ -103,7 +103,7 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
-kotlinx-serialization-jsonpath = "io.github.nomisrev:kotlinx-serialization-jsonpath:1.0.0"
+kotlinx-serialization-jsonpath = "io.github.nomisrev:kotlinx-serialization-jsonpath:2.0.0-alpha.1"
 kotlin-result = "com.michael-bull.kotlin-result:kotlin-result:2.0.1"
 ktor-utils = "io.ktor:ktor-utils:3.2.3"
 kaml = "com.charleskorn.kaml:kaml:0.85.0"

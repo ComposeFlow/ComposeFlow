@@ -3,6 +3,8 @@ package io.composeflow.ui.reorderable
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -11,18 +13,22 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.ReorderableLazyListState
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import sh.calvin.reorderable.ReorderableCollectionItemScope
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.ReorderableLazyListState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
-fun ComposeFlowReorderableItem(
+fun LazyItemScope.ComposeFlowReorderableItem(
     index: Int,
     reorderableLazyListState: ReorderableLazyListState =
-        rememberReorderableLazyListState(onMove = { _, _ -> }),
-    content: @Composable () -> Unit,
+        rememberReorderableLazyListState(rememberLazyListState()) { _, _ -> },
+    content: @Composable ReorderableCollectionItemScope.() -> Unit,
 ) {
-    ReorderableItem(reorderableLazyListState, key = "item-$index", index = index) { isDragging ->
+    ReorderableItem(
+        reorderableLazyListState,
+        key = "item $index"
+    ) { isDragging ->
         val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
         val backgroundModifier =
             if (isDragging) {

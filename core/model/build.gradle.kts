@@ -22,9 +22,6 @@ kotlin {
             implementation(libs.compose.color.picker)
             implementation(libs.compose.navigation)
             implementation(libs.compose.shimmer)
-            implementation(libs.datastore.core.okio)
-            implementation(libs.datastore.preferences.core)
-            implementation(libs.gitlive.firebase.firestore)
             implementation(libs.kaml)
             implementation(compose.materialIconsExtended)
             implementation(libs.koin.core)
@@ -39,14 +36,9 @@ kotlin {
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)
             implementation(libs.precompose.koin)
+            implementation(libs.reorderable)
             implementation(libs.richeditor.compose)
             implementation(libs.xmlutil.core)
-        }
-        commonTest.dependencies {
-            implementation(kotlin("test-junit"))
-            implementation(libs.precompose)
-            implementation(libs.precompose.viewmodel)
-            implementation(libs.google.cloud.storage)
         }
         jvmMain.dependencies {
             implementation(libs.xmlutil.core.jdk)
@@ -57,6 +49,14 @@ kotlin {
             implementation(libs.compose.code.editor)
             implementation(libs.ktlint.core)
             implementation(libs.ktlint.ruleset.standard)
+            // Reflection for ModifierHelper
+            implementation(kotlin("reflect"))
+        }
+        jvmTest.dependencies {
+            implementation(kotlin("test-junit"))
+            implementation(libs.precompose)
+            implementation(libs.precompose.viewmodel)
+            implementation(libs.google.cloud.storage)
         }
         all {
             optInComposeExperimentalApis()

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -61,10 +62,8 @@ import io.composeflow.ui.popup.PositionCustomizablePopup
 import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
 import io.composeflow.ui.textfield.DropdownMenuTextField
 import io.composeflow.ui.textfield.SmallOutlinedTextField
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.jetbrains.compose.resources.stringResource
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun BrushEditDialog(
@@ -177,44 +176,94 @@ fun BrushEditDialog(
                         }
                     }
 
+                    val lazyListState = rememberLazyListState()
                     val reorderableLazyListState =
-                        rememberReorderableLazyListState(onMove = { from, to ->
+                        rememberReorderableLazyListState(lazyListState) { from, to ->
                             val updatedColors = editedBrush.colors.toMutableList()
                             val item = updatedColors.removeAt(from.index)
                             updatedColors.add(to.index, item)
                             editedBrush = editedBrush.copy(colors = updatedColors)
-                        })
+                        }
 
                     LazyColumn(
-                        state = reorderableLazyListState.listState,
-                        modifier =
-                            Modifier
-                                .height(200.dp)
-                                .reorderable(reorderableLazyListState)
-                                .detectReorder(reorderableLazyListState),
+                        state = lazyListState,
+                        modifier = Modifier.height(200.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        itemsIndexed(editedBrush.colors) { index, colorWrapper ->
+                        itemsIndexed(
+                            editedBrush.colors,
+                            key = { _, color -> color }) { index, colorWrapper ->
                             ComposeFlowReorderableItem(
                                 index = index,
-                                reorderableLazyListState = reorderableLazyListState,
+                                reorderableLazyListState,
                             ) {
-                                ColorListItem(
-                                    colorWrapper = colorWrapper,
-                                    onColorChange = { newColor ->
-                                        val updatedColors = editedBrush.colors.toMutableList()
-                                        updatedColors[index] = newColor
-                                        editedBrush = editedBrush.copy(colors = updatedColors)
-                                    },
-                                    onDelete = {
-                                        if (editedBrush.colors.size > 1) {
-                                            val updatedColors = editedBrush.colors.toMutableList()
-                                            updatedColors.removeAt(index)
-                                            editedBrush = editedBrush.copy(colors = updatedColors)
-                                        }
-                                    },
-                                    canDelete = editedBrush.colors.size > 1,
-                                )
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    ColorPropertyEditor(
+                                        label = "", // Empty label since we're in a list
+                                        initialColor = colorWrapper,
+                                        onColorUpdated = { newColor ->
+                                            val updatedColors =
+                                                editedBrush.colors.toMutableList()
+                                            updatedColors[index] =
+                                                ColorWrapper(
+                                                    color = newColor,
+                                                    themeColor = null
+                                                )
+                                            editedBrush =
+                                                editedBrush.copy(colors = updatedColors)
+                                        },
+                                        onThemeColorSelected = { themeColor ->
+                                            val updatedColors =
+                                                editedBrush.colors.toMutableList()
+                                            updatedColors[index] =
+                                                ColorWrapper(
+                                                    color = null,
+                                                    themeColor = themeColor
+                                                )
+                                            editedBrush =
+                                                editedBrush.copy(colors = updatedColors)
+                                        },
+                                        modifier = Modifier.weight(1f),
+                                        includeThemeColor = true,
+                                    )
+
+                                    ComposeFlowIcon(
+                                        imageVector = Icons.Outlined.DragIndicator,
+                                        contentDescription = "Drag to reorder",
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.draggableHandle(),
+                                    )
+
+                                    ComposeFlowIconButton(
+                                        onClick = {
+                                            if (editedBrush.colors.size > 1) {
+                                                val updatedColors =
+                                                    editedBrush.colors.toMutableList()
+                                                updatedColors.removeAt(index)
+                                                editedBrush =
+                                                    editedBrush.copy(colors = updatedColors)
+                                            }
+                                        },
+                                        enabled = editedBrush.colors.size > 1,
+                                    ) {
+                                        ComposeFlowIcon(
+                                            imageVector = Icons.Outlined.Delete,
+                                            contentDescription = "Delete Color",
+                                            tint =
+                                                if (editedBrush.colors.size > 1) {
+                                                    MaterialTheme.colorScheme.error
+                                                } else {
+                                                    MaterialTheme.colorScheme.onSurface.copy(
+                                                        alpha = 0.38f,
+                                                    )
+                                                },
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -256,56 +305,6 @@ fun BrushEditDialog(
     }
 }
 
-@Composable
-private fun ColorListItem(
-    colorWrapper: ColorWrapper,
-    onColorChange: (ColorWrapper) -> Unit,
-    onDelete: () -> Unit,
-    canDelete: Boolean,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        ColorPropertyEditor(
-            label = "", // Empty label since we're in a list
-            initialColor = colorWrapper,
-            onColorUpdated = { newColor ->
-                onColorChange(ColorWrapper(color = newColor, themeColor = null))
-            },
-            onThemeColorSelected = { themeColor ->
-                onColorChange(ColorWrapper(color = null, themeColor = themeColor))
-            },
-            modifier = Modifier.weight(1f),
-            includeThemeColor = true,
-        )
-
-        ComposeFlowIcon(
-            imageVector = Icons.Outlined.DragIndicator,
-            contentDescription = "Drag to reorder",
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-
-        ComposeFlowIconButton(
-            onClick = onDelete,
-            enabled = canDelete,
-        ) {
-            ComposeFlowIcon(
-                imageVector = Icons.Outlined.Delete,
-                contentDescription = "Delete Color",
-                tint =
-                    if (canDelete) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = 0.38f,
-                        )
-                    },
-            )
-        }
-    }
-}
 
 @Composable
 private fun BrushParametersSection(

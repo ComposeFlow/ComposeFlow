@@ -1,6 +1,5 @@
 package io.composeflow.ui.inspector.modifier
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -10,6 +9,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
@@ -26,9 +27,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.add_new_modifier
@@ -46,12 +44,10 @@ import io.composeflow.ui.modifier.hoverOverlay
 import io.composeflow.ui.popup.PositionCustomizablePopup
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.burnoutcrew.reorderable.ReorderableItem
-import org.burnoutcrew.reorderable.ReorderableLazyListState
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.jetbrains.compose.resources.stringResource
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.ReorderableLazyListState
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 fun LazyListScope.modifierInspector(
     project: Project,
@@ -235,35 +231,13 @@ fun SingleModifierInspector(
             } else {
                 Modifier
             }
-        reorderableLazyListState?.let {
-            ReorderableItem(
-                reorderableLazyListState,
-                key = "modifier-$i",
-                index = i,
-            ) { isDragging ->
-                val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
-                val backgroundColor =
-                    if (isDragging) {
-                        MaterialTheme.colorScheme.secondaryContainer.copy(
-                            alpha = 0.8f,
-                        )
-                    } else {
-                        MaterialTheme.colorScheme.surface
-                    }
-                val clipShape =
-                    if (isDragging) RoundedCornerShape(16.dp) else RectangleShape
-                Column(
-                    modifier =
-                        Modifier
-                            .clip(clipShape)
-                            .shadow(elevation.value)
-                            .background(backgroundColor)
-                            .then(highlight),
-                ) {
-                    content()
-                }
+        if (reorderableLazyListState != null) {
+            Column(
+                modifier = highlight.then(issueContainer),
+            ) {
+                content()
             }
-        } ?: run {
+        } else {
             if (issues.isNotEmpty()) {
                 Tooltip(issues.first().errorMessage(project)) {
                     Column(
@@ -618,12 +592,13 @@ fun EditModifierDialog(
                 modifier = modifier.size(width = 420.dp, height = 460.dp),
                 color = MaterialTheme.colorScheme.surfaceContainer,
             ) {
+                val lazyListState = rememberLazyListState()
                 val reorderableLazyListState =
-                    rememberReorderableLazyListState(onMove = { from, to ->
+                    rememberReorderableLazyListState(lazyListState) { from, to ->
                         project.screenHolder.findFocusedNodes().firstOrNull()?.let {
                             composeNodeCallbacks.onModifierSwapped(it, from.index, to.index)
                         }
-                    })
+                    }
                 Column {
                     var addModifierDialogVisible by remember { mutableStateOf(false) }
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -688,19 +663,24 @@ fun EditModifierDialog(
 
                     ProvideModifierReorderAllowed(reorderAllowed = true) {
                         LazyColumn(
-                            state = reorderableLazyListState.listState,
-                            modifier =
-                                Modifier
-                                    .reorderable(reorderableLazyListState)
-                                    .detectReorder(reorderableLazyListState),
+                            state = lazyListState,
+                            modifier = Modifier,
                         ) {
-                            composeNode.modifierList.forEachIndexed { i, chain ->
-
-                                val onVisibilityToggleClicked = {
-                                    chain.visible.value = !chain.visible.value
-                                    composeNodeCallbacks.onModifierUpdatedAt(composeNode, i, chain)
-                                }
-                                item {
+                            itemsIndexed(
+                                composeNode.modifierList,
+                                key = { index, _ -> "modifier-$index" }) { i, chain ->
+                                ReorderableItem(
+                                    reorderableLazyListState,
+                                    key = "modifier-$i"
+                                ) { isDragging ->
+                                    val onVisibilityToggleClicked = {
+                                        chain.visible.value = !chain.visible.value
+                                        composeNodeCallbacks.onModifierUpdatedAt(
+                                            composeNode,
+                                            i,
+                                            chain
+                                        )
+                                    }
                                     SingleModifierInspector(
                                         project = project,
                                         composeNode = composeNode,

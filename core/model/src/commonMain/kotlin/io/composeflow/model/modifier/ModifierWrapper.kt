@@ -61,7 +61,6 @@ import io.composeflow.serializer.LocationAwareDpSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
-import kotlin.reflect.full.primaryConstructor
 
 @Serializable
 @SerialName("ModifierWrapper")
@@ -1060,15 +1059,8 @@ for the children of the same layout parent"""
     data class AlignHorizontal(
         val align: AlignmentHorizontalWrapper = AlignmentHorizontalWrapper.Start,
     ) : ModifierWrapper() {
-        @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
         override fun toModifier(): Modifier {
-            // Creating instance using reflection because modifiers that require LayoutScopeMarker
-            // such as RowScope, ColumnScope can't be instantiated outside of those scopes.
-            val constructor =
-                androidx.compose.foundation.layout.HorizontalAlignElement::class.primaryConstructor
-            return constructor!!.call(
-                align.alignment,
-            )
+            return ModifierHelper.createHorizontalAlignModifier(align.alignment)
         }
 
         override fun displayName(): String = "Align horizontal"
@@ -1098,15 +1090,8 @@ for the children of the same layout parent"""
     data class AlignVertical(
         val align: AlignmentVerticalWrapper = AlignmentVerticalWrapper.Top,
     ) : ModifierWrapper() {
-        @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
         override fun toModifier(): Modifier {
-            // Creating instance using reflection because modifiers that require LayoutScopeMarker
-            // such as RowScope, ColumnScope can't be instantiated outside of those scopes.
-            val constructor =
-                androidx.compose.foundation.layout.VerticalAlignElement::class.primaryConstructor
-            return constructor!!.call(
-                align.alignment,
-            )
+            return ModifierHelper.createVerticalAlignModifier(align.alignment)
         }
 
         override fun displayName(): String = "Align vertical"
@@ -1137,16 +1122,8 @@ for the children of the same layout parent"""
         val weight: Float = 1f,
         val fill: Boolean = true,
     ) : ModifierWrapper() {
-        @Suppress("INVISIBLE_MEMBER", "INVISIBLE_REFERENCE")
         override fun toModifier(): Modifier {
-            // Creating instance using reflection because modifiers that require LayoutScopeMarker
-            // such as RowScope, ColumnScope can't be instantiated outside of those scopes.
-            val constructor =
-                androidx.compose.foundation.layout.LayoutWeightElement::class.primaryConstructor
-            return constructor!!.call(
-                weight,
-                fill,
-            )
+            return ModifierHelper.createWeightModifier(weight, fill)
         }
 
         override fun displayName(): String = "Weight"

@@ -76,9 +76,10 @@ import io.composeflow.ui.propertyeditor.BasicEditableTextProperty
 import io.composeflow.ui.propertyeditor.BooleanPropertyEditor
 import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
 import io.composeflow.ui.utils.TreeExpander
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
+import androidx.compose.foundation.lazy.rememberLazyListState
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -108,31 +109,26 @@ fun ScreenBuilderTab(
             onAddScreen = onAddScreen,
         )
 
+        val lazyListState = rememberLazyListState()
         val reorderableLazyListState =
-            rememberReorderableLazyListState(onMove = { from, to ->
+            rememberReorderableLazyListState(lazyListState) { from, to ->
                 onScreensSwapped(from.index, to.index)
-            })
+            }
 
         LazyColumn(
-            state = reorderableLazyListState.listState,
-            modifier =
-                Modifier
-                    .reorderable(reorderableLazyListState)
-                    .detectReorder(reorderableLazyListState),
+            state = lazyListState,
+            modifier = Modifier,
         ) {
-            itemsIndexed(items = project.screenHolder.screens) { i, screen ->
-                val rowModifier =
-                    if (project.screenHolder.currentEditable() == screen) {
-                        Modifier
-                    } else {
-                        Modifier.alpha(
-                            0.5f,
-                        )
-                    }
-                ComposeFlowReorderableItem(
-                    index = i,
-                    reorderableLazyListState = reorderableLazyListState,
-                ) {
+            itemsIndexed(items = project.screenHolder.screens, key = { _, screen -> screen }) { i, screen ->
+                ReorderableItem(reorderableLazyListState, key = screen) { isDragging ->
+                    val rowModifier =
+                        if (project.screenHolder.currentEditable() == screen) {
+                            Modifier
+                        } else {
+                            Modifier.alpha(
+                                0.5f,
+                            )
+                        }
                     ScreenInfoPanel(
                         screen = screen,
                         numOfScreens = project.screenHolder.screens.size,
@@ -143,6 +139,7 @@ fun ScreenBuilderTab(
                         onSelectScreen = onSelectScreen,
                         onScreenUpdated = onScreenUpdated,
                         modifier = rowModifier,
+                        reorderableScope = this,
                     )
                 }
             }
@@ -246,6 +243,7 @@ private fun ScreenInfoPanel(
     onCopyScreen: (Screen) -> Unit,
     onScreenUpdated: (Screen) -> Unit,
     modifier: Modifier = Modifier,
+    reorderableScope: ReorderableCollectionItemScope? = null,
 ) {
     var expanded by remember { mutableStateOf(false) }
     Column {
@@ -261,6 +259,7 @@ private fun ScreenInfoPanel(
             onCopyScreen = onCopyScreen,
             onScreenUpdated = onScreenUpdated,
             modifier = modifier,
+            reorderableScope = reorderableScope,
         )
 
         if (expanded) {
@@ -316,6 +315,7 @@ private fun ScreenRowHeader(
     onCopyScreen: (Screen) -> Unit,
     onScreenUpdated: (Screen) -> Unit,
     modifier: Modifier = Modifier,
+    reorderableScope: ReorderableCollectionItemScope? = null,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -363,11 +363,22 @@ private fun ScreenRowHeader(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            ComposeFlowIcon(
-                imageVector = Icons.Outlined.DragIndicator,
-                tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = null,
-            )
+            if (reorderableScope != null) {
+                with(reorderableScope) {
+                    ComposeFlowIcon(
+                        imageVector = Icons.Outlined.DragIndicator,
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        contentDescription = null,
+                        modifier = Modifier.draggableHandle(),
+                    )
+                }
+            } else {
+                ComposeFlowIcon(
+                    imageVector = Icons.Outlined.DragIndicator,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    contentDescription = null,
+                )
+            }
 
             ComposeFlowIconButton(
                 onClick = {

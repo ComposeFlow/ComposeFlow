@@ -59,9 +59,10 @@ import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.popup.SingleTextInputDialog
 import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
 import io.composeflow.value
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
+import androidx.compose.foundation.lazy.rememberLazyListState
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
+import sh.calvin.reorderable.ReorderableCollectionItemScope
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -280,24 +281,18 @@ private fun EnumDetailContent(
                     }
                 }
 
+                val lazyListState = rememberLazyListState()
                 val reorderableLazyListState =
-                    rememberReorderableLazyListState(onMove = { from, to ->
+                    rememberReorderableLazyListState(lazyListState) { from, to ->
                         onSwapEnumValueIndexes(from.index, to.index)
-                    })
+                    }
                 EnumDetailContentHeader()
                 LazyColumn(
-                    state = reorderableLazyListState.listState,
-                    modifier =
-                        Modifier
-                            .heightIn(max = 800.dp)
-                            .detectReorder(reorderableLazyListState)
-                            .reorderable(reorderableLazyListState),
+                    state = lazyListState,
+                    modifier = Modifier.heightIn(max = 800.dp),
                 ) {
-                    itemsIndexed(enum.values) { i, value ->
-                        ComposeFlowReorderableItem(
-                            index = i,
-                            reorderableLazyListState = reorderableLazyListState,
-                        ) {
+                    itemsIndexed(enum.values, key = { _, value -> value }) { i, value ->
+                        ReorderableItem(reorderableLazyListState, key = value) { isDragging ->
                             EnumFieldRow(
                                 value = value,
                                 index = i,
@@ -305,9 +300,10 @@ private fun EnumDetailContent(
                                     indexOfEnumToBeEdited = i
                                     addEnumValueDialogOpen = true
                                 },
-                                onDeleteEnumDialogOpen = {
-                                    indexOfEnumToBeDeleted = i
+                                onDeleteEnumDialogOpen = { index ->
+                                    indexOfEnumToBeDeleted = index
                                 },
+                                reorderableScope = this,
                             )
                         }
                     }
@@ -380,6 +376,7 @@ private fun EnumFieldRow(
     index: Int,
     onEditEnumValueDialogOpen: (Int) -> Unit,
     onDeleteEnumDialogOpen: (Int) -> Unit,
+    reorderableScope: ReorderableCollectionItemScope? = null,
 ) {
     Column {
         Row(
@@ -393,10 +390,20 @@ private fun EnumFieldRow(
             )
 
             Spacer(Modifier.weight(1f))
-            Icon(
-                imageVector = Icons.Outlined.DragIndicator,
-                contentDescription = "",
-            )
+            if (reorderableScope != null) {
+                with(reorderableScope) {
+                    Icon(
+                        imageVector = Icons.Outlined.DragIndicator,
+                        contentDescription = "",
+                        modifier = Modifier.draggableHandle(),
+                    )
+                }
+            } else {
+                Icon(
+                    imageVector = Icons.Outlined.DragIndicator,
+                    contentDescription = "",
+                )
+            }
             IconButton(
                 onClick = {
                     onEditEnumValueDialogOpen(index)

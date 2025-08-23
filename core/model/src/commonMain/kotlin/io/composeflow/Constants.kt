@@ -6,7 +6,7 @@ import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
 import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
-import dev.gitlive.firebase.firestore.FirebaseFirestore
+import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
 import io.composeflow.kotlinpoet.MemberHolderWrapper
 import kotlinx.serialization.json.Json
 
@@ -54,7 +54,7 @@ enum class ViewModelConstant {
     firestore {
         override fun generateProperty(): PropertySpecWrapper =
             PropertySpecWrapper
-                .builder(firestore.name, FirebaseFirestore::class.asTypeNameWrapper())
+                .builder(firestore.name, ClassNameWrapper.get("dev.gitlive.firebase.firestore", "FirebaseFirestore"))
                 .addModifiers(KModifierWrapper.PRIVATE)
                 .delegate(
                     CodeBlockWrapper

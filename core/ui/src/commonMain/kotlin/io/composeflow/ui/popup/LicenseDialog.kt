@@ -143,7 +143,7 @@ private fun ThemedLicenseDialogPreview(useDarkTheme: Boolean) {
                 Library("KotlinPoet", "com.squareup", "1.15.3"),
                 Library("Koin", "io.insert-koin", "3.5.3"),
                 Library("Material3", "androidx.compose.material3", "1.5.4"),
-                Library("Reorderable", "org.burnoutcrew.reorderable", "0.9.6"),
+                Library("Reorderable", "sh.calvin.reorderable", "3.0.0"),
                 Library("Color Picker", "com.godaddy.android", "1.0.0"),
             )
 

@@ -47,7 +47,7 @@ object LibraryData {
             Library("kmpauth-firebase", "io.github.mirzemehdi", "2.1.0-alpha02"),
             Library("kmpauth-google", "io.github.mirzemehdi", "2.1.0-alpha02"),
             // UI Libraries
-            Library("reorderable", "org.burnoutcrew.composereorderable", "0.9.6"),
+            Library("reorderable", "sh.calvin.reorderable", "3.0.0"),
             Library("richeditor-compose", "com.mohamedrejeb.richeditor", "1.0.0-rc05-k2"),
             Library("material-kolor", "com.materialkolor", "1.6.1"),
             Library("filekit-compose", "io.github.vinceglb", "0.6.3"),

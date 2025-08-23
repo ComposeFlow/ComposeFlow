@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
@@ -40,10 +41,9 @@ import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.modifier.hoverOverlay
 import io.composeflow.ui.popup.PositionCustomizablePopup
 import io.composeflow.ui.reorderable.ComposeFlowReorderableItem
-import org.burnoutcrew.reorderable.detectReorder
-import org.burnoutcrew.reorderable.rememberReorderableLazyListState
-import org.burnoutcrew.reorderable.reorderable
 import org.jetbrains.compose.resources.stringResource
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun TabRowInspector(
@@ -202,57 +202,58 @@ private fun EditTabRowDialog(
                     }
                 }
 
+                val lazyListState = rememberLazyListState()
                 val reorderableLazyListState =
-                    rememberReorderableLazyListState(onMove = { from, to ->
+                    rememberReorderableLazyListState(lazyListState) { from, to ->
                         tabContainer?.swapTabIndex(from.index, to.index)
-                    })
+                    }
                 LazyColumn(
-                    state = reorderableLazyListState.listState,
-                    modifier =
-                        Modifier
-                            .reorderable(reorderableLazyListState)
-                            .detectReorder(reorderableLazyListState),
+                    state = lazyListState,
+                    modifier = Modifier,
                 ) {
-                    itemsIndexed(tabs) { i, tab ->
-                        val tabTrait = tab.trait.value as TabTrait
-                        ComposeFlowReorderableItem(
-                            index = i,
-                            reorderableLazyListState = reorderableLazyListState,
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier =
-                                    Modifier
-                                        .hoverOverlay()
-                                        .fillMaxWidth()
-                                        .height(42.dp)
-                                        .padding(start = 16.dp),
+                    itemsIndexed(tabs, key = { _, tab -> tab }) { i, tab ->
+                        ReorderableItem(reorderableLazyListState, key = tab) { isDragging ->
+                            val tabTrait = tab.trait.value as TabTrait
+                            ComposeFlowReorderableItem(
+                                index = i,
+                                reorderableLazyListState = reorderableLazyListState,
                             ) {
-                                Text(
-                                    text = tabTrait.text?.displayText(project) ?: "",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.secondary,
-                                )
-
-                                if (tabs.size > 1) {
-                                    Spacer(Modifier.weight(1f))
-                                    ComposeFlowIcon(
-                                        imageVector = Icons.Outlined.DragIndicator,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.secondary,
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier =
+                                        Modifier
+                                            .hoverOverlay()
+                                            .fillMaxWidth()
+                                            .height(42.dp)
+                                            .padding(start = 16.dp),
+                                ) {
+                                    Text(
+                                        text = tabTrait.text?.displayText(project) ?: "",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        color = MaterialTheme.colorScheme.secondary,
                                     )
-                                    ComposeFlowIconButton(
-                                        onClick = {
-                                            tabContainer?.removeTab(i)
-                                        },
-                                        modifier = Modifier.hoverIconClickable(),
-                                    ) {
+
+                                    if (tabs.size > 1) {
+                                        Spacer(Modifier.weight(1f))
                                         ComposeFlowIcon(
-                                            imageVector = Icons.Outlined.Delete,
-                                            contentDescription = stringResource(Res.string.delete_tab),
-                                            tint = MaterialTheme.colorScheme.error,
+                                            imageVector = Icons.Outlined.DragIndicator,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.secondary,
+                                            modifier = Modifier.draggableHandle(),
                                         )
+                                        ComposeFlowIconButton(
+                                            onClick = {
+                                                tabContainer?.removeTab(i)
+                                            },
+                                            modifier = Modifier.hoverIconClickable(),
+                                        ) {
+                                            ComposeFlowIcon(
+                                                imageVector = Icons.Outlined.Delete,
+                                                contentDescription = stringResource(Res.string.delete_tab),
+                                                tint = MaterialTheme.colorScheme.error,
+                                            )
+                                        }
                                     }
                                 }
                             }
