@@ -7,6 +7,10 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -14,10 +18,16 @@ kotlin {
             implementation(project(":core:config"))
             implementation(project(":core:serializer"))
             implementation(project(":core:di"))
-            implementation(libs.okhttp)
             implementation(libs.ktor.core)
             implementation(libs.kotlin.result)
-            implementation(libs.ktor.client.okhttp)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.ktor.client.cio)
+        }
+
+        wasmJsMain.dependencies {
+            implementation(libs.ktor.client.js)
         }
 
         all {

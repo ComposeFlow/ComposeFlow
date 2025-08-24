@@ -41,7 +41,7 @@ kotlin {
             implementation(kotlin("test-junit"))
         }
 
-        named("jvmMain") {
+        jvmMain {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
                 implementation(compose.desktop.common)
