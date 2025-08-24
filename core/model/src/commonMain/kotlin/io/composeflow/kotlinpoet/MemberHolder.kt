@@ -6,13 +6,7 @@ import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 /**
  * Utility objects that hold MemberName for KotlinPoet to avoid same MemberName are repeatedly
  * defined.
- *
- *
  */
-@Deprecated(
-    """Use MemberHolderWrapper instead if possible for supporting Multiplatform.
-        This object will be removed in the future.""",
-)
 object MemberHolder {
     object AndroidX {
         object Foundation {

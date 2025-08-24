@@ -28,7 +28,7 @@ import io.composeflow.firestore_update_document
 import io.composeflow.information
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.kotlinpoet.GenerationContext
-import io.composeflow.kotlinpoet.MemberHolderWrapper
+import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.FunSpecWrapper
@@ -771,8 +771,8 @@ data class ShowConfirmationDialog(
                 if ($variableName) {
                     %M(
                         positiveText = """,
-            MemberHolderWrapper.AndroidX.Runtime.remember,
-            MemberHolderWrapper.AndroidX.Runtime.mutableStateOf,
+            MemberHolder.AndroidX.Runtime.remember,
+            MemberHolder.AndroidX.Runtime.mutableStateOf,
             MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.ui.dialogs", "ConfirmationDialog"),
         )
         builder.add(
@@ -938,8 +938,8 @@ data class ShowInformationDialog(
                     )
                 }
             """,
-            MemberHolderWrapper.AndroidX.Runtime.remember,
-            MemberHolderWrapper.AndroidX.Runtime.mutableStateOf,
+            MemberHolder.AndroidX.Runtime.remember,
+            MemberHolder.AndroidX.Runtime.mutableStateOf,
             MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.ui.dialogs", "InformationDialog"),
         )
         return builder.build()
@@ -1113,8 +1113,8 @@ data class ShowCustomDialog(
                     )
                 }
             """,
-            MemberHolderWrapper.AndroidX.Runtime.remember,
-            MemberHolderWrapper.AndroidX.Runtime.mutableStateOf,
+            MemberHolder.AndroidX.Runtime.remember,
+            MemberHolder.AndroidX.Runtime.mutableStateOf,
             MemberNameWrapper.get("${COMPOSEFLOW_PACKAGE}.ui.dialogs", "CustomDialog"),
         )
         return builder.build()
@@ -1238,8 +1238,8 @@ data class ShowBottomSheet(
                     }
                 }
             """,
-            MemberHolderWrapper.AndroidX.Runtime.remember,
-            MemberHolderWrapper.AndroidX.Runtime.mutableStateOf,
+            MemberHolder.AndroidX.Runtime.remember,
+            MemberHolder.AndroidX.Runtime.mutableStateOf,
             MemberNameWrapper.get("androidx.compose.material3", "rememberModalBottomSheetState"),
             MemberNameWrapper.get("androidx.compose.material3", "ModalBottomSheet"),
         )
@@ -1331,7 +1331,7 @@ data class ShowNavigationDrawer(
                }
            }
         """,
-                MemberHolderWrapper.Coroutines.launch,
+                MemberHolder.Coroutines.launch,
             )
         }
         return builder.build()
@@ -1409,7 +1409,7 @@ sealed interface ShowMessaging : Action {
             context.getCurrentComposableContext().addCompositionLocalVariableEntryIfNotPresent(
                 id = "$id-$snackbarOpenVariableName",
                 initialIdentifier = snackbarOpenVariableName,
-                MemberHolderWrapper.ComposeFlow.LocalOnShowsnackbar,
+                MemberHolder.ComposeFlow.LocalOnShowsnackbar,
             )
             // Initialize the uriHandler once in the compose file instead of initializing it in
             // every action
@@ -1434,7 +1434,7 @@ sealed interface ShowMessaging : Action {
                 }, $actionLabel)
             }
         """,
-                MemberHolderWrapper.Coroutines.launch,
+                MemberHolder.Coroutines.launch,
             )
         }
 
@@ -1465,7 +1465,7 @@ sealed interface YearRangeSelectableAction : Action {
         val builder = CodeBlockWrapper.builder()
         builder.addStatement(
             "val $stateVariableName = %M(",
-            MemberHolderWrapper.Material3.rememberDatePickerState,
+            MemberHolder.Material3.rememberDatePickerState,
         )
         val minYear = minSelectableYear.value
         val maxYear = maxSelectableYear.value
@@ -1492,7 +1492,7 @@ sealed interface YearRangeSelectableAction : Action {
                     return utcTimeMillis <= %T.System.now().toEpochMilliseconds()
                 }
             },""",
-                    MemberHolderWrapper.Material3.SelectableDates,
+                    MemberHolder.Material3.SelectableDates,
                     ClassHolder.Kotlinx.DateTime.Clock,
                 ),
             )
@@ -1506,7 +1506,7 @@ sealed interface YearRangeSelectableAction : Action {
                     return utcTimeMillis >= %T.System.now().toEpochMilliseconds()
                 }
             },""",
-                    MemberHolderWrapper.Material3.SelectableDates,
+                    MemberHolder.Material3.SelectableDates,
                     ClassHolder.Kotlinx.DateTime.Clock,
                 ),
             )
@@ -1663,29 +1663,29 @@ sealed interface DateOrTimePicker : Action {
                     }
                 }
             """,
-                MemberHolderWrapper.AndroidX.Runtime.remember,
-                MemberHolderWrapper.AndroidX.Runtime.mutableStateOf,
-                MemberHolderWrapper.Material3.DatePickerDialog,
-                MemberHolderWrapper.AndroidX.Layout.Column,
-                MemberHolderWrapper.AndroidX.Layout.Row,
-                MemberHolderWrapper.Material3.OutlinedButton,
+                MemberHolder.AndroidX.Runtime.remember,
+                MemberHolder.AndroidX.Runtime.mutableStateOf,
+                MemberHolder.Material3.DatePickerDialog,
+                MemberHolder.AndroidX.Layout.Column,
+                MemberHolder.AndroidX.Layout.Row,
+                MemberHolder.Material3.OutlinedButton,
                 Instant::class.asTypeNameWrapper(),
-                MemberHolderWrapper.Material3.Text,
-                MemberHolderWrapper.JetBrains.stringResource,
-                MemberHolderWrapper.ComposeFlow.Res,
-                MemberHolderWrapper.ComposeFlow.String.confirm,
-                MemberHolderWrapper.AndroidX.Layout.Spacer,
-                MemberHolderWrapper.AndroidX.Ui.Modifier,
-                MemberHolderWrapper.AndroidX.Layout.size,
-                MemberHolderWrapper.AndroidX.Layout.Spacer,
-                MemberHolderWrapper.AndroidX.Ui.Modifier,
-                MemberHolderWrapper.AndroidX.Layout.size,
-                MemberHolderWrapper.Material3.TextButton,
-                MemberHolderWrapper.Material3.Text,
-                MemberHolderWrapper.JetBrains.stringResource,
-                MemberHolderWrapper.ComposeFlow.Res,
-                MemberHolderWrapper.ComposeFlow.String.cancel,
-                MemberHolderWrapper.Material3.DatePicker,
+                MemberHolder.Material3.Text,
+                MemberHolder.JetBrains.stringResource,
+                MemberHolder.ComposeFlow.Res,
+                MemberHolder.ComposeFlow.String.confirm,
+                MemberHolder.AndroidX.Layout.Spacer,
+                MemberHolder.AndroidX.Ui.Modifier,
+                MemberHolder.AndroidX.Layout.size,
+                MemberHolder.AndroidX.Layout.Spacer,
+                MemberHolder.AndroidX.Ui.Modifier,
+                MemberHolder.AndroidX.Layout.size,
+                MemberHolder.Material3.TextButton,
+                MemberHolder.Material3.Text,
+                MemberHolder.JetBrains.stringResource,
+                MemberHolder.ComposeFlow.Res,
+                MemberHolder.ComposeFlow.String.cancel,
+                MemberHolder.Material3.DatePicker,
             )
             return builder.build()
         }
@@ -1863,31 +1863,31 @@ sealed interface DateOrTimePicker : Action {
                     }
                 }
             """,
-                MemberHolderWrapper.Material3.rememberTimePickerState,
-                MemberHolderWrapper.AndroidX.Runtime.remember,
-                MemberHolderWrapper.AndroidX.Runtime.mutableStateOf,
-                MemberHolderWrapper.AndroidX.Runtime.remember,
-                MemberHolderWrapper.AndroidX.Runtime.mutableStateOf,
-                MemberHolderWrapper.Material3.DatePickerDialog,
-                MemberHolderWrapper.AndroidX.Layout.Column,
-                MemberHolderWrapper.AndroidX.Layout.Row,
-                MemberHolderWrapper.Material3.OutlinedButton,
-                MemberHolderWrapper.Material3.Text,
-                MemberHolderWrapper.JetBrains.stringResource,
-                MemberHolderWrapper.ComposeFlow.Res,
-                MemberHolderWrapper.ComposeFlow.String.confirm,
-                MemberHolderWrapper.AndroidX.Layout.Spacer,
-                MemberHolderWrapper.AndroidX.Ui.Modifier,
-                MemberHolderWrapper.AndroidX.Layout.size,
-                MemberHolderWrapper.AndroidX.Layout.Spacer,
-                MemberHolderWrapper.AndroidX.Ui.Modifier,
-                MemberHolderWrapper.AndroidX.Layout.size,
-                MemberHolderWrapper.Material3.TextButton,
-                MemberHolderWrapper.Material3.Text,
-                MemberHolderWrapper.JetBrains.stringResource,
-                MemberHolderWrapper.ComposeFlow.Res,
-                MemberHolderWrapper.ComposeFlow.String.cancel,
-                MemberHolderWrapper.Material3.DatePicker,
+                MemberHolder.Material3.rememberTimePickerState,
+                MemberHolder.AndroidX.Runtime.remember,
+                MemberHolder.AndroidX.Runtime.mutableStateOf,
+                MemberHolder.AndroidX.Runtime.remember,
+                MemberHolder.AndroidX.Runtime.mutableStateOf,
+                MemberHolder.Material3.DatePickerDialog,
+                MemberHolder.AndroidX.Layout.Column,
+                MemberHolder.AndroidX.Layout.Row,
+                MemberHolder.Material3.OutlinedButton,
+                MemberHolder.Material3.Text,
+                MemberHolder.JetBrains.stringResource,
+                MemberHolder.ComposeFlow.Res,
+                MemberHolder.ComposeFlow.String.confirm,
+                MemberHolder.AndroidX.Layout.Spacer,
+                MemberHolder.AndroidX.Ui.Modifier,
+                MemberHolder.AndroidX.Layout.size,
+                MemberHolder.AndroidX.Layout.Spacer,
+                MemberHolder.AndroidX.Ui.Modifier,
+                MemberHolder.AndroidX.Layout.size,
+                MemberHolder.Material3.TextButton,
+                MemberHolder.Material3.Text,
+                MemberHolder.JetBrains.stringResource,
+                MemberHolder.ComposeFlow.Res,
+                MemberHolder.ComposeFlow.String.cancel,
+                MemberHolder.Material3.DatePicker,
             )
 
             // Code to open TimePicker
@@ -1938,28 +1938,28 @@ sealed interface DateOrTimePicker : Action {
         }
     }
                 """,
-                    MemberHolderWrapper.AndroidX.Ui.Dialog,
-                    MemberHolderWrapper.Material3.Card,
-                    MemberHolderWrapper.Material3.MaterialTheme,
-                    MemberHolderWrapper.AndroidX.Layout.Column,
-                    MemberHolderWrapper.AndroidX.Ui.Modifier,
-                    MemberHolderWrapper.AndroidX.Layout.padding,
-                    MemberHolderWrapper.Material3.TimePicker,
-                    MemberHolderWrapper.AndroidX.Ui.Modifier,
-                    MemberHolderWrapper.AndroidX.Ui.Alignment,
-                    MemberHolderWrapper.AndroidX.Layout.Row,
-                    MemberHolderWrapper.AndroidX.Layout.Arrangement,
-                    MemberHolderWrapper.AndroidX.Layout.Spacer,
-                    MemberHolderWrapper.AndroidX.Ui.Modifier,
-                    MemberHolderWrapper.Material3.TextButton,
-                    MemberHolderWrapper.Material3.Text,
-                    MemberHolderWrapper.JetBrains.stringResource,
-                    MemberHolderWrapper.ComposeFlow.Res,
-                    MemberHolderWrapper.ComposeFlow.String.cancel,
-                    MemberHolderWrapper.AndroidX.Layout.Spacer,
-                    MemberHolderWrapper.AndroidX.Ui.Modifier,
-                    MemberHolderWrapper.AndroidX.Layout.width,
-                    MemberHolderWrapper.Material3.OutlinedButton,
+                    MemberHolder.AndroidX.Ui.Dialog,
+                    MemberHolder.Material3.Card,
+                    MemberHolder.Material3.MaterialTheme,
+                    MemberHolder.AndroidX.Layout.Column,
+                    MemberHolder.AndroidX.Ui.Modifier,
+                    MemberHolder.AndroidX.Layout.padding,
+                    MemberHolder.Material3.TimePicker,
+                    MemberHolder.AndroidX.Ui.Modifier,
+                    MemberHolder.AndroidX.Ui.Alignment,
+                    MemberHolder.AndroidX.Layout.Row,
+                    MemberHolder.AndroidX.Layout.Arrangement,
+                    MemberHolder.AndroidX.Layout.Spacer,
+                    MemberHolder.AndroidX.Ui.Modifier,
+                    MemberHolder.Material3.TextButton,
+                    MemberHolder.Material3.Text,
+                    MemberHolder.JetBrains.stringResource,
+                    MemberHolder.ComposeFlow.Res,
+                    MemberHolder.ComposeFlow.String.cancel,
+                    MemberHolder.AndroidX.Layout.Spacer,
+                    MemberHolder.AndroidX.Ui.Modifier,
+                    MemberHolder.AndroidX.Layout.width,
+                    MemberHolder.Material3.OutlinedButton,
                     Instant::class.asTypeNameWrapper(),
                     MemberNameWrapper.get(
                         "${COMPOSEFLOW_PACKAGE}.util",
@@ -1971,10 +1971,10 @@ sealed interface DateOrTimePicker : Action {
                         "setMinute",
                         isExtension = true,
                     ),
-                    MemberHolderWrapper.Material3.Text,
-                    MemberHolderWrapper.JetBrains.stringResource,
-                    MemberHolderWrapper.ComposeFlow.Res,
-                    MemberHolderWrapper.ComposeFlow.String.confirm,
+                    MemberHolder.Material3.Text,
+                    MemberHolder.JetBrains.stringResource,
+                    MemberHolder.ComposeFlow.Res,
+                    MemberHolder.ComposeFlow.String.confirm,
                 ),
             )
 
@@ -2066,7 +2066,7 @@ sealed interface Share : Action {
             context.getCurrentComposableContext().addCompositionLocalVariableEntryIfNotPresent(
                 id = "$id-$uriHandlerName",
                 initialIdentifier = uriHandlerName,
-                MemberHolderWrapper.AndroidX.Platform.LocalUriHandler,
+                MemberHolder.AndroidX.Platform.LocalUriHandler,
             )
             // Initialize the uriHandler once in the compose file instead of initializing it in
             // every action
@@ -2252,7 +2252,7 @@ sealed interface Auth : Action {
                 context.getCurrentComposableContext().addCompositionLocalVariableEntryIfNotPresent(
                     id = "${id}_$snackbarOpenVariableName",
                     snackbarOpenVariableName,
-                    MemberHolderWrapper.ComposeFlow.LocalOnShowsnackbar,
+                    MemberHolder.ComposeFlow.LocalOnShowsnackbar,
                 )
             val currentEditable = context.getCurrentComposableContext().canvasEditable
 
@@ -2291,11 +2291,11 @@ sealed interface Auth : Action {
                 _$signInStateName.value = %T.Error(e.message ?: "Unknown error")
             }
         }""",
-                        MemberHolderWrapper.PreCompose.viewModelScope,
-                        MemberHolderWrapper.Coroutines.launch,
+                        MemberHolder.PreCompose.viewModelScope,
+                        MemberHolder.Coroutines.launch,
                         ClassHolder.ComposeFlow.EventResultState,
-                        MemberHolderWrapper.Firebase.Firebase,
-                        MemberHolderWrapper.Firebase.auth,
+                        MemberHolder.Firebase.Firebase,
+                        MemberHolder.Firebase.auth,
                         ClassHolder.ComposeFlow.EventResultState,
                         ClassHolder.ComposeFlow.EventResultState,
                     ).build(),
@@ -2337,13 +2337,13 @@ sealed interface Auth : Action {
         }
     }
             """,
-                MemberHolderWrapper.AndroidX.Runtime.collectAsState,
+                MemberHolder.AndroidX.Runtime.collectAsState,
                 ClassHolder.ComposeFlow.EventResultState,
-                MemberHolderWrapper.Coroutines.launch,
+                MemberHolder.Coroutines.launch,
                 ClassHolder.ComposeFlow.EventResultState,
                 ClassHolder.ComposeFlow.EventResultState,
                 ClassHolder.ComposeFlow.EventResultState,
-                MemberHolderWrapper.Coroutines.launch,
+                MemberHolder.Coroutines.launch,
             )
             return builder.build()
         }
@@ -2370,10 +2370,10 @@ sealed interface Auth : Action {
                 } else {
             """,
                 ClassHolder.ComposeFlow.EventResultState,
-                MemberHolderWrapper.Material3.CircularProgressIndicator,
-                MemberHolderWrapper.AndroidX.Ui.Modifier,
-                MemberHolderWrapper.AndroidX.Layout.size,
-                MemberHolderWrapper.AndroidX.Ui.dp,
+                MemberHolder.Material3.CircularProgressIndicator,
+                MemberHolder.AndroidX.Ui.Modifier,
+                MemberHolder.AndroidX.Layout.size,
+                MemberHolder.AndroidX.Ui.dp,
             )
             builder.add(insideContent)
             builder.add(
@@ -2486,7 +2486,7 @@ sealed interface Auth : Action {
                 context.getCurrentComposableContext().addCompositionLocalVariableEntryIfNotPresent(
                     id = "$id-$snackbarOpenVariableName",
                     snackbarOpenVariableName,
-                    MemberHolderWrapper.ComposeFlow.LocalOnShowsnackbar,
+                    MemberHolder.ComposeFlow.LocalOnShowsnackbar,
                 )
             val currentEditable = context.getCurrentComposableContext().canvasEditable
 
@@ -2525,11 +2525,11 @@ sealed interface Auth : Action {
                 _$createStateName.value = %T.Error(e.message ?: "Unknown error")
             }
         }""",
-                        MemberHolderWrapper.PreCompose.viewModelScope,
-                        MemberHolderWrapper.Coroutines.launch,
+                        MemberHolder.PreCompose.viewModelScope,
+                        MemberHolder.Coroutines.launch,
                         ClassHolder.ComposeFlow.EventResultState,
-                        MemberHolderWrapper.Firebase.Firebase,
-                        MemberHolderWrapper.Firebase.auth,
+                        MemberHolder.Firebase.Firebase,
+                        MemberHolder.Firebase.auth,
                         ClassHolder.ComposeFlow.EventResultState,
                         ClassHolder.ComposeFlow.EventResultState,
                     ).build(),
@@ -2571,13 +2571,13 @@ sealed interface Auth : Action {
         }
     }
             """,
-                MemberHolderWrapper.AndroidX.Runtime.collectAsState,
+                MemberHolder.AndroidX.Runtime.collectAsState,
                 ClassHolder.ComposeFlow.EventResultState,
-                MemberHolderWrapper.Coroutines.launch,
+                MemberHolder.Coroutines.launch,
                 ClassHolder.ComposeFlow.EventResultState,
                 ClassHolder.ComposeFlow.EventResultState,
                 ClassHolder.ComposeFlow.EventResultState,
-                MemberHolderWrapper.Coroutines.launch,
+                MemberHolder.Coroutines.launch,
             )
             return builder.build()
         }
@@ -2604,10 +2604,10 @@ sealed interface Auth : Action {
                 } else {
             """,
                 ClassHolder.ComposeFlow.EventResultState,
-                MemberHolderWrapper.Material3.CircularProgressIndicator,
-                MemberHolderWrapper.AndroidX.Ui.Modifier,
-                MemberHolderWrapper.AndroidX.Layout.size,
-                MemberHolderWrapper.AndroidX.Ui.dp,
+                MemberHolder.Material3.CircularProgressIndicator,
+                MemberHolder.AndroidX.Ui.Modifier,
+                MemberHolder.AndroidX.Layout.size,
+                MemberHolder.AndroidX.Ui.dp,
             )
             builder.add(insideContent)
             builder.add(
@@ -2653,9 +2653,9 @@ sealed interface Auth : Action {
             %M.%M.signOut()
         }
         """,
-                MemberHolderWrapper.Coroutines.launch,
-                MemberHolderWrapper.Firebase.Firebase,
-                MemberHolderWrapper.Firebase.auth,
+                MemberHolder.Coroutines.launch,
+                MemberHolder.Firebase.Firebase,
+                MemberHolder.Firebase.auth,
             )
 
         override fun hasSuspendFunction(): Boolean = true
@@ -2814,8 +2814,8 @@ sealed interface FirestoreAction : Action {
                 }
             """,
                 dataType.asKotlinPoetClassName(project),
-                MemberHolderWrapper.PreCompose.viewModelScope,
-                MemberHolderWrapper.Coroutines.launch,
+                MemberHolder.PreCompose.viewModelScope,
+                MemberHolder.Coroutines.launch,
             )
             context.addFunction(funSpecBuilder.build(), dryRun = dryRun)
         }
@@ -3003,9 +3003,9 @@ sealed interface FirestoreAction : Action {
                     }
                 }
                 """,
-                        MemberHolderWrapper.PreCompose.viewModelScope,
-                        MemberHolderWrapper.Coroutines.launch,
-                        MemberHolderWrapper.Coroutines.Flow.first,
+                        MemberHolder.PreCompose.viewModelScope,
+                        MemberHolder.Coroutines.launch,
+                        MemberHolder.Coroutines.Flow.first,
                         dataType.asKotlinPoetClassName(project),
                     ),
                 )
@@ -3194,9 +3194,9 @@ sealed interface FirestoreAction : Action {
                     }
                 }
                 """,
-                        MemberHolderWrapper.PreCompose.viewModelScope,
-                        MemberHolderWrapper.Coroutines.launch,
-                        MemberHolderWrapper.Coroutines.Flow.first,
+                        MemberHolder.PreCompose.viewModelScope,
+                        MemberHolder.Coroutines.launch,
+                        MemberHolder.Coroutines.Flow.first,
                     ),
                 )
             }

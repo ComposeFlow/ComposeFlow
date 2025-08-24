@@ -2,7 +2,7 @@ package io.composeflow.datetime
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.AnnotatedString
-import io.composeflow.kotlinpoet.MemberHolderWrapper
+import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.ui.propertyeditor.DropdownItem
 import kotlinx.datetime.LocalDateTime
@@ -59,7 +59,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 dayOfMonth(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "YYYY${separator}MM${separator}DD"
@@ -109,7 +109,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 minute()
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "YYYY${separator}MM${separator}DD HH:MM"
@@ -149,7 +149,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 monthNumber(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "YYYY${separator}MM$"
@@ -186,7 +186,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 dayOfMonth(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "MM${separator}DD"
@@ -228,7 +228,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 year(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "DD${separator}MM${separator}YYYY"
@@ -268,8 +268,8 @@ sealed interface DateTimeFormatter : DropdownItem {
                 year(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
-                MemberHolderWrapper.DateTime.MonthNames,
+                MemberHolder.DateTime.LocalDateTime,
+                MemberHolder.DateTime.MonthNames,
             )
 
         override fun simplifiedFormat(): String = "MMM DD, YYYY"
@@ -304,8 +304,8 @@ sealed interface DateTimeFormatter : DropdownItem {
                 dayOfMonth(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
-                MemberHolderWrapper.DateTime.MonthNames,
+                MemberHolder.DateTime.LocalDateTime,
+                MemberHolder.DateTime.MonthNames,
             )
 
         override fun simplifiedFormat(): String = "MMM DD"
@@ -336,7 +336,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 year(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "YYYY"
@@ -367,7 +367,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 dayOfMonth(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "MM"
@@ -395,8 +395,8 @@ sealed interface DateTimeFormatter : DropdownItem {
                 monthName(%M.ENGLISH_ABBREVIATED)
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
-                MemberHolderWrapper.DateTime.MonthNames,
+                MemberHolder.DateTime.LocalDateTime,
+                MemberHolder.DateTime.MonthNames,
             )
 
         override fun simplifiedFormat(): String = "MMM"
@@ -427,7 +427,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 dayOfMonth(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "DD"
@@ -462,7 +462,7 @@ sealed interface DateTimeFormatter : DropdownItem {
                 minute(${padding.asCodeBlock()})
             }
             """,
-                MemberHolderWrapper.DateTime.LocalDateTime,
+                MemberHolder.DateTime.LocalDateTime,
             )
 
         override fun simplifiedFormat(): String = "HH:MM"
@@ -527,7 +527,7 @@ fun Padding.asString(): String =
 
 fun Padding.asCodeBlock(): CodeBlockWrapper =
     when (this) {
-        Padding.ZERO -> CodeBlockWrapper.of("%M.ZERO", MemberHolderWrapper.DateTime.Padding)
-        Padding.NONE -> CodeBlockWrapper.of("%M.NONE", MemberHolderWrapper.DateTime.Padding)
-        Padding.SPACE -> CodeBlockWrapper.of("%M.SPACE", MemberHolderWrapper.DateTime.Padding)
+        Padding.ZERO -> CodeBlockWrapper.of("%M.ZERO", MemberHolder.DateTime.Padding)
+        Padding.NONE -> CodeBlockWrapper.of("%M.NONE", MemberHolder.DateTime.Padding)
+        Padding.SPACE -> CodeBlockWrapper.of("%M.SPACE", MemberHolder.DateTime.Padding)
     }

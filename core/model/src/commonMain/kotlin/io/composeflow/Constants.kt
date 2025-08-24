@@ -2,7 +2,7 @@ package io.composeflow
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.FlowSettings
-import io.composeflow.kotlinpoet.MemberHolderWrapper
+import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.ClassNameWrapper
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
@@ -34,7 +34,7 @@ enum class ViewModelConstant {
                     CodeBlockWrapper
                         .builder()
                         .add("lazy { ")
-                        .add("%M()", MemberHolderWrapper.Koin.get)
+                        .add("%M()", MemberHolder.Koin.get)
                         .add(" }")
                         .build(),
                 ).build()
@@ -47,7 +47,7 @@ enum class ViewModelConstant {
                 .delegate(
                     CodeBlockWrapper
                         .builder()
-                        .add("%M()", MemberHolderWrapper.Koin.inject)
+                        .add("%M()", MemberHolder.Koin.inject)
                         .build(),
                 ).build()
     },
@@ -59,7 +59,7 @@ enum class ViewModelConstant {
                 .delegate(
                     CodeBlockWrapper
                         .builder()
-                        .add("%M()", MemberHolderWrapper.Koin.inject)
+                        .add("%M()", MemberHolder.Koin.inject)
                         .build(),
                 ).build()
     },
