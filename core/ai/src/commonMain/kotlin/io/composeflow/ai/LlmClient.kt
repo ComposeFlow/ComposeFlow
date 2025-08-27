@@ -319,7 +319,7 @@ class LlmClient(
         fun extractContent(input: String): String {
             // Use [\s\S] instead of . to match any character including line terminators.
 
-            // 1. Try to match ```json...``` first (with closing ```)
+            // 1. Try to match ```json...``` (with closing ```)
             val tripleJsonRegex = """```json[\s\n]*([\s\S]*?)[\s\n]*```""".toRegex()
             val tripleJsonMatch = tripleJsonRegex.find(input)
             if (tripleJsonMatch != null) {
