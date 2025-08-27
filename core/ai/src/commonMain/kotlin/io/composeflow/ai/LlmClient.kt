@@ -1,5 +1,6 @@
 package io.composeflow.ai
 
+import androidx.annotation.VisibleForTesting
 import co.touchlab.kermit.Logger
 import com.github.michaelbull.result.Result
 import com.github.michaelbull.result.getOrThrow
@@ -302,41 +303,52 @@ class LlmClient(
             }
         }
 
-    /**
-     * Extract the content wrapped with
-     * ```json
-     * ```
-     *
-     * or
-     * `json
-     * `
-     *
-     * or return the original string as it is
-     */
-    private fun extractContent(input: String): String {
-        // First, try to find content wrapped in `json ... `
-        val jsonRegex = """`json[\s\n]*(.*?)[\s\n]*`""".toRegex(RegexOption.MULTILINE)
-        val jsonMatchResult = jsonRegex.find(input)
+    companion object {
+        /**
+         * Extract the content wrapped with
+         * ```json
+         * ```
+         *
+         * or
+         * `json
+         * `
+         *
+         * or return the original string as it is
+         */
+        @VisibleForTesting
+        fun extractContent(input: String): String {
+            // Use [\s\S] instead of . to match any character including line terminators.
 
-        if (jsonMatchResult != null) {
-            return jsonMatchResult.groupValues[1].trim()
+            // 1. Try to match ```json...``` (with closing ```)
+            val tripleJsonRegex = """```json[\s\n]*([\s\S]*?)[\s\n]*```""".toRegex()
+            val tripleJsonMatch = tripleJsonRegex.find(input)
+            if (tripleJsonMatch != null) {
+                return tripleJsonMatch.groupValues[1].trim()
+            }
+
+            // 2. Try to match ```json... (without closing ```)
+            val jsonOpenOnlyRegex = """```json[\s\n]*([\s\S]*)""".toRegex()
+            val jsonOpenOnlyMatch = jsonOpenOnlyRegex.find(input)
+            if (jsonOpenOnlyMatch != null) {
+                return jsonOpenOnlyMatch.groupValues[1].trim()
+            }
+
+            // 3. Try to match ```...``` (generic triple backticks)
+            val genericCodeRegex = """```[\s\n]*([\s\S]*?)[\s\n]*```""".toRegex()
+            val genericCodeMatch = genericCodeRegex.find(input)
+            if (genericCodeMatch != null) {
+                return genericCodeMatch.groupValues[1].trim()
+            }
+
+            // 4. Try to find content wrapped in `json ... ` (single backticks)
+            val jsonRegex = """`json[\s\n]*([\s\S]*?)[\s\n]*`""".toRegex()
+            val jsonMatchResult = jsonRegex.find(input)
+            if (jsonMatchResult != null) {
+                return jsonMatchResult.groupValues[1].trim()
+            }
+
+            // If not wrapped in backticks, return the original string
+            return input.trim()
         }
-
-        // 2. Try to match ```json... (without closing ```)
-        val jsonOpenOnlyRegex = """```json[\s\n]*(.*)""".toRegex(RegexOption.MULTILINE)
-        val jsonOpenOnlyMatch = jsonOpenOnlyRegex.find(input)
-        if (jsonOpenOnlyMatch != null) {
-            return jsonOpenOnlyMatch.groupValues[1].trim()
-        }
-
-        // 3. Try to match ```...``` (generic)
-        val genericCodeRegex = """```[\s\n]*(.*?)[\s\n]*```""".toRegex(RegexOption.MULTILINE)
-        val genericCodeMatch = genericCodeRegex.find(input)
-        if (genericCodeMatch != null) {
-            return genericCodeMatch.groupValues[1].trim()
-        }
-
-        // If not wrapped in triple backticks, return the original string
-        return input.trim()
     }
 }
