@@ -71,15 +71,15 @@ class StringResourceEditorOperator {
                 "The YAML representation of StringResource(s) to be added. " +
                     "Can be a single StringResource or a list of StringResources. Keys will be made unique if necessary.",
         )
-        stringResourceYaml: String,
+        stringResourcesYaml: String,
     ): EventResult =
         try {
             // Try to parse as list first, fallback to single resource
             val stringResources =
                 try {
-                    decodeFromStringWithFallback<List<StringResource>>(stringResourceYaml)
+                    decodeFromStringWithFallback<List<StringResource>>(stringResourcesYaml)
                 } catch (_: Exception) {
-                    listOf(decodeFromStringWithFallback<StringResource>(stringResourceYaml))
+                    listOf(decodeFromStringWithFallback<StringResource>(stringResourcesYaml))
                 }
             addStringResources(project, stringResources)
         } catch (e: Exception) {
@@ -173,18 +173,18 @@ class StringResourceEditorOperator {
         project: Project,
         @LlmParam(
             description =
-                "The YAML representation of the updated StringResource(s). " +
-                    "Can be a single StringResource or a list of StringResources. Must include the ID of each resource to update.",
+                "The YAML representation of StringResourceUpdate(s). " +
+                    "Can be a single StringResourceUpdate or a list of StringResourceUpdate objects. Each update must include the ID of the resource to update.",
         )
-        stringResourceYaml: String,
+        stringResourceUpdatesYaml: String,
     ): EventResult =
         try {
             // Try to parse as list first, fallback to single resource
             val updates =
                 try {
-                    decodeFromStringWithFallback<List<StringResourceUpdate>>(stringResourceYaml)
+                    decodeFromStringWithFallback<List<StringResourceUpdate>>(stringResourceUpdatesYaml)
                 } catch (_: Exception) {
-                    listOf(decodeFromStringWithFallback<StringResourceUpdate>(stringResourceYaml))
+                    listOf(decodeFromStringWithFallback<StringResourceUpdate>(stringResourceUpdatesYaml))
                 }
             updateStringResources(project, updates)
         } catch (e: Exception) {
