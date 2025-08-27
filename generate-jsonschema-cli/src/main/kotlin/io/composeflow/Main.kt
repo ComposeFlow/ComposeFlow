@@ -4,13 +4,14 @@ import dev.adamko.kxstsgen.KxsTsGenerator
 import io.composeflow.ai.AiResponse
 import io.composeflow.ai.CreateProjectAiResponse
 import io.composeflow.model.project.Project
+import io.composeflow.model.project.string.StringResourceUpdate
 import java.io.File
 
 fun main() {
     println("Generating type script for ComposeFlow project...")
     val generator = KxsTsGenerator()
     val fileName = "composeflow.d.ts"
-    File(fileName).writeText(generator.generate(Project.serializer()))
+    File(fileName).writeText(generator.generate(Project.serializer(), StringResourceUpdate.serializer()))
     println("Project typescript file is generated at $fileName")
 
     val aiResponseFileName = "airesponse.d.ts"
