@@ -396,6 +396,10 @@ class LlmRepository(
                 estimatedSize += toolArg.composeNodeId.length
             }
 
+            is ToolArgs.RemoveComposeNodesArgs -> {
+                estimatedSize += toolArg.composeNodeIds.length
+            }
+
             is ToolArgs.AddModifierArgs -> {
                 estimatedSize += toolArg.composeNodeId.length
                 estimatedSize += toolArg.modifierYaml.length
@@ -493,6 +497,7 @@ class LlmRepository(
             is ToolArgs.ListAppStatesArgs,
             is ToolArgs.ListDataTypesArgs,
             is ToolArgs.ListCustomEnumsArgs,
+            is ToolArgs.GetProjectIssuesArgs,
             is ToolArgs.ListScreensArgs,
             -> {
                 // These have minimal content but potentially large results

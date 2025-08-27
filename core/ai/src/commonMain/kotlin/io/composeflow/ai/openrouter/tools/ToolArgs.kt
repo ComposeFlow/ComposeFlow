@@ -36,6 +36,12 @@ sealed class ToolArgs {
     ) : ToolArgs()
 
     @Serializable
+    @SerialName("remove_compose_nodes")
+    data class RemoveComposeNodesArgs(
+        val composeNodeIds: String,
+    ) : ToolArgs()
+
+    @Serializable
     @SerialName("add_modifier")
     data class AddModifierArgs(
         val composeNodeId: String,
@@ -183,6 +189,12 @@ sealed class ToolArgs {
     @SerialName("get_custom_enum")
     data class GetCustomEnumArgs(
         val customEnumId: String,
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("get_project_issues")
+    data class GetProjectIssuesArgs(
+        val dummy: String = "",
     ) : ToolArgs()
 
     @Serializable

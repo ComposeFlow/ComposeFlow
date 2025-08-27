@@ -31,6 +31,13 @@ sealed interface OpenRouterToolResult {
     ) : OpenRouterToolResult
 
     @Serializable
+    data class RemoveComposeNodesArgs(
+        override val tool_name: String = "remove_compose_nodes",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.RemoveComposeNodesArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
     data class AddModifierArgs(
         override val tool_name: String = "add_modifier",
         override val tool_call_id: String,
@@ -189,6 +196,13 @@ sealed interface OpenRouterToolResult {
         override val tool_name: String = "get_custom_enum",
         override val tool_call_id: String,
         override val tool_args: ToolArgs.GetCustomEnumArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class GetProjectIssuesArgs(
+        override val tool_name: String = "get_project_issues",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.GetProjectIssuesArgs,
     ) : OpenRouterToolResult
 
     @Serializable
