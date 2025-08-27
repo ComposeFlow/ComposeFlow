@@ -19,6 +19,7 @@ import io.composeflow.serializer.decodeFromStringWithFallback
 import io.composeflow.ui.EventResult
 import io.composeflow.ui.UiBuilderHelper
 import io.composeflow.ui.UiBuilderHelper.addNodeToCanvasEditable
+import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.getString
 
 /**
@@ -513,18 +514,7 @@ class UiBuilderOperator {
         val result = EventResult()
         try {
             val screens = project.screenHolder.screens
-            val screenList =
-                screens.map { screen ->
-                    mapOf(
-                        "id" to screen.id,
-                        "name" to screen.name,
-                        "title" to screen.title.value,
-                        "label" to screen.label.value,
-                        "isDefault" to screen.isDefault.value,
-                        "isSelected" to screen.isSelected.value,
-                        "showOnNavigation" to screen.showOnNavigation.value,
-                    )
-                }
+            val screenList = screens.map { it.toScreenSummary() }
 
             Logger.i { "Listed ${screens.size} screens in project" }
             screens.forEach { screen ->
@@ -567,3 +557,28 @@ class UiBuilderOperator {
         return result
     }
 }
+
+/**
+ * Data class representing a screen summary for AI tools.
+ */
+@Serializable
+data class ScreenSummary(
+    val id: String,
+    val name: String,
+    val title: String,
+    val label: String,
+    val isDefault: Boolean,
+    val isSelected: Boolean,
+    val showOnNavigation: Boolean,
+)
+
+fun Screen.toScreenSummary() =
+    ScreenSummary(
+        id = id,
+        name = name,
+        title = title.value,
+        label = label.value,
+        isDefault = isDefault.value,
+        isSelected = isSelected.value,
+        showOnNavigation = showOnNavigation.value,
+    )
