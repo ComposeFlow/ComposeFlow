@@ -5,6 +5,16 @@ import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.FlashOn
 import androidx.compose.material.icons.outlined.ZoomIn
 import androidx.compose.ui.graphics.vector.ImageVector
+import io.composeflow.custom.ComposeFlowIcons
+import io.composeflow.custom.composeflowicons.AssetsDark
+import io.composeflow.custom.composeflowicons.CloudFirestore
+import io.composeflow.custom.composeflowicons.Colors
+import io.composeflow.custom.composeflowicons.DatacolumnDark
+import io.composeflow.custom.composeflowicons.DbmsDark
+import io.composeflow.custom.composeflowicons.EditfolderDark
+import io.composeflow.custom.composeflowicons.HttpRequestsFiletypeDark
+import io.composeflow.custom.composeflowicons.SettingsDark
+import io.composeflow.custom.composeflowicons.TranslateDark
 
 const val UI_BUILDER_ROUTE = "ui_builder_route"
 const val DATA_TYPE_EDITOR_ROUTE = "datatype_editor_route"
@@ -17,52 +27,52 @@ const val STRING_EDITOR_ROUTE = "string_editor_route"
 const val SETTINGS_ROUTE = "settings_route"
 
 enum class TopLevelDestination(
-    val iconPath: String,
+    val icon: ImageVector,
     val label: String,
     val route: String,
 ) {
     UiBuilder(
-        "icons/editFolder.svg",
+        ComposeFlowIcons.EditfolderDark,
         "UI Builder",
         UI_BUILDER_ROUTE,
     ),
     DataTypeEditor(
-        "icons/dataColumn.svg",
+        ComposeFlowIcons.DatacolumnDark,
         "Data type",
         DATA_TYPE_EDITOR_ROUTE,
     ),
     AppStateEditor(
-        "icons/dbms.svg",
+        ComposeFlowIcons.DbmsDark,
         "App State",
         APP_STATE_EDITOR_ROUTE,
     ),
     FirestoreEditor(
-        "icons/cloud_firestore.svg",
+        ComposeFlowIcons.CloudFirestore,
         "Firestore",
         FIRESTORE_EDITOR_ROUTE,
     ),
     ApiEditor(
-        "icons/http_requests_filetype.svg",
+        ComposeFlowIcons.HttpRequestsFiletypeDark,
         "API editor",
         API_EDITOR_ROUTE,
     ),
     ThemeEditor(
-        "icons/colors.svg",
+        ComposeFlowIcons.Colors,
         "Theme editor",
         THEME_EDITOR_ROUTE,
     ),
     AssetEditor(
-        "icons/assets.svg",
+        ComposeFlowIcons.AssetsDark,
         "Assets",
         ASSET_EDITOR_ROUTE,
     ),
     StringEditor(
-        "icons/translate.svg",
+        ComposeFlowIcons.TranslateDark,
         "Strings",
         STRING_EDITOR_ROUTE,
     ),
     Settings(
-        "icons/settings.svg",
+        ComposeFlowIcons.SettingsDark,
         "Settings",
         SETTINGS_ROUTE,
     ),
