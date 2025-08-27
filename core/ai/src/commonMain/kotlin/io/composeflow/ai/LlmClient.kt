@@ -317,29 +317,37 @@ class LlmClient(
          */
         @VisibleForTesting
         fun extractContent(input: String): String {
-            // First, try to find content wrapped in `json ... `
-            val jsonRegex = """`json[\s\n]*(.*?)[\s\n]*`""".toRegex(RegexOption.MULTILINE)
-            val jsonMatchResult = jsonRegex.find(input)
+            // Use [\s\S] instead of . to match any character including line terminators.
 
-            if (jsonMatchResult != null) {
-                return jsonMatchResult.groupValues[1].trim()
+            // 1. Try to match ```json...``` first (with closing ```)
+            val tripleJsonRegex = """```json[\s\n]*([\s\S]*?)[\s\n]*```""".toRegex()
+            val tripleJsonMatch = tripleJsonRegex.find(input)
+            if (tripleJsonMatch != null) {
+                return tripleJsonMatch.groupValues[1].trim()
             }
 
             // 2. Try to match ```json... (without closing ```)
-            val jsonOpenOnlyRegex = """```json[\s\n]*(.*)""".toRegex(RegexOption.MULTILINE)
+            val jsonOpenOnlyRegex = """```json[\s\n]*([\s\S]*)""".toRegex()
             val jsonOpenOnlyMatch = jsonOpenOnlyRegex.find(input)
             if (jsonOpenOnlyMatch != null) {
                 return jsonOpenOnlyMatch.groupValues[1].trim()
             }
 
-            // 3. Try to match ```...``` (generic)
-            val genericCodeRegex = """```[\s\n]*(.*?)[\s\n]*```""".toRegex(RegexOption.MULTILINE)
+            // 3. Try to match ```...``` (generic triple backticks)
+            val genericCodeRegex = """```[\s\n]*([\s\S]*?)[\s\n]*```""".toRegex()
             val genericCodeMatch = genericCodeRegex.find(input)
             if (genericCodeMatch != null) {
                 return genericCodeMatch.groupValues[1].trim()
             }
 
-            // If not wrapped in triple backticks, return the original string
+            // 4. Try to find content wrapped in `json ... ` (single backticks)
+            val jsonRegex = """`json[\s\n]*([\s\S]*?)[\s\n]*`""".toRegex()
+            val jsonMatchResult = jsonRegex.find(input)
+            if (jsonMatchResult != null) {
+                return jsonMatchResult.groupValues[1].trim()
+            }
+
+            // If not wrapped in backticks, return the original string
             return input.trim()
         }
     }
