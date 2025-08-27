@@ -33,9 +33,6 @@ import io.composeflow.serializer.encodeToString
 import io.composeflow.ui.EventResult
 import org.jetbrains.compose.resources.getString
 
-// TODO: Wire this class with ToolDispatcher to enable AI to edit string resources.
-//       https://github.com/ComposeFlow/ComposeFlow/issues/34
-
 /**
  * Handles operations related to string resource editor, such as adding, updating, or removing string resources.
  * Operations in this class are exposed to the LLM to allow them to call it as tools as well as used
