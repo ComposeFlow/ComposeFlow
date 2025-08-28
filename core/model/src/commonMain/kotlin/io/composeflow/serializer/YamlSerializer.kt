@@ -58,7 +58,16 @@ val yamlPropertyBasedSerializer =
  * Checks if this throwable or any of its causes is a [MissingTypeTagException].
  */
 val Throwable.isCausedByMissingTypeTag: Boolean
-    get() = this is MissingTypeTagException || this.cause?.isCausedByMissingTypeTag == true
+    get() {
+        var current: Throwable? = this
+        while (current != null) {
+            if (current is MissingTypeTagException) {
+                return true
+            }
+            current = current.cause
+        }
+        return false
+    }
 
 /**
  * Wrapper method that attempts to decode using yamlDefaultSerializer first,
