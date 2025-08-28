@@ -74,8 +74,8 @@ fun ModifierInspectorContainer(
     // Use external state if provided, otherwise use local state
     var localExpanded by remember { mutableStateOf(false) }
     val actualExpanded = expanded ?: localExpanded
-    
-    val setExpanded = { value: Boolean -> 
+
+    val setExpanded = { value: Boolean ->
         if (onExpandedChange != null) {
             onExpandedChange(value)
         } else {
