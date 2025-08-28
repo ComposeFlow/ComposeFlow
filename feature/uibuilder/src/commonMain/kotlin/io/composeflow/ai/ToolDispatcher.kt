@@ -69,7 +69,10 @@ class ToolDispatcher(
             is ToolArgs.RemoveComposeNodesArgs -> {
                 uiBuilderOperator.onRemoveComposeNodes(
                     project,
-                    toolArgs.composeNodeIds.split(",").map { it.trim() },
+                    toolArgs.composeNodeIds
+                        .split(",")
+                        .map { it.trim() }
+                        .filter { it.isNotEmpty() },
                 )
             }
 
