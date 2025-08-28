@@ -317,7 +317,7 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
         val processedToolArgsElement =
             if (toolArgsElement is JsonPrimitive && toolArgsElement.isString) {
                 try {
-                    json.parseToJsonElement(toolArgsElement.content)
+                    json.parseToJsonElement(toolArgsElement.content.ifEmpty { "{}" })
                 } catch (e: Exception) {
                     throw SerializationException("Failed to parse tool_args JSON string: ${e.message}")
                 }

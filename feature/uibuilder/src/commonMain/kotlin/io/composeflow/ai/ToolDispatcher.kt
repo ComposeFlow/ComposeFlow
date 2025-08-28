@@ -9,6 +9,7 @@ import io.composeflow.ui.EventResult
 import io.composeflow.ui.appstate.AppStateEditorOperator
 import io.composeflow.ui.datatype.DataTypeEditorOperator
 import io.composeflow.ui.uibuilder.UiBuilderOperator
+import io.composeflow.ui.uibuilder.toScreenSummary
 
 /**
  * Handles dispatching tool execution requests to appropriate operators.
@@ -318,18 +319,7 @@ class ToolDispatcher(
                     val result = uiBuilderOperator.onListScreens(project)
                     if (result.errorMessages.isEmpty()) {
                         val screens = project.screenHolder.screens
-                        val screenList =
-                            screens.map { screen ->
-                                mapOf(
-                                    "id" to screen.id,
-                                    "name" to screen.name,
-                                    "title" to screen.title.value,
-                                    "label" to screen.label.value,
-                                    "isDefault" to screen.isDefault.value,
-                                    "isSelected" to screen.isSelected.value,
-                                    "showOnNavigation" to screen.showOnNavigation.value,
-                                )
-                            }
+                        val screenList = screens.map { it.toScreenSummary() }
                         toolArgs.result = encodeToString(screenList)
                     } else {
                         toolArgs.result = result.errorMessages.joinToString("; ")
