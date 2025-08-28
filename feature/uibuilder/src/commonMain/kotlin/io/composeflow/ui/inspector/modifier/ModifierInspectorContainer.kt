@@ -67,21 +67,9 @@ fun ModifierInspectorContainer(
     composeNodeCallbacks: ComposeNodeCallbacks,
     onVisibilityToggleClicked: () -> Unit,
     modifier: Modifier = Modifier,
-    expanded: Boolean? = null,
-    onExpandedChange: ((Boolean) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    // Use external state if provided, otherwise use local state
-    var localExpanded by remember { mutableStateOf(false) }
-    val actualExpanded = expanded ?: localExpanded
-
-    val setExpanded = { value: Boolean ->
-        if (onExpandedChange != null) {
-            onExpandedChange(value)
-        } else {
-            localExpanded = value
-        }
-    }
+    var expanded by remember { mutableStateOf(false) }
     Column(
         modifier =
             modifier
@@ -93,9 +81,9 @@ fun ModifierInspectorContainer(
         if (reorderScope != null) {
             with(reorderScope) {
                 ModifierInspectorHeaderRow(
-                    expanded = actualExpanded,
+                    expanded = expanded,
                     wrapper = wrapper,
-                    onExpandButtonClicked = { setExpanded(!actualExpanded) },
+                    onExpandButtonClicked = { expanded = !expanded },
                     onDeleteButtonClicked = {
                         composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
                     },
@@ -105,9 +93,9 @@ fun ModifierInspectorContainer(
             }
         } else {
             ModifierInspectorHeaderRow(
-                expanded = actualExpanded,
+                expanded = expanded,
                 wrapper = wrapper,
-                onExpandButtonClicked = { setExpanded(!actualExpanded) },
+                onExpandButtonClicked = { expanded = !expanded },
                 onDeleteButtonClicked = {
                     composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
                 },
@@ -115,7 +103,7 @@ fun ModifierInspectorContainer(
             )
         }
 
-        if (actualExpanded) {
+        if (expanded) {
             content()
         }
     }
