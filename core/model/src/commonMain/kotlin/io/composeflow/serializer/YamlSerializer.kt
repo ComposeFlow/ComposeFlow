@@ -1,5 +1,7 @@
 package io.composeflow.serializer
 
+import co.touchlab.kermit.Logger
+import com.charleskorn.kaml.MissingTypeTagException
 import com.charleskorn.kaml.PolymorphismStyle
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
@@ -54,6 +56,12 @@ val yamlPropertyBasedSerializer =
     )
 
 /**
+ * Checks if this throwable or any of its causes is a [MissingTypeTagException].
+ */
+val Throwable.isCausedByMissingTypeTag: Boolean
+    get() = this is MissingTypeTagException || this.cause?.isCausedByMissingTypeTag == true
+
+/**
  * Wrapper method that attempts to decode using yamlDefaultSerializer first,
  * and falls back to yamlPropertyBasedSerializer only if the exception indicates
  * a missing 'type' property (property-based polymorphism issue).
@@ -66,7 +74,7 @@ inline fun <reified T> decodeFromStringWithFallback(yamlContent: String): T =
     } catch (e: SerializationException) {
         // Only fallback if the error is specifically about missing 'type' property
         // which indicates the YAML might be using property-based polymorphism
-        if (e.message?.contains("Property 'type' is required but it is missing") == true) {
+        if (e.isCausedByMissingTypeTag) {
             yamlPropertyBasedSerializer.decodeFromString<T>(yamlContent)
         } else {
             // Re-throw other serialization exceptions to avoid masking real issues
@@ -91,7 +99,7 @@ fun <T> decodeFromStringWithFallback(
     } catch (e: SerializationException) {
         // Only fallback if the error is specifically about missing 'type' property
         // which indicates the YAML might be using property-based polymorphism
-        if (e.message?.contains("Property 'type' is required but it is missing") == true) {
+        if (e.isCausedByMissingTypeTag) {
             yamlPropertyBasedSerializer.decodeFromString(deserializer, yamlContent)
         } else {
             // Re-throw other serialization exceptions to avoid masking real issues
@@ -141,7 +149,7 @@ fun <T> decodeFromYamlNodeWithFallback(
     } catch (e: SerializationException) {
         // Only fallback if the error is specifically about missing 'type' property
         // which indicates the YAML might be using property-based polymorphism
-        if (e.message?.contains("Property 'type' is required but it is missing") == true) {
+        if (e.isCausedByMissingTypeTag) {
             yamlPropertyBasedSerializer.decodeFromYamlNode(deserializer, yamlNode)
         } else {
             // Re-throw other serialization exceptions to avoid masking real issues
