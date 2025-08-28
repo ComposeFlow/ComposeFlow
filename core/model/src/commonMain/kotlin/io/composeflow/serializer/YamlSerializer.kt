@@ -1,6 +1,5 @@
 package io.composeflow.serializer
 
-import co.touchlab.kermit.Logger
 import com.charleskorn.kaml.MissingTypeTagException
 import com.charleskorn.kaml.PolymorphismStyle
 import com.charleskorn.kaml.Yaml
