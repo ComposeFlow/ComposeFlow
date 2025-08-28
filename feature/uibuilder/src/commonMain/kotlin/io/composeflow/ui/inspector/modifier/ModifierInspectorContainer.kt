@@ -40,6 +40,7 @@ import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.modifier.hoverOverlay
+import io.composeflow.ui.inspector.modifier.LocalEditModifierDialogExpandedStates
 import io.composeflow.ui.utils.TreeExpander
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableCollectionItemScope
@@ -67,9 +68,31 @@ fun ModifierInspectorContainer(
     composeNodeCallbacks: ComposeNodeCallbacks,
     onVisibilityToggleClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    expanded: Boolean? = null,
+    onExpandedChange: ((Boolean) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    // Create a more stable key that includes wrapper type to ensure state persistence
+    val stableKey = "${node.id}_${modifierIndex}_${wrapper::class.simpleName}"
+    
+    // Check if we're in the EditModifierDialog context
+    val dialogExpandedStates = LocalEditModifierDialogExpandedStates.current
+    
+    // Use external state if provided, then check dialog states, then use local state
+    var localExpanded by remember(stableKey) { mutableStateOf(false) }
+    val actualExpanded = when {
+        expanded != null -> expanded
+        dialogExpandedStates != null -> dialogExpandedStates.getOrPut(stableKey) { false }
+        else -> localExpanded
+    }
+    
+    val setExpanded = { value: Boolean -> 
+        when {
+            onExpandedChange != null -> onExpandedChange(value)
+            dialogExpandedStates != null -> dialogExpandedStates[stableKey] = value
+            else -> localExpanded = value
+        }
+    }
     Column(
         modifier =
             modifier
@@ -81,9 +104,9 @@ fun ModifierInspectorContainer(
         if (reorderScope != null) {
             with(reorderScope) {
                 ModifierInspectorHeaderRow(
-                    expanded = expanded,
+                    expanded = actualExpanded,
                     wrapper = wrapper,
-                    onExpandButtonClicked = { expanded = !expanded },
+                    onExpandButtonClicked = { setExpanded(!actualExpanded) },
                     onDeleteButtonClicked = {
                         composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
                     },
@@ -93,9 +116,9 @@ fun ModifierInspectorContainer(
             }
         } else {
             ModifierInspectorHeaderRow(
-                expanded = expanded,
+                expanded = actualExpanded,
                 wrapper = wrapper,
-                onExpandButtonClicked = { expanded = !expanded },
+                onExpandButtonClicked = { setExpanded(!actualExpanded) },
                 onDeleteButtonClicked = {
                     composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
                 },
@@ -103,7 +126,7 @@ fun ModifierInspectorContainer(
             )
         }
 
-        if (expanded) {
+        if (actualExpanded) {
             content()
         }
     }

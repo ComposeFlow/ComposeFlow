@@ -81,6 +81,7 @@ import io.composeflow.ui.inspector.component.ComponentParameterInspector
 import io.composeflow.ui.inspector.component.ScreenParameterInspector
 import io.composeflow.ui.inspector.dynamicitems.DynamicItemsInspector
 import io.composeflow.ui.inspector.lazylist.LazyListChildInspector
+import io.composeflow.ui.inspector.modifier.EditModifierDialog
 import io.composeflow.ui.inspector.modifier.modifierInspector
 import io.composeflow.ui.inspector.parameter.BottomAppBarParamsInspector
 import io.composeflow.ui.inspector.parameter.BoxParamsInspector
@@ -128,6 +129,8 @@ fun PropertyInspector(
 ) {
     val focusedNodes = project.screenHolder.findFocusedNodes()
     val editable = project.screenHolder.currentEditable()
+    var editModifierDialogVisible by remember { mutableStateOf(false) }
+    
     if (focusedNodes.isEmpty()) {
         EmptyInspector()
     } else if (focusedNodes.size > 1) {
@@ -242,8 +245,21 @@ fun PropertyInspector(
                     project = project,
                     listState = lazyListState,
                     composeNodeCallbacks = composeNodeCallbacks,
+                    editModifierDialogVisible = editModifierDialogVisible,
+                    onEditModifierDialogVisibilityChanged = { editModifierDialogVisible = it },
                 )
             }
+        }
+        
+        // Render the EditModifierDialog outside the LazyColumn to prevent recomposition issues
+        if (editModifierDialogVisible) {
+            EditModifierDialog(
+                project = project,
+                composeNodeCallbacks = composeNodeCallbacks,
+                onCloseDialog = {
+                    editModifierDialogVisible = false
+                },
+            )
         }
     }
 }

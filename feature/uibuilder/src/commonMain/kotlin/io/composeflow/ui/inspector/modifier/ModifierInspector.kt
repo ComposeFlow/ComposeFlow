@@ -21,12 +21,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.add_new_modifier
@@ -49,10 +56,15 @@ import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableLazyListState
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
+// Composition local to provide expanded states for modifiers in EditModifierDialog
+val LocalEditModifierDialogExpandedStates = compositionLocalOf<MutableMap<String, Boolean>?> { null }
+
 fun LazyListScope.modifierInspector(
     project: Project,
     listState: LazyListState,
     composeNodeCallbacks: ComposeNodeCallbacks,
+    editModifierDialogVisible: Boolean,
+    onEditModifierDialogVisibilityChanged: (Boolean) -> Unit,
 ) {
     val focusedNodes = project.screenHolder.findFocusedNodes()
     when {
@@ -67,7 +79,6 @@ fun LazyListScope.modifierInspector(
             item {
                 val coroutineScope = rememberCoroutineScope()
                 var addModifierDialogVisible by remember { mutableStateOf(false) }
-                var editModifierDialogVisible by remember { mutableStateOf(false) }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = "Modifiers",
@@ -97,7 +108,7 @@ fun LazyListScope.modifierInspector(
 
                     ComposeFlowIconButton(
                         onClick = {
-                            editModifierDialogVisible = true
+                            onEditModifierDialogVisibilityChanged(true)
                         },
                         modifier =
                             Modifier
@@ -145,16 +156,6 @@ fun LazyListScope.modifierInspector(
                             onCloseClick = {
                                 addModifierDialogVisible = false
                                 onAllDialogsClosed()
-                            },
-                        )
-                    }
-
-                    if (editModifierDialogVisible) {
-                        EditModifierDialog(
-                            project = project,
-                            composeNodeCallbacks = composeNodeCallbacks,
-                            onCloseDialog = {
-                                editModifierDialogVisible = false
                             },
                         )
                     }
@@ -573,6 +574,7 @@ fun SingleModifierInspector(
     }
 }
 
+
 @Composable
 fun EditModifierDialog(
     project: Project,
@@ -590,8 +592,22 @@ fun EditModifierDialog(
 
         else -> {
             val composeNode = focusedNodes.first()
+            // Store expanded states for all modifiers to preserve them across recompositions
+            val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
             PositionCustomizablePopup(
                 onDismissRequest = onCloseDialog,
+                onKeyEvent = { keyEvent ->
+                    // Handle ESC key to close dialog
+                    if (keyEvent.key == Key.Escape && 
+                        keyEvent.type == KeyEventType.KeyDown) {
+                        onCloseDialog()
+                        true
+                    } else {
+                        // Consume all other key events to prevent them from bubbling up to parent handlers
+                        // This prevents the dialog from closing on every keystroke
+                        true
+                    }
+                },
             ) {
                 Surface(
                     modifier = modifier.size(width = 420.dp, height = 460.dp),
@@ -605,9 +621,10 @@ fun EditModifierDialog(
                                 composeNodeCallbacks.onModifierSwapped(composeNode, from.index, to.index)
                             }
                         }
-                    Column {
-                        var addModifierDialogVisible by remember { mutableStateOf(false) }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                    CompositionLocalProvider(LocalEditModifierDialogExpandedStates provides expandedStates) {
+                        Column {
+                            var addModifierDialogVisible by remember { mutableStateOf(false) }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "Modifiers",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -673,12 +690,12 @@ fun EditModifierDialog(
                         ) {
                             itemsIndexed(
                                 composeNode.modifierList,
-                                key = { index, modifier -> modifier },
+                                key = { index, modifier -> "${composeNode.id}_modifier_$index" },
                             ) { i, chain ->
                                 ComposeFlowReorderableItem(
                                     index = i,
                                     reorderableLazyListState,
-                                    key = chain,
+                                    key = "${composeNode.id}_modifier_$i",
                                 ) {
                                     ProvideModifierReorderAllowed(reorderableCollectionItemScope = this) {
                                         val onVisibilityToggleClicked = {
@@ -700,6 +717,7 @@ fun EditModifierDialog(
                                         )
                                     }
                                 }
+                            }
                             }
                         }
                     }
