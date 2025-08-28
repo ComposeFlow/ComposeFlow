@@ -602,7 +602,11 @@ fun EditModifierDialog(
                         rememberReorderableLazyListState(lazyListState) { from, to ->
                             if (from.index != to.index) {
                                 // Use the composeNode that's already in scope
-                                composeNodeCallbacks.onModifierSwapped(composeNode, from.index, to.index)
+                                composeNodeCallbacks.onModifierSwapped(
+                                    composeNode,
+                                    from.index,
+                                    to.index,
+                                )
                             }
                         }
                     Column {
@@ -673,12 +677,12 @@ fun EditModifierDialog(
                         ) {
                             itemsIndexed(
                                 composeNode.modifierList,
-                                key = { index, modifier -> modifier },
+                                key = { index, modifier -> "${composeNode.id}_modifier_$index" },
                             ) { i, chain ->
                                 ComposeFlowReorderableItem(
                                     index = i,
                                     reorderableLazyListState,
-                                    key = chain,
+                                    key = "${composeNode.id}_modifier_$i",
                                 ) {
                                     ProvideModifierReorderAllowed(reorderableCollectionItemScope = this) {
                                         val onVisibilityToggleClicked = {

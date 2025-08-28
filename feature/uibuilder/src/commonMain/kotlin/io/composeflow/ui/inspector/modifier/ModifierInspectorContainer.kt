@@ -67,9 +67,21 @@ fun ModifierInspectorContainer(
     composeNodeCallbacks: ComposeNodeCallbacks,
     onVisibilityToggleClicked: () -> Unit,
     modifier: Modifier = Modifier,
+    expanded: Boolean? = null,
+    onExpandedChange: ((Boolean) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
-    var expanded by remember { mutableStateOf(false) }
+    // Use external state if provided, otherwise use local state
+    var localExpanded by remember { mutableStateOf(false) }
+    val actualExpanded = expanded ?: localExpanded
+
+    val setExpanded = { value: Boolean ->
+        if (onExpandedChange != null) {
+            onExpandedChange(value)
+        } else {
+            localExpanded = value
+        }
+    }
     Column(
         modifier =
             modifier
@@ -81,9 +93,9 @@ fun ModifierInspectorContainer(
         if (reorderScope != null) {
             with(reorderScope) {
                 ModifierInspectorHeaderRow(
-                    expanded = expanded,
+                    expanded = actualExpanded,
                     wrapper = wrapper,
-                    onExpandButtonClicked = { expanded = !expanded },
+                    onExpandButtonClicked = { setExpanded(!actualExpanded) },
                     onDeleteButtonClicked = {
                         composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
                     },
@@ -93,9 +105,9 @@ fun ModifierInspectorContainer(
             }
         } else {
             ModifierInspectorHeaderRow(
-                expanded = expanded,
+                expanded = actualExpanded,
                 wrapper = wrapper,
-                onExpandButtonClicked = { expanded = !expanded },
+                onExpandButtonClicked = { setExpanded(!actualExpanded) },
                 onDeleteButtonClicked = {
                     composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
                 },
@@ -103,7 +115,7 @@ fun ModifierInspectorContainer(
             )
         }
 
-        if (expanded) {
+        if (actualExpanded) {
             content()
         }
     }
