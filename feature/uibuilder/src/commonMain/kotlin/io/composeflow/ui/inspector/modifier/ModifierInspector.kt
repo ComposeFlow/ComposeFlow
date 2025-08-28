@@ -19,11 +19,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,9 +49,6 @@ import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableLazyListState
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-// Composition local to provide expanded states for modifiers in EditModifierDialog
-val LocalEditModifierDialogExpandedStates =
-    compositionLocalOf<MutableMap<String, Boolean>?> { null }
 
 fun LazyListScope.modifierInspector(
     project: Project,
@@ -598,8 +592,6 @@ fun EditModifierDialog(
 
         else -> {
             val composeNode = focusedNodes.first()
-            // Store expanded states for all modifiers to preserve them across recompositions
-            val expandedStates = remember { mutableStateMapOf<String, Boolean>() }
             PositionCustomizablePopup(
                 onDismissRequest = onCloseDialog,
             ) {
@@ -619,8 +611,7 @@ fun EditModifierDialog(
                                 )
                             }
                         }
-                    CompositionLocalProvider(LocalEditModifierDialogExpandedStates provides expandedStates) {
-                        Column {
+                    Column {
                             var addModifierDialogVisible by remember { mutableStateOf(false) }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
@@ -718,7 +709,6 @@ fun EditModifierDialog(
                                 }
                             }
                         }
-                    }
                 }
             }
         }
