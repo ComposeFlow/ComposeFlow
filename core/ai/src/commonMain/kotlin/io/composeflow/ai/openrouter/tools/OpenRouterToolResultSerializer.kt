@@ -63,6 +63,15 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                             ),
                         )
 
+                    is OpenRouterToolResult.RemoveComposeNodesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.RemoveComposeNodesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
                     is OpenRouterToolResult.AddModifierArgs ->
                         put(
                             "tool_args",
@@ -270,6 +279,15 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                             ),
                         )
 
+                    is OpenRouterToolResult.GetProjectIssuesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.GetProjectIssuesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
                     is OpenRouterToolResult.ListScreensArgs ->
                         put(
                             "tool_args",
@@ -347,6 +365,19 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                         processedToolArgsElement,
                     )
                 OpenRouterToolResult.RemoveComposeNodeArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "remove_compose_nodes" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.RemoveComposeNodesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.RemoveComposeNodesArgs(
                     tool_name = toolName,
                     tool_call_id = toolCallId,
                     tool_args = toolArgs,
@@ -646,6 +677,19 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                         processedToolArgsElement,
                     )
                 OpenRouterToolResult.GetCustomEnumArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "get_project_issues" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.GetProjectIssuesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.GetProjectIssuesArgs(
                     tool_name = toolName,
                     tool_call_id = toolCallId,
                     tool_args = toolArgs,

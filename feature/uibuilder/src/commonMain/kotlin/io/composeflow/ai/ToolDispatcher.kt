@@ -66,6 +66,16 @@ class ToolDispatcher(
                 )
             }
 
+            is ToolArgs.RemoveComposeNodesArgs -> {
+                uiBuilderOperator.onRemoveComposeNodes(
+                    project,
+                    toolArgs.composeNodeIds
+                        .split(",")
+                        .map { it.trim() }
+                        .filter { it.isNotEmpty() },
+                )
+            }
+
             is ToolArgs.RemoveModifierArgs -> {
                 uiBuilderOperator.onRemoveModifier(
                     project,
@@ -312,6 +322,14 @@ class ToolDispatcher(
                     toolArgs.result = "Error getting custom enum: ${e.message}"
                     EventResult().apply { errorMessages.add("Failed to get custom enum: ${e.message}") }
                 }
+            }
+
+            is ToolArgs.GetProjectIssuesArgs -> {
+                val result = uiBuilderOperator.onGetProjectIssues(project)
+                if (result.errorMessages.isNotEmpty()) {
+                    toolArgs.result = result.errorMessages.joinToString("; ")
+                }
+                result
             }
 
             is ToolArgs.ListScreensArgs -> {
