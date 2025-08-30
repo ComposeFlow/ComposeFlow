@@ -7,6 +7,10 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -18,10 +22,8 @@ kotlin {
             implementation(project(":core:ui"))
             implementation(libs.compose.color.picker)
             implementation(libs.compose.shimmer)
-            implementation(libs.datastore.preferences.core)
             implementation(libs.kaml)
             implementation(libs.kotlin.result)
-            implementation(libs.kotlinpoet)
             implementation(libs.material.kolor)
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)

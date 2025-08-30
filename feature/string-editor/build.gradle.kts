@@ -8,6 +8,10 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -18,7 +22,6 @@ kotlin {
             implementation(project(":core:resources"))
             implementation(project(":core:serializer"))
             implementation(project(":core:ui"))
-            implementation(libs.jewel.int.ui.standalone)
             implementation(libs.kaml)
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)

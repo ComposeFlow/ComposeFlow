@@ -5,6 +5,10 @@ plugins {
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -18,11 +22,14 @@ kotlin {
             implementation(libs.kermit)
             implementation(libs.commons.compress)
             implementation(libs.coroutines.core)
-            implementation(libs.gradle.tooling.api)
-            implementation(libs.kotlinpoet)
             implementation(libs.kotlin.result)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.kotlinpoet)
             implementation(libs.ktlint.core)
             implementation(libs.ktlint.ruleset.standard)
+            implementation(libs.gradle.tooling.api)
         }
     }
 }

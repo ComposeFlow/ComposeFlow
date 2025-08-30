@@ -7,6 +7,10 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -16,13 +20,10 @@ kotlin {
             implementation(project(":core:serializer"))
             implementation(project(":core:ui"))
             implementation(libs.compose.shimmer)
-            implementation(libs.datastore.core.okio)
-            implementation(libs.datastore.preferences.core)
             implementation(libs.filekit.compose)
             implementation(libs.kaml)
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.result)
-            implementation(libs.kotlinpoet)
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)
         }
