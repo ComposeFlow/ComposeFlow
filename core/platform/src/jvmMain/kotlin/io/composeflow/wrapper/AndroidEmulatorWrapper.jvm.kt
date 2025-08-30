@@ -1,9 +1,9 @@
 package io.composeflow.wrapper
 
 import co.touchlab.kermit.Logger
+import io.composeflow.removeLineBreak
 import io.composeflow.wrapper.CommandUtil.runCommand
 import io.composeflow.wrapper.CommandUtil.runCommandAndWait
-import io.composeflow.removeLineBreak
 
 actual class AndroidEmulatorWrapper actual constructor() {
     private val sdkPath =

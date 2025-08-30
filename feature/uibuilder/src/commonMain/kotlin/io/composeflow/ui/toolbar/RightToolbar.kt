@@ -21,10 +21,10 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.auth.FirebaseIdToken
-import io.composeflow.download_jdk_confirmation
 import io.composeflow.device.Device
 import io.composeflow.device.EmulatorStatus
 import io.composeflow.device.SimulatorStatus
+import io.composeflow.download_jdk_confirmation
 import io.composeflow.preview_app_disabled_due_to_issues
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIconButton

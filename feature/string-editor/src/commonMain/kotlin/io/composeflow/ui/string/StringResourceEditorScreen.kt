@@ -451,12 +451,12 @@ private fun StringResourceEditorContent(
                 if (selectedResources.size == 1) {
                     stringResource(
                         Res.string.delete_string_resource_confirmation,
-                        selectedResources.first().key
+                        selectedResources.first().key,
                     )
                 } else {
                     stringResource(
                         Res.string.delete_string_resources_confirmation,
-                        selectedResources.size
+                        selectedResources.size,
                     )
                 },
             onConfirmClick = {
@@ -927,11 +927,11 @@ private fun EditSupportedLocalesDialog(
                             allLocales.filter { locale ->
                                 displayNames[locale]?.startsWith(
                                     searchQuery,
-                                    ignoreCase = true
+                                    ignoreCase = true,
                                 ) == true ||
                                     locale.languageCode.startsWith(
                                         searchQuery,
-                                        ignoreCase = true
+                                        ignoreCase = true,
                                     ) ||
                                     locale.name.startsWith(searchQuery, ignoreCase = true)
                             }
@@ -956,15 +956,17 @@ private fun EditSupportedLocalesDialog(
                 if (visibleNonDefaultLocales.isNotEmpty()) {
                     Row(
                         modifier =
-                            Modifier.align(Alignment.End)
-                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp).onClick {
-                                selectedLocales =
-                                    if (allVisibleSelected) {
-                                        selectedLocales - visibleNonDefaultLocales.toSet()
-                                    } else {
-                                        selectedLocales + visibleNonDefaultLocales
-                                    }
-                            },
+                            Modifier
+                                .align(Alignment.End)
+                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                                .onClick {
+                                    selectedLocales =
+                                        if (allVisibleSelected) {
+                                            selectedLocales - visibleNonDefaultLocales.toSet()
+                                        } else {
+                                            selectedLocales + visibleNonDefaultLocales
+                                        }
+                                },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
@@ -996,10 +998,11 @@ private fun EditSupportedLocalesDialog(
                     if (filteredLocales.isEmpty() && searchQuery.isNotBlank()) {
                         item {
                             Text(
-                                text = stringResource(
-                                    Res.string.no_locales_found_matching,
-                                    searchQuery
-                                ),
+                                text =
+                                    stringResource(
+                                        Res.string.no_locales_found_matching,
+                                        searchQuery,
+                                    ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
@@ -1064,9 +1067,10 @@ private fun EditSupportedLocalesDialog(
                                             color =
                                                 when {
                                                     isDefault -> LocalContentColor.current.copy(0.6f)
-                                                    isSelected -> MaterialTheme.colorScheme.onPrimaryContainer.copy(
-                                                        0.7f
-                                                    )
+                                                    isSelected ->
+                                                        MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                            0.7f,
+                                                        )
 
                                                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                                                 },

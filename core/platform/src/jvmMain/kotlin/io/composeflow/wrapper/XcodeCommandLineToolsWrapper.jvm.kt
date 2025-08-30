@@ -1,11 +1,11 @@
 package io.composeflow.wrapper
 
 import co.touchlab.kermit.Logger
-import io.composeflow.wrapper.CommandUtil.runCommandAndWait
-import io.composeflow.logger.logger
 import io.composeflow.device.Device
 import io.composeflow.device.SimulatorStatus
+import io.composeflow.logger.logger
 import io.composeflow.ui.statusbar.StatusBarUiState
+import io.composeflow.wrapper.CommandUtil.runCommandAndWait
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

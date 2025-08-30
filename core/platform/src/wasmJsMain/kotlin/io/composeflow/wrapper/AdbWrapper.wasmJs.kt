@@ -8,19 +8,19 @@ import io.composeflow.device.Device
  */
 actual class AdbWrapper {
     actual suspend fun listDevices(): List<Device.AndroidEmulator> = emptyList()
-    
+
     actual suspend fun installApk(
         deviceId: String,
         appDirPath: String,
-        apkRelativePath: String
+        apkRelativePath: String,
     ) {
         // No-op: ADB operations not supported on WASM
     }
-    
+
     actual suspend fun launchActivity(
         deviceId: String,
         applicationId: String,
-        activityName: String
+        activityName: String,
     ) {
         // No-op: ADB operations not supported on WASM
     }

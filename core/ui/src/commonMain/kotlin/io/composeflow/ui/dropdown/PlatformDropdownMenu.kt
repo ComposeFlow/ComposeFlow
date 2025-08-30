@@ -6,5 +6,5 @@ import androidx.compose.runtime.Composable
 expect fun PlatformDropdownMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 )

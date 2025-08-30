@@ -121,7 +121,8 @@ class ApiEditorViewModel(
         project.apiHolder.apiDefinitions
             .removeAll(
                 project.apiHolder.apiDefinitions
-                    .filter { it.id == apiDefinition.id })
+                    .filter { it.id == apiDefinition.id },
+            )
 
         saveProject()
     }

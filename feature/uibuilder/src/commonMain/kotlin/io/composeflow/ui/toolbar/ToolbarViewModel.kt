@@ -8,14 +8,14 @@ import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.cloud.storage.AssetSynchronizer
 import io.composeflow.cloud.storage.GoogleCloudStorageWrapper
 import io.composeflow.datastore.LocalAssetSaver
+import io.composeflow.device.Device
+import io.composeflow.device.EmulatorStatus
+import io.composeflow.device.nextPortNumber
 import io.composeflow.download_jdk_needed_message
 import io.composeflow.downloading_jdk
 import io.composeflow.failed_to_download_jdk
 import io.composeflow.finished_downloading_jdk
 import io.composeflow.firebase.FirebaseApiCaller
-import io.composeflow.device.Device
-import io.composeflow.device.EmulatorStatus
-import io.composeflow.device.nextPortNumber
 import io.composeflow.model.project.LoadedProjectUiState
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.asLoadedProjectUiState
