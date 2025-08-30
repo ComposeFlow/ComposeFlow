@@ -10,23 +10,23 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StateOperationTest {
-
     @Test
     fun testGetUpdateIndexParamsAsString_verifyNoSpaces() {
         val project = Project()
         val mockContext = GenerationContext()
         val lazyListNodeId = "lazy-grid-node-123"
 
-        val operation = StateOperationForList.RemoveValueAtIndex(
-            IntProperty.ValueFromLazyListIndex(
-                lazyListNodeId = lazyListNodeId
+        val operation =
+            StateOperationForList.RemoveValueAtIndex(
+                IntProperty.ValueFromLazyListIndex(
+                    lazyListNodeId = lazyListNodeId,
+                ),
             )
-        )
         project.screenHolder.currentScreen().getRootNode().addChild(
             ComposeNode(
                 id = lazyListNodeId,
-                trait = mutableStateOf(LazyVerticalGridTrait())
-            )
+                trait = mutableStateOf(LazyVerticalGridTrait()),
+            ),
         )
 
         val result = operation.getUpdateIndexParamsAsString(project, mockContext)

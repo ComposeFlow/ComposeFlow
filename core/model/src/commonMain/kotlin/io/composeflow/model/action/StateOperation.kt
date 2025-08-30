@@ -173,11 +173,9 @@ sealed interface StateOperation {
         @Composable
         override fun displayName(): String = stringResource(Res.string.set_value)
 
-        override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
-            readProperty.getDependentComposeNodes(project)
+        override fun getDependentComposeNodes(project: Project): List<ComposeNode> = readProperty.getDependentComposeNodes(project)
 
-        override fun getAssignableProperties(): List<AssignableProperty> =
-            readProperty.getAssignableProperties()
+        override fun getAssignableProperties(): List<AssignableProperty> = readProperty.getAssignableProperties()
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString(displayName())
@@ -506,11 +504,9 @@ sealed interface StateOperationForList : StateOperation {
         DropdownItem {
         override fun isDependent(sourceId: String): Boolean = readProperty.isDependent(sourceId)
 
-        override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
-            readProperty.getDependentComposeNodes(project)
+        override fun getDependentComposeNodes(project: Project): List<ComposeNode> = readProperty.getDependentComposeNodes(project)
 
-        override fun getAssignableProperties(): List<AssignableProperty> =
-            readProperty.getAssignableProperties()
+        override fun getAssignableProperties(): List<AssignableProperty> = readProperty.getAssignableProperties()
 
         override fun getUpdateMethodParamsAsString(
             project: Project,
@@ -740,11 +736,9 @@ sealed interface StateOperationForList : StateOperation {
             readProperty.isDependent(sourceId) ||
                 indexProperty.isDependent(sourceId)
 
-        override fun getDependentComposeNodes(project: Project): List<ComposeNode> =
-            readProperty.getDependentComposeNodes(project)
+        override fun getDependentComposeNodes(project: Project): List<ComposeNode> = readProperty.getDependentComposeNodes(project)
 
-        override fun getAssignableProperties(): List<AssignableProperty> =
-            readProperty.getAssignableProperties()
+        override fun getAssignableProperties(): List<AssignableProperty> = readProperty.getAssignableProperties()
 
         override fun getUpdateMethodName(
             project: Project,
