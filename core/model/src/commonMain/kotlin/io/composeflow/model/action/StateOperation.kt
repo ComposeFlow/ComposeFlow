@@ -36,6 +36,7 @@ import io.composeflow.model.type.convertCodeFromType
 import io.composeflow.remove_first_value
 import io.composeflow.remove_last_value
 import io.composeflow.remove_value_at_index
+import io.composeflow.replaceSpaces
 import io.composeflow.set_value
 import io.composeflow.toggle_value
 import io.composeflow.ui.propertyeditor.DropdownItem
@@ -1222,6 +1223,7 @@ sealed interface StateOperationWithIndexProperty : StateOperation {
                 val lazyList = project.findComposeNodeOrThrow(property.lazyListNodeId)
                 lazyList.trait.value
                     .iconText()
+                    .replaceSpaces()
                     .replaceFirstChar { it.lowercase() } + "Index"
             }
         }
