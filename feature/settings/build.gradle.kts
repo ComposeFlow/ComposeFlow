@@ -24,7 +24,7 @@ kotlin {
             implementation(libs.precompose.viewmodel)
         }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(kotlin("test-junit"))
         }
         all {

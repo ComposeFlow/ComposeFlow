@@ -29,13 +29,12 @@ kotlin {
             implementation(libs.precompose.viewmodel)
         }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(project(":core:model"))
             implementation(kotlin("test-junit"))
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.desktop.uiTestJUnit4)
             implementation(compose.desktop.currentOs)
-            implementation(libs.jewel.int.ui.standalone)
         }
         all {
             optInComposeExperimentalApis()

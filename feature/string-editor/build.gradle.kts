@@ -25,7 +25,6 @@ kotlin {
             implementation(libs.kaml)
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)
-            implementation(libs.datastore.preferences.core)
         }
 
         // Configure KSP for LLM tools
@@ -39,13 +38,12 @@ kotlin {
             arg("llmToolsOutputDir", "${project.layout.buildDirectory.get()}/generated/llm-tools")
         }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(project(":core:model"))
             implementation(kotlin("test-junit"))
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.desktop.uiTestJUnit4)
             implementation(compose.desktop.currentOs)
-            implementation(libs.jewel.int.ui.standalone)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.common)
