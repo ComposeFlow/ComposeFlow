@@ -33,7 +33,7 @@ class ApiEditorViewModel(
     private val apiCallRepository: ApiCallRepository = ApiCallRepository(),
     private val projectRepository: ProjectRepository = ProjectRepository(firebaseIdToken),
 ) : ViewModel() {
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineScope = CoroutineScope(Dispatchers.Default)
 
     // Project that is updated when the the project that is being edited.
     // This may conflicts with the [project] field in this ViewModel, but to detect the real time
@@ -118,7 +118,10 @@ class ApiEditorViewModel(
     }
 
     fun onApiDefinitionDeleted(apiDefinition: ApiDefinition) {
-        project.apiHolder.apiDefinitions.removeIf { it.id == apiDefinition.id }
+        project.apiHolder.apiDefinitions
+            .removeAll(
+                project.apiHolder.apiDefinitions
+                    .filter { it.id == apiDefinition.id })
 
         saveProject()
     }

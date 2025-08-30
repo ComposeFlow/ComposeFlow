@@ -23,7 +23,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
@@ -97,6 +96,7 @@ import io.composeflow.ui.LocalOnShowSnackbar
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.apieditor.ApiEditorViewModel
 import io.composeflow.ui.apieditor.model.ApiResponseUiState
+import io.composeflow.ui.dropdown.PlatformDropdownMenu
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
 import io.composeflow.ui.jsonpath.createJsonTreeWithJsonPath
@@ -322,7 +322,7 @@ private fun ApiEditorRowOptionMenu(
     onDismissRequest: () -> Unit,
     onDeleteApiDefinitionDialogOpen: () -> Unit,
 ) {
-    CursorDropdownMenu(
+    PlatformDropdownMenu(
         expanded = true,
         onDismissRequest = onDismissRequest,
     ) {

@@ -1,17 +1,17 @@
-package io.composeflow.appbuilder.wrapper
+package io.composeflow.wrapper
 
 import co.touchlab.kermit.Logger
-import io.composeflow.model.device.Device
-import io.composeflow.model.device.EmulatorStatus
+import io.composeflow.device.Device
+import io.composeflow.device.EmulatorStatus
 import io.composeflow.removeLineBreak
 import java.io.File
 
-class AdbWrapper {
+actual class AdbWrapper {
     private val sdkPath =
         System.getenv("ANDROID_SDK_ROOT") ?: null
     private val adbPath = sdkPath?.let { "$sdkPath/platform-tools/adb" }
 
-    suspend fun listDevices(): List<Device.AndroidEmulator> =
+    actual suspend fun listDevices(): List<Device.AndroidEmulator> =
         adbPath?.let {
             val command = arrayOf(adbPath, "devices")
             val output = CommandUtil.runCommandAndWait(command)
@@ -54,12 +54,13 @@ class AdbWrapper {
         }
     }
 
-    suspend fun installApk(
+    actual suspend fun installApk(
         deviceId: String,
-        appDir: File,
-        apkRelativePath: String = "./composeApp/build/outputs/apk/debug/composeApp-debug.apk",
+        appDirPath: String,
+        apkRelativePath: String,
     ) {
         adbPath?.let {
+            val appDir = File(appDirPath)
             val command =
                 arrayOf(
                     it,
@@ -73,7 +74,7 @@ class AdbWrapper {
         } ?: Logger.w("Adb path not found")
     }
 
-    suspend fun launchActivity(
+    actual suspend fun launchActivity(
         deviceId: String,
         applicationId: String,
         activityName: String,

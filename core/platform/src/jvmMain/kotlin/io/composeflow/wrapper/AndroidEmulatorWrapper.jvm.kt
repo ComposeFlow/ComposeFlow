@@ -1,11 +1,11 @@
-package io.composeflow.appbuilder.wrapper
+package io.composeflow.wrapper
 
 import co.touchlab.kermit.Logger
-import io.composeflow.appbuilder.wrapper.CommandUtil.runCommand
-import io.composeflow.appbuilder.wrapper.CommandUtil.runCommandAndWait
+import io.composeflow.wrapper.CommandUtil.runCommand
+import io.composeflow.wrapper.CommandUtil.runCommandAndWait
 import io.composeflow.removeLineBreak
 
-class AndroidEmulatorWrapper {
+actual class AndroidEmulatorWrapper actual constructor() {
     private val sdkPath =
         System.getenv("ANDROID_SDK_ROOT") ?: System.getenv("ANDROID_HOME") ?: null
     private val emulatorPath =
@@ -13,7 +13,7 @@ class AndroidEmulatorWrapper {
             "$it/emulator/emulator"
         }
 
-    suspend fun listAvdsAndWait(): List<String> =
+    actual suspend fun listAvdsAndWait(): List<String> =
         emulatorPath?.let {
             val command = arrayOf(emulatorPath, "-list-avds")
             val output = runCommandAndWait(command)
@@ -24,7 +24,7 @@ class AndroidEmulatorWrapper {
                 .map { it.removeLineBreak() }
         } ?: emptyList()
 
-    fun runAvd(
+    actual suspend fun runAvd(
         avdName: String,
         portNumber: Int,
     ) {

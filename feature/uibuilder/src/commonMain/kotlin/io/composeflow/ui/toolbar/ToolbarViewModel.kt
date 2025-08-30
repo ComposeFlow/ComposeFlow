@@ -13,9 +13,9 @@ import io.composeflow.downloading_jdk
 import io.composeflow.failed_to_download_jdk
 import io.composeflow.finished_downloading_jdk
 import io.composeflow.firebase.FirebaseApiCaller
-import io.composeflow.model.device.Device
-import io.composeflow.model.device.EmulatorStatus
-import io.composeflow.model.device.nextPortNumber
+import io.composeflow.device.Device
+import io.composeflow.device.EmulatorStatus
+import io.composeflow.device.nextPortNumber
 import io.composeflow.model.project.LoadedProjectUiState
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.asLoadedProjectUiState

@@ -25,6 +25,7 @@ kotlin {
         jvmMain.dependencies {
             implementation(libs.jewel.int.ui.standalone)
             implementation(libs.jewel.int.ui.decorated.window)
+            implementation(compose.material)
         }
         jvmTest.dependencies {
             implementation(kotlin("test-junit"))

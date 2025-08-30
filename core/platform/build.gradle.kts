@@ -50,6 +50,7 @@ kotlin {
                 implementation(libs.ktor.server.cio)
                 implementation(libs.ktor.server.content.negotiation)
                 implementation(libs.datastore.preferences.core)
+                implementation(libs.gradle.tooling.api)
             }
         }
 

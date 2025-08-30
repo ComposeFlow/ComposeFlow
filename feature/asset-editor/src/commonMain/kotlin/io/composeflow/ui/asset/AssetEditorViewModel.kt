@@ -26,7 +26,7 @@ class AssetEditorViewModel(
     private val project: Project,
     private val ioDispatcher: CoroutineDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.IO
+            Dispatchers.Default
         },
     private val storageWrapper: GoogleCloudStorageWrapper,
     private val projectRepository: ProjectRepository = ProjectRepository(firebaseIdToken),

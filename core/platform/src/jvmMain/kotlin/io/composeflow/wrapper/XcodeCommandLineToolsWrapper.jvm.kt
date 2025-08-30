@@ -1,10 +1,10 @@
-package io.composeflow.appbuilder.wrapper
+package io.composeflow.wrapper
 
 import co.touchlab.kermit.Logger
-import io.composeflow.appbuilder.wrapper.CommandUtil.runCommandAndWait
+import io.composeflow.wrapper.CommandUtil.runCommandAndWait
 import io.composeflow.logger.logger
-import io.composeflow.model.device.Device
-import io.composeflow.model.device.SimulatorStatus
+import io.composeflow.device.Device
+import io.composeflow.device.SimulatorStatus
 import io.composeflow.ui.statusbar.StatusBarUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -19,13 +19,13 @@ import java.io.File
 private const val XCODEBUILD = "xcodebuild"
 private const val XCRUN = "xcrun"
 
-class XcodeCommandLineToolsWrapper(
+actual class XcodeCommandLineToolsWrapper(
     private val buildLogger: Logger,
 ) {
     private var readStdOutJob: Job? = null
     private var readStdErrJob: Job? = null
 
-    suspend fun isToolAvailable(): Boolean {
+    actual suspend fun isToolAvailable(): Boolean {
         return try {
             val xcodebuildOutput = runCommandAndWait(arrayOf(XCODEBUILD, "-version"))
             if (!xcodebuildOutput.startsWith("Xcode")) return false
@@ -39,7 +39,7 @@ class XcodeCommandLineToolsWrapper(
 
     private val xcrunResultRegex = """^(.+?) \(([^()]+)\) \(([^()]+)\) *$""".toRegex()
 
-    suspend fun listSimulators(): List<Device.IosSimulator> {
+    actual suspend fun listSimulators(): List<Device.IosSimulator> {
         val command = arrayOf(XCRUN, "simctl", "list", "devices", "available")
         val output = runCommandAndWait(command)
         return output
@@ -64,9 +64,9 @@ class XcodeCommandLineToolsWrapper(
     suspend fun buildAndLaunchSimulator(
         appDir: File,
         simulator: Device.IosSimulator,
+        onStatusBarUiStateChanged: (StatusBarUiState) -> Unit,
         packageName: String,
         projectName: String,
-        onStatusBarUiStateChanged: (StatusBarUiState) -> Unit,
     ) {
         launchSimulator(
             appDir = appDir,
