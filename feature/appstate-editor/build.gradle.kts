@@ -15,7 +15,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":ksp-llm-tools"))
+            implementation(project(":ksp-llm-tools-annotations"))
             implementation(project(":core:di"))
             implementation(project(":core:model"))
             implementation(project(":core:platform"))
@@ -46,6 +46,9 @@ kotlin {
             implementation(compose.desktop.uiTestJUnit4)
             implementation(compose.desktop.currentOs)
             implementation(libs.jewel.int.ui.standalone)
+        }
+        jvmMain.dependencies {
+            implementation(compose.desktop.common)
         }
         all {
             optInComposeExperimentalApis()

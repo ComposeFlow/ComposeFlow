@@ -12,7 +12,7 @@ package io.composeflow.ksp
 annotation class LlmTool(
     val name: String = "",
     val description: String,
-    val category: String = "",
+    val category: String = ""
 )
 
 /**
@@ -27,5 +27,5 @@ annotation class LlmTool(
 annotation class LlmParam(
     val description: String,
     val required: Boolean = true,
-    val defaultValue: String = "",
+    val defaultValue: String = ""
 )

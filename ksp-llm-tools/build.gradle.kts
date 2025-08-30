@@ -13,6 +13,7 @@ java {
 }
 
 dependencies {
+    implementation(project(":ksp-llm-tools-annotations"))
     implementation(libs.symbol.processing.api)
     implementation(libs.kotlinx.serialization.json)
 
