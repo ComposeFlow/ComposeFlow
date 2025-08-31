@@ -8,21 +8,23 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":ksp-llm-tools"))
+            implementation(project(":ksp-llm-tools-annotations"))
             implementation(project(":core:di"))
             implementation(project(":core:model"))
             implementation(project(":core:platform"))
             implementation(project(":core:resources"))
             implementation(project(":core:serializer"))
             implementation(project(":core:ui"))
-            implementation(libs.jewel.int.ui.standalone)
             implementation(libs.kaml)
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)
-            implementation(libs.datastore.preferences.core)
         }
 
         // Configure KSP for LLM tools
@@ -36,18 +38,15 @@ kotlin {
             arg("llmToolsOutputDir", "${project.layout.buildDirectory.get()}/generated/llm-tools")
         }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(project(":core:model"))
             implementation(kotlin("test-junit"))
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.desktop.uiTestJUnit4)
             implementation(compose.desktop.currentOs)
-            implementation(libs.jewel.int.ui.standalone)
         }
-        named("jvmMain") {
-            dependencies {
-                implementation(compose.desktop.common)
-            }
+        jvmMain.dependencies {
+            implementation(compose.desktop.common)
         }
         all {
             optInComposeExperimentalApis()

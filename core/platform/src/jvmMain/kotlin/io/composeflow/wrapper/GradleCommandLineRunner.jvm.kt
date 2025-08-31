@@ -1,4 +1,4 @@
-package io.composeflow.appbuilder.wrapper
+package io.composeflow.wrapper
 
 import co.touchlab.kermit.Logger
 import io.composeflow.CurrentOs
@@ -18,10 +18,10 @@ import kotlin.coroutines.cancellation.CancellationException
 /**
  * Class to run gradle wrapper by running command line
  */
-class GradleCommandLineRunner(
+actual class GradleCommandLineRunner(
     private val projectRoot: File,
     private val buildLogger: Logger,
-    private val localJavaHomePath: String?,
+    private val localJavaHomePath: String,
 ) {
     private var readStdOutJob: Job? = null
     private var readStdErrJob: Job? = null
@@ -32,13 +32,13 @@ class GradleCommandLineRunner(
             onStatusBarUiStateChanged = onStatusBarUiStateChanged,
         )
 
-    suspend fun assembleDebug(onStatusBarUiStateChanged: (StatusBarUiState) -> Unit) =
+    actual suspend fun assembleDebug(onStatusBarUiStateChanged: (StatusBarUiState) -> Unit) =
         runTask(
             task = "assembleDebug",
             onStatusBarUiStateChanged = onStatusBarUiStateChanged,
         )
 
-    suspend fun jsBrowserDevelopmentRun(onStatusBarUiStateChanged: (StatusBarUiState) -> Unit) =
+    actual suspend fun jsBrowserDevelopmentRun(onStatusBarUiStateChanged: (StatusBarUiState) -> Unit) =
         runTask(
             task = "jsBrowserDevelopmentRun",
             onStatusBarUiStateChanged = onStatusBarUiStateChanged,
@@ -72,10 +72,10 @@ class GradleCommandLineRunner(
                     directory(projectRoot)
                 }
 
-            localJavaHomePath?.let {
+            if (localJavaHomePath.isNotEmpty()) {
                 val environment = processBuilder.environment()
-                environment["JAVA_HOME"] = it
-                logger.debug("JAVA_HOME is set for gradle wrapper : {}", it)
+                environment["JAVA_HOME"] = localJavaHomePath
+                logger.debug("JAVA_HOME is set for gradle wrapper : {}", localJavaHomePath)
             }
 
             Logger.d("Executing command: ${processBuilder.command()}")

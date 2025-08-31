@@ -1,4 +1,4 @@
-package io.composeflow.appbuilder.wrapper
+package io.composeflow.wrapper
 
 import io.composeflow.di.ServiceLocator
 import kotlinx.coroutines.CoroutineDispatcher
@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 
-object CommandUtil {
+actual object CommandUtil {
     private val ioDispatcher: CoroutineDispatcher =
         ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
             Dispatchers.IO
@@ -20,7 +20,7 @@ object CommandUtil {
         return processBuilder.start()
     }
 
-    suspend fun runCommandAndWait(command: Array<String>): String =
+    actual suspend fun runCommandAndWait(command: Array<String>): String =
         withContext(ioDispatcher) {
             val processBuilder =
                 ProcessBuilder(*command).apply {

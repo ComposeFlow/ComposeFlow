@@ -1,6 +1,6 @@
 package io.composeflow.ui.toolbar
 
-import io.composeflow.model.device.Device
+import io.composeflow.device.Device
 import io.composeflow.model.settings.PathSetting
 
 data class PreviewAppParams(

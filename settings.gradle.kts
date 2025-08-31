@@ -77,6 +77,7 @@ include(":feature:theme-editor")
 include(":feature:settings")
 include(":feature:top")
 include(":ksp-llm-tools")
+include(":ksp-llm-tools-annotations")
 
 includeBuild("build-logic")
 includeBuild("feature/app-builder/app-template")

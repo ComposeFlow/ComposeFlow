@@ -1,4 +1,4 @@
-package io.composeflow.model.device
+package io.composeflow.device
 
 sealed class Device(
     val deviceName: String,

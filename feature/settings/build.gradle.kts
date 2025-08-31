@@ -6,6 +6,10 @@ plugins {
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -14,15 +18,13 @@ kotlin {
             implementation(project(":core:platform"))
             implementation(project(":core:ui"))
             implementation(project(":core:serializer"))
-            implementation(libs.datastore.core.okio)
-            implementation(libs.datastore.preferences.core)
             implementation(libs.filekit.compose)
             implementation(libs.kotlin.result)
             implementation(libs.precompose)
             implementation(libs.precompose.viewmodel)
         }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(kotlin("test-junit"))
         }
         all {

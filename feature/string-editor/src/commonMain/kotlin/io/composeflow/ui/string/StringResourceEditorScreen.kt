@@ -26,7 +26,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.onClick
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
@@ -118,6 +117,7 @@ import io.composeflow.ui.LocalOnAllDialogsClosed
 import io.composeflow.ui.LocalOnAnyDialogIsShown
 import io.composeflow.ui.PointerIconResizeHorizontal
 import io.composeflow.ui.Tooltip
+import io.composeflow.ui.dropdown.PlatformDropdownMenu
 import io.composeflow.ui.modifier.backgroundContainerNeutral
 import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.textfield.SmallOutlinedTextField
@@ -240,7 +240,8 @@ private fun StringResourceEditorContent(
                 )
                 Spacer(modifier = Modifier.width(32.dp))
                 if (isAiEnabled()) {
-                    val hasResourcesNeedingUpdate = project.stringResourceHolder.stringResources.any { it.needsTranslationUpdate }
+                    val hasResourcesNeedingUpdate =
+                        project.stringResourceHolder.stringResources.any { it.needsTranslationUpdate }
                     val hasSelectedResources = selectedResourceIds.isNotEmpty()
 
                     if (hasSelectedResources) {
@@ -329,11 +330,13 @@ private fun StringResourceEditorContent(
                 keyColumnWidth = (keyColumnWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
             },
             onDescriptionColumnWidthChange = { delta ->
-                descriptionColumnWidth = (descriptionColumnWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
+                descriptionColumnWidth =
+                    (descriptionColumnWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
             },
             onLocaleColumnWidthChange = { locale, delta ->
                 val currentWidth = localeColumnWidths[locale] ?: DEFAULT_COLUMN_WIDTH
-                localeColumnWidths[locale] = (currentWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
+                localeColumnWidths[locale] =
+                    (currentWidth + delta).coerceAtLeast(DEFAULT_COLUMN_WIDTH)
             },
             horizontalScrollState = horizontalScrollState,
             modifier = Modifier.onSizeChanged { tableWidthPx = it.width },
@@ -446,9 +449,15 @@ private fun StringResourceEditorContent(
         SimpleConfirmationDialog(
             text =
                 if (selectedResources.size == 1) {
-                    stringResource(Res.string.delete_string_resource_confirmation, selectedResources.first().key)
+                    stringResource(
+                        Res.string.delete_string_resource_confirmation,
+                        selectedResources.first().key,
+                    )
                 } else {
-                    stringResource(Res.string.delete_string_resources_confirmation, selectedResources.size)
+                    stringResource(
+                        Res.string.delete_string_resources_confirmation,
+                        selectedResources.size,
+                    )
                 },
             onConfirmClick = {
                 onDeleteStringResources(selectedResources)
@@ -788,7 +797,7 @@ private fun LocaleHeaderCell(
             )
         }
 
-        CursorDropdownMenu(
+        PlatformDropdownMenu(
             expanded = showDropdown,
             onDismissRequest = { showDropdown = false },
         ) {
@@ -916,8 +925,14 @@ private fun EditSupportedLocalesDialog(
                             allLocales
                         } else {
                             allLocales.filter { locale ->
-                                displayNames[locale]?.startsWith(searchQuery, ignoreCase = true) == true ||
-                                    locale.languageCode.startsWith(searchQuery, ignoreCase = true) ||
+                                displayNames[locale]?.startsWith(
+                                    searchQuery,
+                                    ignoreCase = true,
+                                ) == true ||
+                                    locale.languageCode.startsWith(
+                                        searchQuery,
+                                        ignoreCase = true,
+                                    ) ||
                                     locale.name.startsWith(searchQuery, ignoreCase = true)
                             }
                         }
@@ -941,14 +956,17 @@ private fun EditSupportedLocalesDialog(
                 if (visibleNonDefaultLocales.isNotEmpty()) {
                     Row(
                         modifier =
-                            Modifier.align(Alignment.End).padding(start = 16.dp, end = 16.dp, bottom = 8.dp).onClick {
-                                selectedLocales =
-                                    if (allVisibleSelected) {
-                                        selectedLocales - visibleNonDefaultLocales.toSet()
-                                    } else {
-                                        selectedLocales + visibleNonDefaultLocales
-                                    }
-                            },
+                            Modifier
+                                .align(Alignment.End)
+                                .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
+                                .onClick {
+                                    selectedLocales =
+                                        if (allVisibleSelected) {
+                                            selectedLocales - visibleNonDefaultLocales.toSet()
+                                        } else {
+                                            selectedLocales + visibleNonDefaultLocales
+                                        }
+                                },
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
@@ -980,7 +998,11 @@ private fun EditSupportedLocalesDialog(
                     if (filteredLocales.isEmpty() && searchQuery.isNotBlank()) {
                         item {
                             Text(
-                                text = stringResource(Res.string.no_locales_found_matching, searchQuery),
+                                text =
+                                    stringResource(
+                                        Res.string.no_locales_found_matching,
+                                        searchQuery,
+                                    ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
@@ -1045,7 +1067,11 @@ private fun EditSupportedLocalesDialog(
                                             color =
                                                 when {
                                                     isDefault -> LocalContentColor.current.copy(0.6f)
-                                                    isSelected -> MaterialTheme.colorScheme.onPrimaryContainer.copy(0.7f)
+                                                    isSelected ->
+                                                        MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                            0.7f,
+                                                        )
+
                                                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                                                 },
                                         )

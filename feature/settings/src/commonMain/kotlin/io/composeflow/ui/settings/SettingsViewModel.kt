@@ -42,7 +42,7 @@ import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.getString
-import java.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class SettingsViewModel(
     private val project: Project,
@@ -137,7 +137,7 @@ class SettingsViewModel(
                         Logger.w("Failed in checking the authentication status", e)
                         authenticationStatusCheckJob?.cancel()
                     }
-                    delay(Duration.ofSeconds(30).toMillis())
+                    delay(30.seconds)
                 }
             }
     }

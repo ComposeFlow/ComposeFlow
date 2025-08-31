@@ -1,4 +1,4 @@
-package io.composeflow.appbuilder.wrapper
+package io.composeflow.wrapper
 
 import co.touchlab.kermit.Logger
 import io.composeflow.ui.statusbar.StatusBarUiState

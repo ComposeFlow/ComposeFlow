@@ -12,7 +12,7 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":ksp-llm-tools"))
+            implementation(project(":ksp-llm-tools-annotations"))
             implementation(project(":core:ai"))
             implementation(project(":core:analytics"))
             implementation(project(":core:config"))
