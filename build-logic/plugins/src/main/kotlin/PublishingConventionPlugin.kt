@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.get
 import org.gradle.kotlin.dsl.getByType
+import org.gradle.kotlin.dsl.withType
 
 /**
  * Convention plugin for publishing ComposeFlow modules to Maven repositories.
@@ -26,54 +27,38 @@ import org.gradle.kotlin.dsl.getByType
 class PublishingConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            // Apply maven-publish plugin
-            pluginManager.apply("maven-publish")
+            // For Kotlin Multiplatform projects, the maven-publish plugin is already applied
+            // by the KMP plugin, so we don't need to apply it again
             
-            // Configure publishing after the project is evaluated
+            // We only configure the existing publications created by KMP
             afterEvaluate {
                 configure<PublishingExtension> {
-                    publications {
-                        create<MavenPublication>("maven") {
-                            // Determine artifact ID from project path
-                            // e.g., ":core:model" becomes "core-model"
-                            val projectPath = project.path.substring(1) // Remove leading ":"
-                            val artifactId = projectPath.replace(":", "-")
+                    // Configure all existing Maven publications
+                    publications.withType<MavenPublication>().configureEach {
+                        // Add POM metadata to all publications
+                        pom {
+                            name.set("ComposeFlow ${project.name}")
+                            description.set("${project.name} module for ComposeFlow")
+                            url.set("https://github.com/ComposeFlow/ComposeFlow")
                             
-                            groupId = "io.composeflow"
-                            this.artifactId = artifactId
-                            version = project.findProperty("version")?.toString() ?: "local-SNAPSHOT"
+                            licenses {
+                                license {
+                                    name.set("The Apache License, Version 2.0")
+                                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                                }
+                            }
                             
-                            // Use the Kotlin Multiplatform component
-                            from(components["kotlin"])
+                            developers {
+                                developer {
+                                    id.set("composeflow")
+                                    name.set("ComposeFlow Team")
+                                }
+                            }
                             
-                            pom {
-                                // Format module name for display (e.g., "core-model" -> "Core Model")
-                                val displayName = artifactId.split("-")
-                                    .joinToString(" ") { it.capitalize() }
-                                
-                                name.set("ComposeFlow $displayName")
-                                description.set("$displayName module for ComposeFlow")
+                            scm {
+                                connection.set("scm:git:git://github.com/ComposeFlow/ComposeFlow.git")
+                                developerConnection.set("scm:git:ssh://github.com/ComposeFlow/ComposeFlow.git")
                                 url.set("https://github.com/ComposeFlow/ComposeFlow")
-                                
-                                licenses {
-                                    license {
-                                        name.set("The Apache License, Version 2.0")
-                                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                                    }
-                                }
-                                
-                                developers {
-                                    developer {
-                                        id.set("composeflow")
-                                        name.set("ComposeFlow Team")
-                                    }
-                                }
-                                
-                                scm {
-                                    connection.set("scm:git:git://github.com/ComposeFlow/ComposeFlow.git")
-                                    developerConnection.set("scm:git:ssh://github.com/ComposeFlow/ComposeFlow.git")
-                                    url.set("https://github.com/ComposeFlow/ComposeFlow")
-                                }
                             }
                         }
                     }
