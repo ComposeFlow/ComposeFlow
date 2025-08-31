@@ -2,7 +2,6 @@ plugins {
     id("io.compose.flow.kmp.library")
     id("io.compose.flow.compose.multiplatform")
     alias(libs.plugins.kotlin.serialization)
-    id("io.compose.flow.publishing")
 }
 
 kotlin {
