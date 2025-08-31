@@ -80,21 +80,21 @@ publishing {
                 name.set("ComposeFlow Core Model")
                 description.set("Core domain models for ComposeFlow")
                 url.set("https://github.com/ComposeFlow/ComposeFlow")
-                
+
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
                         url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
                     }
                 }
-                
+
                 developers {
                     developer {
                         id.set("composeflow")
                         name.set("ComposeFlow Team")
                     }
                 }
-                
+
                 scm {
                     connection.set("scm:git:git://github.com/ComposeFlow/ComposeFlow.git")
                     developerConnection.set("scm:git:ssh://github.com/ComposeFlow/ComposeFlow.git")
@@ -103,7 +103,7 @@ publishing {
             }
         }
     }
-    
+
     // Note: For JitPack, no repository configuration is needed here
     // JitPack builds directly from your GitHub repository
     // Users just need to add JitPack repository and use the dependency
