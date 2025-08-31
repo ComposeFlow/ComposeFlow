@@ -2,4 +2,9 @@ jdk:
   - openjdk17
   
 install:
-  - ./gradlew :core:model:publishToMavenLocal
+  # Build and publish all core modules
+  - |
+    for module in model ai di platform serializer ui kxs-ts-gen-core; do
+      echo "Publishing core:$module..."
+      ./gradlew :core:$module:publishToMavenLocal -Dorg.gradle.jvmargs="-Xmx4096m" --no-daemon --stacktrace
+    done

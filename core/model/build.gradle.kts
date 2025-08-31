@@ -2,7 +2,7 @@ plugins {
     id("io.compose.flow.kmp.library")
     alias(libs.plugins.kotlin.serialization)
     id("io.compose.flow.compose.multiplatform")
-    `maven-publish`
+    id("io.compose.flow.publishing")
 }
 
 kotlin {
@@ -65,46 +65,4 @@ kotlin {
             optInKotlinExperimentalApis()
         }
     }
-}
-
-publishing {
-    publications {
-        create<MavenPublication>("maven") {
-            groupId = "io.composeflow"
-            artifactId = "core-model"
-            version = project.findProperty("version")?.toString() ?: "local-SNAPSHOT"
-
-            from(components["kotlin"])
-
-            pom {
-                name.set("ComposeFlow Core Model")
-                description.set("Core domain models for ComposeFlow")
-                url.set("https://github.com/ComposeFlow/ComposeFlow")
-
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-
-                developers {
-                    developer {
-                        id.set("composeflow")
-                        name.set("ComposeFlow Team")
-                    }
-                }
-
-                scm {
-                    connection.set("scm:git:git://github.com/ComposeFlow/ComposeFlow.git")
-                    developerConnection.set("scm:git:ssh://github.com/ComposeFlow/ComposeFlow.git")
-                    url.set("https://github.com/ComposeFlow/ComposeFlow")
-                }
-            }
-        }
-    }
-
-    // Note: For JitPack, no repository configuration is needed here
-    // JitPack builds directly from your GitHub repository
-    // Users just need to add JitPack repository and use the dependency
 }
