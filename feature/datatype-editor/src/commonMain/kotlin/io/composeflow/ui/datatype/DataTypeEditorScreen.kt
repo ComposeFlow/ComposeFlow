@@ -132,7 +132,6 @@ fun DataTypeEditor(
         viewModel(modelClass = DataTypeEditorViewModel::class) {
             DataTypeEditorViewModel(firebaseIdToken = firebaseIdToken, project = project)
         }
-//    val projectUiState by viewModel.projectUiState.collectAsState()
 
     var deleteDataTypeDialogOpen by remember { mutableStateOf(false) }
     var deleteEnumDialogOpen by remember { mutableStateOf(false) }
@@ -990,14 +989,11 @@ fun AddDataFieldDialog(
                                 }
                             },
                 )
-                var dropDownSelectedIndex by remember { mutableStateOf(0) }
-
                 BasicDropdownPropertyEditor(
                     project = project,
                     items = FieldType.entries(),
                     onValueChanged = { index, item ->
                         fieldType = item
-                        dropDownSelectedIndex = index
                     },
                     selectedItem = fieldType,
                     label = stringResource(Res.string.field_type),

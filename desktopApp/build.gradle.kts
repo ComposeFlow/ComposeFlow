@@ -9,6 +9,7 @@ plugins {
     id("io.compose.flow.kmp.library")
     id("io.compose.flow.compose.multiplatform")
     alias(libs.plugins.roborazzi)
+    alias(libs.plugins.jetbrains.compose.hot.reload) version libs.versions.compose.hot.reload
     id("io.sentry.jvm.gradle") version libs.versions.sentry.jvm.gradle
     id("dev.hydraulic.conveyor") version libs.versions.conveyor
 }
