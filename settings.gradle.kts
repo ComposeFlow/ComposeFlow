@@ -48,6 +48,11 @@ pluginManagement {
     }
 }
 
+plugins {
+    // So that Compose Hot Reload automatically downloads the appropriate JBR
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 rootProject.name = "ComposeFlow"
 
 include(":desktopApp")

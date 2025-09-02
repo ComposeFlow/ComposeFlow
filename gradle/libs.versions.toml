@@ -11,6 +11,7 @@ compose-adaptive-layout = "1.1.2"
 compose-color-picker = "1.1.2"
 compose-multiplatform = "1.8.2"
 compose-navigation = "2.8.0-alpha13"
+compose-hot-reload = "1.0.0-beta06"
 conveyor = "1.12"
 core-splashscreen = "1.0.1"
 coroutine = "1.10.2"
@@ -185,6 +186,7 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+jetbrains-compose-hot-reload = { id = "org.jetbrains.compose.hot-reload", version.ref = "compose-hot-reload" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 

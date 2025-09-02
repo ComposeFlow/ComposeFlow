@@ -49,7 +49,8 @@ Adjust the style visually with real time preview
 
 Get ComposeFlow for your platform:
 
-- **Mac & Linux users**: [Download page](https://composeflow-artifacts.s3.amazonaws.com/conveyor/download.html)
+- **Mac & Linux users
+  **: [Download page](https://composeflow-artifacts.s3.amazonaws.com/conveyor/download.html)
 - **Windows users**: [Download from Microsoft Store](https://apps.microsoft.com/detail/9mxdx6mf2crq)
 
 ## Build from source
@@ -113,6 +114,10 @@ Choose a run configuration for an appropriate target in Android Studio and run i
 ### Run desktop via Gradle
 
 `./gradlew desktopApp:run`
+
+Or if you want to enable Hot Reload (https://github.com/JetBrains/compose-hot-reload)
+
+`./gradlew desktopApp:hotRunJvm --auto`
 
 ### How to run tests
 
