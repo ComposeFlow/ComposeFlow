@@ -3,20 +3,17 @@ import org.gradle.api.Project
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.withType
 
 /**
- * Convention plugin for publishing ComposeFlow modules to Maven repositories.
+ * Convention plugin for configuring KMP publications for JitPack.
  * 
  * This plugin:
- * - Applies the maven-publish plugin
- * - Configures a standard publication with ComposeFlow metadata
- * - Uses the module name to determine the artifact ID
+ * - Waits for KMP to create its publications
+ * - Configures the group ID for JitPack compatibility
+ * - Adds POM metadata
  * 
- * Apply this plugin to any module that needs to be published:
+ * Apply this plugin to any module that needs custom publishing configuration:
  * ```
  * plugins {
  *     id("io.compose.flow.kmp.library")
@@ -27,45 +24,50 @@ import org.gradle.kotlin.dsl.withType
 class PublishingConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
-            // For Kotlin Multiplatform projects, the maven-publish plugin is already applied
-            // by the KMP plugin, so we don't need to apply it again
-            
-            // We only configure the existing publications created by KMP
-            afterEvaluate {
-                configure<PublishingExtension> {
-                    // Configure all existing Maven publications
-                    publications.withType<MavenPublication>().configureEach {
-                        // Add POM metadata to all publications
-                        pom {
-                            name.set("ComposeFlow ${project.name}")
-                            description.set("${project.name} module for ComposeFlow")
-                            url.set("https://github.com/ComposeFlow/ComposeFlow")
+            // Wait for maven-publish to be applied by KMP
+            pluginManager.withPlugin("maven-publish") {
+                afterEvaluate {
+                    configure<PublishingExtension> {
+                        // Configure ALL existing publications created by KMP
+                        publications.withType<MavenPublication>().configureEach {
+                            // Set consistent group ID for JitPack
+                            groupId = "com.github.ComposeFlow.ComposeFlow"
                             
-                            licenses {
-                                license {
-                                    name.set("The Apache License, Version 2.0")
-                                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                                }
+                            // Set artifact ID based on publication name
+                            // KMP creates: kotlinMultiplatform, jvm, js, etc.
+                            artifactId = when (name) {
+                                "kotlinMultiplatform" -> "core-${project.name}"
+                                else -> "core-${project.name}-$name"
                             }
                             
-                            developers {
-                                developer {
-                                    id.set("composeflow")
-                                    name.set("ComposeFlow Team")
-                                }
-                            }
-                            
-                            scm {
-                                connection.set("scm:git:git://github.com/ComposeFlow/ComposeFlow.git")
-                                developerConnection.set("scm:git:ssh://github.com/ComposeFlow/ComposeFlow.git")
+                            // Add POM metadata
+                            pom {
+                                name.set("ComposeFlow ${project.name}")
+                                description.set("${project.name} module for ComposeFlow")
                                 url.set("https://github.com/ComposeFlow/ComposeFlow")
+                                
+                                licenses {
+                                    license {
+                                        name.set("The Apache License, Version 2.0")
+                                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                                    }
+                                }
+                                
+                                developers {
+                                    developer {
+                                        id.set("composeflow")
+                                        name.set("ComposeFlow Team")
+                                    }
+                                }
+                                
+                                scm {
+                                    connection.set("scm:git:git://github.com/ComposeFlow/ComposeFlow.git")
+                                    developerConnection.set("scm:git:ssh://github.com/ComposeFlow/ComposeFlow.git")
+                                    url.set("https://github.com/ComposeFlow/ComposeFlow")
+                                }
                             }
                         }
                     }
-                    
-                    // Note: For JitPack, no repository configuration is needed here
-                    // JitPack builds directly from your GitHub repository
-                    // Users just need to add JitPack repository and use the dependency
                 }
             }
         }
