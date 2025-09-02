@@ -5,6 +5,20 @@ install:
   # First, build all modules to ensure they compile
   - ./gradlew assemble -Dorg.gradle.jvmargs="-Xmx4096m" --no-daemon --stacktrace
   
-  # Then publish all modules to Maven Local
-  # This will publish all KMP publications (metadata, jvm, js, etc.)
-  - ./gradlew publishToMavenLocal -Dorg.gradle.jvmargs="-Xmx4096m" --no-daemon --stacktrace
+  # Then publish each core module individually to Maven Local
+  # This avoids issues with modules that have multiple publications
+  - |
+    for module in model ai platform di serializer ui kxs-ts-gen-core config logger resources; do
+      echo "Publishing :core:$module..."
+      ./gradlew :core:$module:publishToMavenLocal -Dorg.gradle.jvmargs="-Xmx4096m" --no-daemon --stacktrace || {
+        echo "Failed to publish :core:$module"
+        exit 1
+      }
+    done
+  
+  # Optional modules that may not have publishing configured
+  - |
+    for module in analytics billing-client testing; do
+      echo "Publishing :core:$module (optional)..."
+      ./gradlew :core:$module:publishToMavenLocal -Dorg.gradle.jvmargs="-Xmx4096m" --no-daemon --stacktrace || true
+    done
