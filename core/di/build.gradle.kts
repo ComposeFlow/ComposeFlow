@@ -1,5 +1,6 @@
 plugins {
     id("io.compose.flow.kmp.library")
+    `maven-publish`
 }
 
 kotlin {
