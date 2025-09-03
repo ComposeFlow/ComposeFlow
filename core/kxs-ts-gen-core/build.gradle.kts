@@ -1,6 +1,7 @@
 plugins {
     id("io.compose.flow.kmp.library")
     kotlin("plugin.serialization")
+    `maven-publish`
 }
 
 kotlin {
