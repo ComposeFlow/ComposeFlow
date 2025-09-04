@@ -155,9 +155,6 @@ import io.composeflow.ui.handleMessages
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.inspector.InspectorTab
 import io.composeflow.ui.inspector.modifier.AddModifierDialog
-import io.composeflow.ui.jewel.SplitLayoutState
-import io.composeflow.ui.jewel.StatefulHorizontalSplitLayout
-import io.composeflow.ui.jewel.rememberSplitLayoutState
 import io.composeflow.ui.modifier.backgroundContainerNeutral
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.modifierForCanvas
@@ -166,6 +163,10 @@ import io.composeflow.ui.palette.PaletteIcon
 import io.composeflow.ui.palette.PaletteTab
 import io.composeflow.ui.popup.SingleTextInputDialog
 import io.composeflow.ui.screenbuilder.ScreenBuilderTab
+import io.composeflow.ui.splitlayout.SplitLayoutState
+import io.composeflow.ui.splitlayout.StatefulHorizontalSplitLayout
+import io.composeflow.ui.splitlayout.VerticalSplitLayout
+import io.composeflow.ui.splitlayout.rememberSplitLayoutState
 import io.composeflow.ui.tab.ComposeFlowTab
 import io.composeflow.ui.uibuilder.onboarding.OnboardingManager
 import io.composeflow.ui.uibuilder.onboarding.OnboardingOverlay
@@ -179,7 +180,6 @@ import io.composeflow.zoom_out
 import kotlinx.coroutines.CoroutineScope
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.ui.component.VerticalSplitLayout
 import kotlin.math.roundToInt
 
 @Composable
@@ -554,11 +554,11 @@ private fun LeftPane(
     ) {
         val maxHeight = maxHeight.value.dp
         VerticalSplitLayout(
-            initialDividerPosition = maxHeight / 2,
-            minRatio = 0.25f,
-            maxRatio = 0.75f,
-            first = { firstModifier ->
-                Column(modifier = firstModifier) {
+            initialSliderPosition = maxHeight / 2,
+            minSliderRatio = 0.25f,
+            maxSliderRatio = 0.75f,
+            topContent = {
+                Column {
                     var selectedTabIndex by remember { mutableStateOf(0) }
                     TabRow(
                         selectedTabIndex = selectedTabIndex,
@@ -661,7 +661,7 @@ private fun LeftPane(
                     }
                 }
             },
-            second = { secondModifier ->
+            bottomContent = {
                 ComposeNodeTree(
                     project = project,
                     copiedNodes = copiedNodes,
@@ -675,10 +675,11 @@ private fun LeftPane(
                     onShowActionTab = onShowActionTab,
                     onShowSnackbar = onShowSnackbar,
                     modifier =
-                        secondModifier.onboardingTarget(
-                            TargetArea.ProjectStructure,
-                            onboardingManager,
-                        ),
+                        Modifier
+                            .onboardingTarget(
+                                TargetArea.ProjectStructure,
+                                onboardingManager,
+                            ),
                 )
             },
         )
