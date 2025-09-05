@@ -1,26 +1,51 @@
 package io.composeflow.ui.toolbar
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
-import io.composeflow.auth.FirebaseIdToken
+import io.composeflow.custom.ComposeFlowIcons
+import io.composeflow.custom.composeflowicons.AndroiddeviceDark
+import io.composeflow.custom.composeflowicons.IphonedeviceDark
+import io.composeflow.custom.composeflowicons.WebDark
 import io.composeflow.device.Device
 import io.composeflow.device.EmulatorStatus
 import io.composeflow.device.SimulatorStatus
@@ -33,42 +58,35 @@ import io.composeflow.ui.modifier.hoverOverlay
 import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.statusbar.StatusBarUiState
 import moe.tlaster.precompose.navigation.Navigator
-import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.foundation.theme.JewelTheme
-import org.jetbrains.jewel.ui.component.Dropdown
-import org.jetbrains.jewel.ui.component.Text
-import org.jetbrains.jewel.ui.painter.badge.DotBadgeShape
-import org.jetbrains.jewel.ui.painter.hints.Badge
-import org.jetbrains.jewel.ui.painter.rememberResourcePainterProvider
-import org.jetbrains.jewel.ui.theme.colorPalette
 
 const val TOOLBAR_TEST_TAG = "Toolbar"
 const val TOOLBAR_RUN_BUTTON_TEST_TAG = "$TOOLBAR_TEST_TAG/RunButton"
 
+private val playIconNormalColor = Color(0xFF57965C)
+private val playIconWarningColor = Color(0xFF73BD79)
+private val downloadIconColor = Color(0xFFCED0D6)
+private val dropdownBackgroundHoverColor = Color(0xFF393B40)
+private val dropdownBackgroundSelectedColor = Color(0xFF2E436E)
+private val dropdownBackgroundHoverSelectedColor = Color(0xFF35538F)
+private val dropdownBorderColor = Color(0xFF43454A)
+private val arrowIconColor = Color(0xFF9DA0A8)
+
 @Composable
 fun RightToolbar(
-    firebaseIdToken: FirebaseIdToken?,
+    viewModel: ToolbarViewModel,
     projectFileName: String,
     onStatusBarUiStateChanged: (StatusBarUiState) -> Unit,
     statusBarUiState: StatusBarUiState,
     navigator: Navigator,
     modifier: Modifier = Modifier,
 ) {
-    val viewModel =
-        viewModel(modelClass = ToolbarViewModel::class, keys = listOf(firebaseIdToken?.user_id ?: "anonymous")) {
-            ToolbarViewModel(
-                firebaseIdTokenArg = firebaseIdToken,
-            )
-        }
     val availableDevices by viewModel.availableDevices.collectAsState()
     val project by viewModel.editingProject.collectAsState()
     val buttonEnabled = statusBarUiState !is StatusBarUiState.Loading
     val buttonModifier =
         if (buttonEnabled) {
-            Modifier
-                .hoverIconClickable()
-                .hoverOverlay()
+            Modifier.hoverIconClickable().hoverOverlay()
         } else {
             Modifier.alpha(0.5f)
         }
@@ -96,69 +114,9 @@ fun RightToolbar(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier =
-            modifier
-                .testTag(TOOLBAR_TEST_TAG),
+        modifier = modifier.testTag(TOOLBAR_TEST_TAG),
     ) {
         val selectedDevice by viewModel.selectedDevice.collectAsState()
-
-        @Composable
-        fun DeviceIcon(device: Device) {
-            val icon =
-                when (device) {
-                    is Device.AndroidEmulator -> {
-                        val iconProvider =
-                            rememberResourcePainterProvider(
-                                "icons/androidDevice.svg",
-                                Icons::class.java,
-                            )
-                        if (device.status == EmulatorStatus.Device) {
-                            val badged by iconProvider.getPainter(
-                                Badge(
-                                    Color.Green,
-                                    DotBadgeShape.Default,
-                                ),
-                            )
-                            badged
-                        } else {
-                            val icon by iconProvider.getPainter()
-                            icon
-                        }
-                    }
-
-                    is Device.IosSimulator -> {
-                        val iconProvider =
-                            rememberResourcePainterProvider(
-                                "icons/iPhoneDevice.svg",
-                                Icons::class.java,
-                            )
-                        if (device.status == SimulatorStatus.Booted) {
-                            val badged by iconProvider.getPainter(
-                                Badge(
-                                    Color.Green,
-                                    DotBadgeShape.Default,
-                                ),
-                            )
-                            badged
-                        } else {
-                            val icon by iconProvider.getPainter()
-                            icon
-                        }
-                    }
-
-                    Device.Web -> {
-                        val iconProvider =
-                            rememberResourcePainterProvider("icons/web.svg", Icons::class.java)
-                        val icon by iconProvider.getPainter()
-                        icon
-                    }
-                }
-            org.jetbrains.jewel.ui.component.Icon(
-                painter = icon,
-                "device icon",
-                modifier = Modifier.padding(end = 4.dp),
-            )
-        }
 
         Spacer(Modifier.weight(1f))
 
@@ -171,31 +129,11 @@ fun RightToolbar(
         )
         Spacer(Modifier.width(16.dp))
 
-        Dropdown(
-            menuContent = {
-                availableDevices.forEach {
-                    selectableItem(
-                        selected = selectedDevice == it,
-                        onClick = {
-                            viewModel.onSelectedDeviceNameChanged(it.deviceName)
-                        },
-                    ) {
-                        Row {
-                            Spacer(Modifier.weight(1f))
-                            DeviceIcon(it)
-                            Text(it.deviceName)
-                        }
-                    }
-                }
-            },
-            modifier = Modifier.wrapContentWidth(),
-        ) {
-            Row(modifier = Modifier.wrapContentWidth()) {
-                Spacer(Modifier.weight(1f))
-                DeviceIcon(selectedDevice)
-                Text(selectedDevice.deviceName)
-            }
-        }
+        DeviceDropdown(
+            availableDevices = availableDevices,
+            selectedDevice = selectedDevice,
+            onSelectedDeviceNameChanged = viewModel::onSelectedDeviceNameChanged,
+        )
 
         val runAppContentDesc =
             if (issues.isEmpty()) {
@@ -234,24 +172,22 @@ fun RightToolbar(
                 },
                 enabled = statusBarUiState !is StatusBarUiState.Loading && issues.isEmpty(),
                 modifier =
-                    Modifier
-                        .testTag(TOOLBAR_RUN_BUTTON_TEST_TAG)
-                        .then(
-                            if (issues.isEmpty()) {
-                                buttonModifier
-                            } else {
-                                Modifier
-                            },
-                        ),
+                    Modifier.testTag(TOOLBAR_RUN_BUTTON_TEST_TAG).then(
+                        if (issues.isEmpty()) {
+                            buttonModifier
+                        } else {
+                            Modifier
+                        },
+                    ),
             ) {
                 Icon(
                     imageVector = Icons.Outlined.PlayArrow,
                     contentDescription = runAppContentDesc,
                     tint =
                         if (issues.isEmpty()) {
-                            JewelTheme.colorPalette.green(5)
+                            playIconNormalColor
                         } else {
-                            JewelTheme.colorPalette.grey(7)
+                            playIconWarningColor
                         },
                 )
             }
@@ -273,11 +209,154 @@ fun RightToolbar(
                 Icon(
                     imageVector = Icons.Filled.Download,
                     contentDescription = downloadCodeContentDesc,
-                    tint = JewelTheme.colorPalette.grey(11),
+                    tint = downloadIconColor,
                 )
             }
         }
 
         Spacer(modifier = Modifier.width(80.dp))
+    }
+}
+
+@Composable
+fun DeviceDropdown(
+    availableDevices: List<Device>,
+    selectedDevice: Device,
+    onSelectedDeviceNameChanged: (String) -> Unit,
+) {
+    @Composable
+    fun DeviceIconNew(device: Device) {
+        val showBadge by remember(device) {
+            mutableStateOf(
+                when (device) {
+                    is Device.AndroidEmulator -> {
+                        device.status == EmulatorStatus.Device
+                    }
+
+                    is Device.IosSimulator -> {
+                        device.status == SimulatorStatus.Booted
+                    }
+
+                    Device.Web -> true
+                },
+            )
+        }
+
+        val icon =
+            when (device) {
+                is Device.AndroidEmulator -> {
+                    ComposeFlowIcons.AndroiddeviceDark
+                }
+
+                is Device.IosSimulator -> {
+                    ComposeFlowIcons.IphonedeviceDark
+                }
+
+                Device.Web -> {
+                    ComposeFlowIcons.WebDark
+                }
+            }
+
+        BadgedBox(
+            badge = {
+                if (showBadge) {
+                    androidx.compose.material3.Badge(
+                        containerColor = Color.Green,
+                    )
+                }
+            },
+        ) {
+            Icon(
+                imageVector = icon,
+                tint = Color.Unspecified,
+                contentDescription = "device icon",
+                modifier = Modifier.size(15.dp),
+            )
+        }
+    }
+
+    var isExpanded by remember { mutableStateOf(false) }
+    Box {
+        Box(
+            modifier =
+                Modifier
+                    .wrapContentWidth()
+                    .clickable {
+                        isExpanded = !isExpanded
+                    }.hoverOverlay(dropdownBackgroundHoverColor, 4.dp)
+                    .width(IntrinsicSize.Max)
+                    .height(24.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 6.dp, vertical = 3.dp),
+                horizontalArrangement = Arrangement.spacedBy(5.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                DeviceIconNew(selectedDevice)
+                Text(
+                    text = selectedDevice.deviceName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+
+                Spacer(
+                    modifier = Modifier.width(4.dp),
+                )
+
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    tint = arrowIconColor,
+                    contentDescription = null,
+                    modifier = Modifier.size(15.dp),
+                )
+            }
+        }
+
+        DropdownMenu(
+            expanded = isExpanded,
+            onDismissRequest = { isExpanded = false },
+            shape = RoundedCornerShape(8.dp),
+            border = BorderStroke(Dp.Hairline, dropdownBorderColor),
+            modifier = Modifier.width(IntrinsicSize.Max),
+        ) {
+            availableDevices.forEach { device ->
+                val isSelected = device == selectedDevice
+                val interactionSource = remember { MutableInteractionSource() }
+                val isHovered by interactionSource.collectIsHoveredAsState()
+
+                val backgroundColor =
+                    when {
+                        isHovered && isSelected -> dropdownBackgroundHoverSelectedColor
+                        isHovered -> dropdownBackgroundHoverColor
+                        isSelected -> dropdownBackgroundSelectedColor
+                        else -> Color.Unspecified
+                    }
+
+                Box(
+                    modifier =
+                        Modifier
+                            .padding(horizontal = 8.dp)
+                            .padding(top = 2.dp)
+                            .hoverable(interactionSource)
+                            .clickable {
+                                onSelectedDeviceNameChanged(device.deviceName)
+                                isExpanded = false
+                            }.background(backgroundColor, RoundedCornerShape(4.dp)),
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(5.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        DeviceIconNew(device)
+                        Text(
+                            text = device.deviceName,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                    }
+                }
+            }
+        }
     }
 }
