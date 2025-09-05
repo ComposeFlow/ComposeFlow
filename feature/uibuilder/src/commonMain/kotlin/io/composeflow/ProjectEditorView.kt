@@ -34,6 +34,7 @@ import io.composeflow.ui.statusbar.StatusBar
 import io.composeflow.ui.statusbar.StatusBarViewModel
 import io.composeflow.ui.toolbar.LeftToolbar
 import io.composeflow.ui.toolbar.RightToolbar
+import io.composeflow.ui.toolbar.ToolbarViewModel
 import moe.tlaster.precompose.navigation.rememberNavigator
 import moe.tlaster.precompose.viewmodel.viewModel
 
@@ -94,6 +95,15 @@ fun ProjectEditorContent(
     Surface(
         modifier = aiChatToggleVisibilityModifier,
     ) {
+        val toolbarViewModel =
+            viewModel(
+                modelClass = ToolbarViewModel::class,
+                keys = listOf(firebaseIdToken?.user_id ?: "anonymous"),
+            ) {
+                ToolbarViewModel(
+                    firebaseIdTokenArg = firebaseIdToken,
+                )
+            }
         val statusBarViewModel =
             viewModel(modelClass = StatusBarViewModel::class) {
                 StatusBarViewModel()
@@ -114,7 +124,7 @@ fun ProjectEditorContent(
                     }
                     onTitleBarRightContentSet {
                         RightToolbar(
-                            firebaseIdToken = firebaseIdToken,
+                            viewModel = toolbarViewModel,
                             projectFileName = projectId,
                             onStatusBarUiStateChanged = statusBarViewModel::onStatusBarUiStateChanged,
                             statusBarUiState = statusBarUiState,
