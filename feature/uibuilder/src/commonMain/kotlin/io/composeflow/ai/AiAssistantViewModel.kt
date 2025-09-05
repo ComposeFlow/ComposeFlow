@@ -224,6 +224,7 @@ class AiAssistantViewModel(
             when (val state = _uiState.value) {
                 is AiAssistantUiState.ScreensCreationSuccess -> {
                     val originalPrompts = state.screenPrompts
+                    val screenNames = originalPrompts.joinToString { it.screenName }
                     val updatedPrompts = originalPrompts.toMutableList()
 
                     val firebaseIdTokenRawValue = firebaseIdToken.value?.rawToken
@@ -265,11 +266,7 @@ class AiAssistantViewModel(
                             architectureResponse =
                                 llmRepository.prepareArchitecture(
                                     firebaseIdToken = firebaseIdTokenRawValue,
-                                    promptString = "Prepare architecture for screens: ${
-                                        originalPrompts.joinToString(
-                                            ", ",
-                                        ) { it.screenName }
-                                    }",
+                                    promptString = "Prepare the architecture for an app with these screens: $screenNames",
                                     projectContext = projectContext,
                                     previousToolArgs = previousToolArgs,
                                 )
