@@ -5,6 +5,7 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.FlowColumn
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +34,8 @@ import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Redo
+import androidx.compose.material.icons.automirrored.outlined.Undo
 import androidx.compose.material.icons.filled.ModeNight
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material.icons.outlined.Delete
@@ -40,6 +44,8 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,12 +63,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -83,10 +97,12 @@ import io.composeflow.chane_to_day_theme
 import io.composeflow.chane_to_night_theme
 import io.composeflow.confirm
 import io.composeflow.dark_scheme
+import io.composeflow.keyboard.getCtrlKeyStr
 import io.composeflow.light_scheme
 import io.composeflow.model.palette.PaletteRenderParams
 import io.composeflow.model.parameter.wrapper.Material3ColorWrapper
 import io.composeflow.model.project.Project
+import io.composeflow.redo
 import io.composeflow.reset
 import io.composeflow.reset_to_default_colors
 import io.composeflow.seed_color
@@ -111,6 +127,7 @@ import io.composeflow.ui.propertyeditor.BasicDropdownPropertyEditor
 import io.composeflow.ui.propertyeditor.ColorPreviewInfo
 import io.composeflow.ui.switch.ComposeFlowSwitch
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
+import io.composeflow.undo
 import io.composeflow.update_colors
 import io.composeflow.updated_color_schemes
 import kotlinx.coroutines.launch
@@ -123,8 +140,26 @@ fun ColorEditorContent(
     modifier: Modifier = Modifier,
 ) {
     Surface {
+        val coroutineScope = rememberCoroutineScope()
+        val onShowSnackbar = LocalOnShowSnackbar.current
+
         Row(
-            modifier = modifier.fillMaxSize(),
+            modifier =
+                modifier
+                    .fillMaxSize()
+                    .onKeyEvent { event ->
+                        if (event.type == KeyEventType.KeyDown) {
+                            val result = callbacks.onKeyPressed(event)
+                            result.errorMessages.forEach {
+                                coroutineScope.launch {
+                                    onShowSnackbar(it, null)
+                                }
+                            }
+                            result.consumed
+                        } else {
+                            false
+                        }
+                    },
         ) {
             val colorSchemeHolder = project.themeHolder.colorSchemeHolder
             var sourceColor by remember(colorSchemeHolder.sourceColor) {
@@ -137,12 +172,12 @@ fun ColorEditorContent(
                     colorSchemeHolder.paletteStyle,
                 )
             }
-            var lightScheme by remember {
+            var lightScheme by remember(colorSchemeHolder.lightColorScheme.value) {
                 mutableStateOf(
                     colorSchemeHolder.lightColorScheme.value.toColorScheme(),
                 )
             }
-            var darkScheme by remember {
+            var darkScheme by remember(colorSchemeHolder.darkColorScheme.value) {
                 mutableStateOf(
                     colorSchemeHolder.darkColorScheme.value.toColorScheme(),
                 )
@@ -150,8 +185,6 @@ fun ColorEditorContent(
             var syncSchemes by remember { mutableStateOf(true) }
             var schemeInEdit by remember { mutableStateOf(ColorSchemeType.Light) }
 
-            val coroutineScope = rememberCoroutineScope()
-            val onShowSnackbar = LocalOnShowSnackbar.current
             val updateColorSchemes = stringResource(Res.string.updated_color_schemes)
 
             fun buildScheme(isDark: Boolean): ColorScheme =
@@ -264,9 +297,20 @@ private fun ColorSchemeEditor(
 ) {
     var colorInEdit by remember { mutableStateOf(false) }
     var resetToDefaultColorsDialogOpen by remember { mutableStateOf(false) }
+    var actionsMenuExpanded by remember { mutableStateOf(false) }
+    val focusRequester = remember { FocusRequester() }
 
     Column(
-        modifier = Modifier.padding(16.dp).width(240.dp),
+        modifier =
+            Modifier
+                .padding(16.dp)
+                .width(240.dp)
+                .fillMaxHeight()
+                .focusProperties { canFocus = true }
+                .focusRequester(focusRequester)
+                .onClick(matcher = PointerMatcher.mouse(PointerButton.Secondary)) {
+                    actionsMenuExpanded = true
+                },
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -312,6 +356,7 @@ private fun ColorSchemeEditor(
                         initialColor = sourceColor ?: Color.Black,
                         onColorConfirmed = {
                             onSourceColorChanged(it)
+                            focusRequester.requestFocus()
                         },
                     )
                     val seedColorDesc = stringResource(Res.string.seed_color_description)
@@ -429,6 +474,17 @@ private fun ColorSchemeEditor(
                 closeDialog()
             },
             positiveText = stringResource(Res.string.reset),
+        )
+    }
+
+    if (actionsMenuExpanded) {
+        ActionsDropdownMenu(
+            expanded = actionsMenuExpanded,
+            onUndo = { callbacks.onUndo() },
+            onRedo = { callbacks.onRedo() },
+            onDismissRequest = {
+                actionsMenuExpanded = false
+            },
         )
     }
 }
@@ -726,6 +782,7 @@ private fun ColorSchemePalette(
     var colorSelected by remember {
         mutableStateOf<Material3ColorWrapper?>(null)
     }
+    val focusRequester = remember { FocusRequester() }
 
     val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
     val onAllDialogsClosed = LocalOnAllDialogsClosed.current
@@ -768,7 +825,8 @@ private fun ColorSchemePalette(
                     width = 1.dp,
                     color = colorScheme.outline,
                     shape = RoundedCornerShape(8.dp),
-                ),
+                ).focusProperties { canFocus = true }
+                .focusRequester(focusRequester),
     ) {
         Column(
             modifier = Modifier.padding(16.dp).width(820.dp),
@@ -875,6 +933,7 @@ private fun ColorSchemePalette(
                 onColorConfirmed = {
                     onColorSelected(colorSelected!!, appColor, textColor, it)
                     onAllDialogsClosed()
+                    focusRequester.requestFocus()
                 },
             )
         }
@@ -1010,6 +1069,89 @@ private fun ColorBox(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ActionsDropdownMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onUndo: () -> Unit,
+    onRedo: () -> Unit,
+) {
+    PositionCustomizablePopup(
+        onDismissRequest = onDismissRequest,
+        onKeyEvent = {
+            /*when (it.key) {
+                Key.Escape -> {
+                    onCloseClick()
+                    true
+                }
+
+                Key.Enter -> {
+                    onColorConfirmed(selectedColor)
+                    onCloseClick()
+                    true
+                }
+
+                else -> {
+                    false
+                }
+            }*/
+            false
+        },
+    ) {
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = onDismissRequest,
+        ) {
+            DropdownMenuItem(text = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.Undo,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Text(
+                        text = stringResource(Res.string.undo),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text = "(${getCtrlKeyStr()} + Z)",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.alpha(0.6f),
+                    )
+                }
+            }, onClick = {
+                onUndo()
+                onDismissRequest()
+            })
+            DropdownMenuItem(text = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.Redo,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Text(
+                        text = stringResource(Res.string.redo),
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text = "(${getCtrlKeyStr()} + Y)",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.alpha(0.6f),
+                    )
+                }
+            }, onClick = {
+                onRedo()
+                onDismissRequest()
+            })
         }
     }
 }
