@@ -2,10 +2,12 @@ package io.composeflow.ui.themeeditor
 
 import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.KeyEvent
 import com.materialkolor.PaletteStyle
 import io.composeflow.font.FontFamilyWrapper
 import io.composeflow.model.enumwrapper.TextStyleWrapper
 import io.composeflow.model.project.theme.TextStyleOverride
+import io.composeflow.ui.EventResult
 
 data class ThemeEditorCallbacks(
     val onColorSchemeUpdated: (
@@ -20,4 +22,7 @@ data class ThemeEditorCallbacks(
     val onTextStyleOverridesChanged: (TextStyleWrapper, TextStyleOverride) -> Unit,
     val onApplyFontEditableParams: () -> Unit,
     val onResetFonts: () -> Unit,
+    val onKeyPressed: (KeyEvent) -> EventResult,
+    val onUndo: () -> Unit,
+    val onRedo: () -> Unit,
 )
