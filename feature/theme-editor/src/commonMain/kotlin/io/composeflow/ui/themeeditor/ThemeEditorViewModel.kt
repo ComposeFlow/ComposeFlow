@@ -7,17 +7,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.isCtrlPressed
+import androidx.compose.ui.input.key.isMetaPressed
+import androidx.compose.ui.input.key.key
 import com.materialkolor.PaletteStyle
 import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.font.FontFamilyWrapper
 import io.composeflow.model.color.ColorSchemeWrapper
 import io.composeflow.model.enumwrapper.TextStyleWrapper
 import io.composeflow.model.project.Project
+import io.composeflow.model.project.theme.ColorSchemeHolder
 import io.composeflow.model.project.theme.TextStyleOverride
 import io.composeflow.model.project.theme.TextStyleOverrides
 import io.composeflow.model.useroperation.OperationHistory
 import io.composeflow.model.useroperation.UserOperation
 import io.composeflow.repository.ProjectRepository
+import io.composeflow.ui.EventResult
 import io.composeflow.ui.common.defaultDarkScheme
 import io.composeflow.ui.common.defaultLightScheme
 import kotlinx.coroutines.launch
@@ -63,7 +70,6 @@ class ThemeEditorViewModel(
                 darkScheme = darkSchemeWrapper,
             ),
         )
-
         project.themeHolder.colorSchemeHolder.apply {
             this.sourceColor = sourceColor
             this.paletteStyle = paletteStyle
@@ -123,7 +129,7 @@ class ThemeEditorViewModel(
         saveProject()
     }
 
-    private fun saveProject() {
+    private fun saveProject(project: Project = this.project) {
         viewModelScope.launch {
             projectRepository.updateProject(project)
         }
@@ -138,6 +144,48 @@ class ThemeEditorViewModel(
                 project = project,
                 userOperation = userOperation,
             )
+        }
+    }
+
+    fun onKeyPressed(keyEvent: KeyEvent): EventResult =
+        when {
+            keyEvent.key == Key.Z && (keyEvent.isMetaPressed || keyEvent.isCtrlPressed) -> {
+                onUndo()
+            }
+            keyEvent.key == Key.Y && (keyEvent.isMetaPressed || keyEvent.isCtrlPressed) -> {
+                onRedo()
+            }
+            else -> {
+                EventResult(consumed = false)
+            }
+        }
+
+    fun onUndo(): EventResult {
+        val undoableOperation = OperationHistory.undo(project)
+        undoableOperation?.let {
+            val restored = Project.deserializeFromString(undoableOperation.serializedProject)
+            updateColorSchemeHolder(restored.themeHolder.colorSchemeHolder)
+            saveProject()
+        }
+        return EventResult()
+    }
+
+    fun onRedo(): EventResult {
+        val undoableOperation = OperationHistory.redo(project)
+        undoableOperation?.let {
+            val restored = Project.deserializeFromString(undoableOperation.serializedProject)
+            updateColorSchemeHolder(restored.themeHolder.colorSchemeHolder)
+            saveProject()
+        }
+        return EventResult()
+    }
+
+    private fun updateColorSchemeHolder(holder: ColorSchemeHolder) {
+        project.themeHolder.colorSchemeHolder.apply {
+            sourceColor = holder.sourceColor
+            paletteStyle = holder.paletteStyle
+            lightColorScheme.value = holder.lightColorScheme.value
+            darkColorScheme.value = holder.darkColorScheme.value
         }
     }
 }
