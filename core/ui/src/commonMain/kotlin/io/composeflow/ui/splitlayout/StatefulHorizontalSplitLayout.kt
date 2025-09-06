@@ -1,4 +1,4 @@
-package io.composeflow.ui.jewel
+package io.composeflow.ui.splitlayout
 
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,10 +30,6 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.composeflow.ui.PointerIconResizeHorizontal
-import org.jetbrains.jewel.foundation.theme.JewelTheme
-import org.jetbrains.jewel.ui.Orientation
-import org.jetbrains.jewel.ui.component.Divider
-import org.jetbrains.jewel.ui.component.HorizontalSplitLayout
 import kotlin.math.roundToInt
 
 @Immutable
@@ -112,18 +111,12 @@ fun StatefulHorizontalSplitLayout(
     }
 }
 
-/**
- * Wrapper of [HorizontalSplitLayout] that accepts [onDividerPositionChanged] callback that emits
- * the changed divider position.
- * Also changed the behavior (or an issue?) that passing different initialDividerPosition value
- * will affect the actual divider's position in the next recomposition.
- */
 @Composable
 fun HorizontalSplitLayoutWrapper(
     first: @Composable (Modifier) -> Unit,
     second: @Composable (Modifier) -> Unit,
     modifier: Modifier = Modifier,
-    dividerColor: Color = JewelTheme.globalColors.borders.normal,
+    dividerColor: Color = MaterialTheme.colorScheme.outlineVariant,
     dividerThickness: Dp = 1.dp,
     dividerIndent: Dp = 0.dp,
     draggableWidth: Dp = 8.dp,
@@ -155,12 +148,14 @@ fun HorizontalSplitLayoutWrapper(
             val dividerInteractionSource = remember { MutableInteractionSource() }
             first(Modifier.layoutId("first"))
 
-            Divider(
-                orientation = Orientation.Vertical,
-                modifier = Modifier.fillMaxHeight().layoutId("divider"),
+            VerticalDivider(
+                modifier =
+                    Modifier
+                        .fillMaxHeight()
+                        .padding(start = dividerIndent)
+                        .layoutId("divider"),
                 color = dividerColor,
                 thickness = dividerThickness,
-                startIndent = dividerIndent,
             )
 
             second(Modifier.layoutId("second"))
