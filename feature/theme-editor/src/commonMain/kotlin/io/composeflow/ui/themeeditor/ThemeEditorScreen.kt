@@ -63,6 +63,9 @@ fun ThemeEditorScreen(
             onTextStyleOverridesChanged = viewModel::onTextStyleOverrideChanged,
             onApplyFontEditableParams = viewModel::onApplyFontEditableParams,
             onResetFonts = viewModel::onResetFonts,
+            onKeyPressed = viewModel::onKeyPressed,
+            onUndo = viewModel::onUndo,
+            onRedo = viewModel::onRedo,
         )
     val fontEditableParams =
         FontEditableParams(
