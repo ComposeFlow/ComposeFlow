@@ -20,7 +20,6 @@ import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TooltipBox
@@ -450,9 +449,13 @@ private fun TreeViewScope<ComposeNode>.ComposeNodeName(
                 positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
                 tooltip = {
                     if (allActions.size == 1) {
-                        PlainTooltip {
-                            allActions[0].SimplifiedContent(project)
-                        }
+                        RichTooltip(
+                            text = {
+                                Column(modifier = Modifier.padding(8.dp)) {
+                                    allActions[0].SimplifiedContent(project)
+                                }
+                            },
+                        )
                     } else {
                         RichTooltip(
                             title = {
