@@ -26,10 +26,6 @@ const val DEBUG_YAML = false
 
 class LlmRepository(
     private val client: LlmClient = LlmClient(),
-    private val ioDispatcher: CoroutineDispatcher =
-        ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.Default
-        },
 ) {
     companion object {
         private const val MAX_RETRY_COUNT = 4

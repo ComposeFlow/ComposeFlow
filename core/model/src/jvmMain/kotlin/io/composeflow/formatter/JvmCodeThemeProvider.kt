@@ -2,11 +2,10 @@ package io.composeflow.formatter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import com.wakaztahir.codeeditor.theme.CodeTheme
 import com.wakaztahir.codeeditor.theme.SyntaxColors
 
-val LocalCodeTheme = compositionLocalOf<CodeTheme> { error("No CodeColorScheme provided") }
+actual class PlatformCodeTheme(val theme: CodeTheme)
 
 class LightCodeTheme :
     CodeTheme(
@@ -49,7 +48,7 @@ class DarkCodeTheme :
     )
 
 @Composable
-fun ProvideCodeTheme(
+actual fun ProvideCodeTheme(
     useDarkTheme: Boolean,
     content: @Composable () -> Unit,
 ) {
@@ -59,7 +58,7 @@ fun ProvideCodeTheme(
         } else {
             LightCodeTheme()
         }
-    CompositionLocalProvider(LocalCodeTheme providesDefault codeTheme) {
+    CompositionLocalProvider(LocalCodeTheme provides PlatformCodeTheme(codeTheme)) {
         content()
     }
 }

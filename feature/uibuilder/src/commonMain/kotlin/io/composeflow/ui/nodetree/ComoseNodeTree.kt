@@ -20,7 +20,12 @@ import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltip
+import androidx.compose.material3.RichTooltip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,7 +69,6 @@ import io.composeflow.ui.treeview.tree.Tree
 import io.composeflow.ui.treeview.tree.TreeScope
 import io.composeflow.ui.uibuilder.UiBuilderContextMenuDropDown
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.ui.component.Tooltip
 
 @Composable
 fun ComposeNodeTree(
@@ -442,26 +446,37 @@ private fun TreeViewScope<ComposeNode>.ComposeNodeName(
                 } else {
                     "${allActions.size} actions"
                 }
-            Tooltip({
-                if (allActions.size == 1) {
-                    allActions[0].SimplifiedContent(project)
-                } else {
-                    Column {
-                        Text(
-                            "${allActions.size} actions",
-                            color = MaterialTheme.colorScheme.tertiary,
-                            style = MaterialTheme.typography.bodyMedium,
-                        )
-                        allActions.forEach { action ->
-                            Text(
-                                action.name,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                style = MaterialTheme.typography.bodySmall,
-                            )
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                tooltip = {
+                    if (allActions.size == 1) {
+                        PlainTooltip {
+                            allActions[0].SimplifiedContent(project)
                         }
+                    } else {
+                        RichTooltip(
+                            title = {
+                                Text(
+                                    "${allActions.size} actions",
+                                    color = MaterialTheme.colorScheme.tertiary,
+                                )
+                            },
+                            text = {
+                                Column {
+                                    allActions.forEach { action ->
+                                        Text(
+                                            action.name,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            style = MaterialTheme.typography.bodySmall,
+                                        )
+                                    }
+                                }
+                            },
+                        )
                     }
-                }
-            }) {
+                },
+                state = rememberTooltipState(),
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.FlashOn,
                     contentDescription = contentDesc,
@@ -481,62 +496,69 @@ private fun TreeViewScope<ComposeNode>.ComposeNodeName(
                     visibilityParams.visibilityCondition.transformedValueExpression(
                         project,
                     )
-            Tooltip({
-                Column {
-                    Text(
-                        buildAnnotatedString {
-                            append("Visible if ")
-                            withStyle(
-                                style =
-                                    SpanStyle(
-                                        color = MaterialTheme.colorScheme.tertiary,
-                                    ),
-                            ) {
-                                append(
-                                    visibilityParams.visibilityCondition.transformedValueExpression(
-                                        project,
-                                    ),
-                                )
+            TooltipBox(
+                positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+                tooltip = {
+                    RichTooltip(
+                        title = {
+                            Text(
+                                buildAnnotatedString {
+                                    append("Visible if ")
+                                    withStyle(
+                                        style =
+                                            SpanStyle(
+                                                color = MaterialTheme.colorScheme.tertiary,
+                                            ),
+                                    ) {
+                                        append(
+                                            visibilityParams.visibilityCondition.transformedValueExpression(
+                                                project,
+                                            ),
+                                        )
+                                    }
+                                },
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                        },
+                        text = {
+                            if (!visibilityParams.formFactorVisibility.alwaysVisible()) {
+                                @Composable
+                                fun FormFactorIcon(
+                                    formFactorImageVector: ImageVector,
+                                    visible: Boolean,
+                                ) {
+                                    val iconModifier =
+                                        if (visible) {
+                                            Modifier
+                                        } else {
+                                            Modifier.alpha(0.3f)
+                                        }
+                                    ComposeFlowIcon(
+                                        imageVector = formFactorImageVector,
+                                        contentDescription = "",
+                                        modifier = Modifier.padding(2.dp).then(iconModifier),
+                                    )
+                                }
+                                Row {
+                                    FormFactorIcon(
+                                        Icons.Outlined.Smartphone,
+                                        visible = visibilityParams.formFactorVisibility.visibleInCompact,
+                                    )
+                                    FormFactorIcon(
+                                        Icons.Outlined.TabletMac,
+                                        visible = visibilityParams.formFactorVisibility.visibleInMedium,
+                                    )
+                                    FormFactorIcon(
+                                        Icons.Outlined.DesktopMac,
+                                        visible = visibilityParams.formFactorVisibility.visibleInExpanded,
+                                    )
+                                }
                             }
                         },
-                        style = MaterialTheme.typography.labelMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
                     )
-                    if (!visibilityParams.formFactorVisibility.alwaysVisible()) {
-                        @Composable
-                        fun FormFactorIcon(
-                            formFactorImageVector: ImageVector,
-                            visible: Boolean,
-                        ) {
-                            val iconModifier =
-                                if (visible) {
-                                    Modifier
-                                } else {
-                                    Modifier.alpha(0.3f)
-                                }
-                            ComposeFlowIcon(
-                                imageVector = formFactorImageVector,
-                                contentDescription = "",
-                                modifier = Modifier.padding(2.dp).then(iconModifier),
-                            )
-                        }
-                        Row {
-                            FormFactorIcon(
-                                Icons.Outlined.Smartphone,
-                                visible = visibilityParams.formFactorVisibility.visibleInCompact,
-                            )
-                            FormFactorIcon(
-                                Icons.Outlined.TabletMac,
-                                visible = visibilityParams.formFactorVisibility.visibleInMedium,
-                            )
-                            FormFactorIcon(
-                                Icons.Outlined.DesktopMac,
-                                visible = visibilityParams.formFactorVisibility.visibleInExpanded,
-                            )
-                        }
-                    }
-                }
-            }) {
+                },
+                state = rememberTooltipState(),
+            ) {
                 Icon(
                     imageVector =
                         if (visibilityParams.visibleInUiBuilder) {

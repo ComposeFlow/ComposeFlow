@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.East
@@ -20,11 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.alignment_bottom_center
@@ -37,7 +32,6 @@ import io.composeflow.alignment_top_center
 import io.composeflow.alignment_top_end
 import io.composeflow.alignment_top_start
 import io.composeflow.model.parameter.wrapper.AlignmentWrapper
-import io.composeflow.platform.AsyncImage
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconToggleButton
@@ -62,8 +56,7 @@ fun AlignmentPropertyEditor(
         @Composable
         fun runIconToggleButton(
             boxAlignment: AlignmentWrapper,
-            imageVector: ImageVector? = null,
-            resourcePath: String? = null,
+            imageVector: ImageVector,
             contentDesc: String,
         ) = run {
             val thisItemSelected = initialValue == boxAlignment
@@ -88,33 +81,11 @@ fun AlignmentPropertyEditor(
                             },
                         ),
                 ) {
-                    imageVector?.let {
                         ComposeFlowIcon(
                             imageVector = imageVector,
                             contentDescription = contentDesc,
                             tint = MaterialTheme.colorScheme.primary,
                         )
-                    }
-
-                    // Load the image from the local resource if the icon isn't available as
-                    // part of the material icons
-                    val density = LocalDensity.current
-                    resourcePath?.let {
-                        AsyncImage(
-                            load = {
-                                useResource(resourcePath) {
-                                    loadSvgPainter(
-                                        it,
-                                        density,
-                                    )
-                                }
-                            },
-                            painterFor = { it },
-                            contentDescription = contentDesc,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
                 }
             }
         }

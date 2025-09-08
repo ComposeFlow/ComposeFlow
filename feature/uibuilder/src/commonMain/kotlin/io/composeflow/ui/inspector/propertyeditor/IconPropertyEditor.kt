@@ -56,10 +56,7 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.DialogWindow
-import androidx.compose.ui.window.rememberDialogState
 import io.composeflow.Res
 import io.composeflow.configure_icon
 import io.composeflow.delete_icon
@@ -77,6 +74,7 @@ import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
 import io.composeflow.ui.labeledbox.LabeledBorderBox
 import io.composeflow.ui.modifier.hoverOverlay
+import io.composeflow.ui.popup.PositionCustomizablePopup
 import io.composeflow.ui.propertyeditor.propertyEditorMinWidth
 import io.composeflow.ui.textfield.SmallOutlinedTextField
 import org.jetbrains.compose.resources.stringResource
@@ -142,13 +140,10 @@ fun IconPropertyEditor(
             dialogOpen = false
             onAllDialogsClosed()
         }
-        DialogWindow(
-            onCloseRequest = {
+        PositionCustomizablePopup(
+            onDismissRequest = {
                 onCloseDialog()
             },
-            state = rememberDialogState(size = DpSize(800.dp, 680.dp)),
-            title = stringResource(Res.string.select_icon),
-            undecorated = true,
             onKeyEvent = {
                 if (it.key == Escape) {
                     onCloseDialog()
@@ -162,8 +157,7 @@ fun IconPropertyEditor(
             Surface(
                 modifier =
                     Modifier
-                        .fillMaxSize()
-                        .size(width = 600.dp, height = 540.dp),
+                        .size(width = 800.dp, height = 680.dp),
             ) {
                 Column(
                     modifier =
