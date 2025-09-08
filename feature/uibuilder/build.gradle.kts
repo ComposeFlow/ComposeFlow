@@ -70,14 +70,12 @@ kotlin {
             arg("llmToolsOutputDir", "${project.layout.buildDirectory.get()}/generated/llm-tools")
         }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(project(":core:model"))
             implementation(project(":core:testing"))
+            implementation(kotlin("test-junit"))
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.coroutines.test)
-        }
-        jvmTest.dependencies {
-            implementation(kotlin("test-junit"))
         }
 
         all {
