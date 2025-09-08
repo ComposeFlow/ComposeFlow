@@ -864,7 +864,7 @@ class UiBuilderViewModel(
         // Track screen creation
         try {
             AnalyticsTracker.trackScreenCreated(
-                screenType = screen.javaClass.simpleName,
+                screenType = screen::class.simpleName ?: "Unknown",
                 creationMethod = "manual",
             )
         } catch (_: Exception) {

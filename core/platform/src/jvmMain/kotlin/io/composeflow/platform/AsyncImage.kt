@@ -50,38 +50,3 @@ actual fun <T> AsyncImage(
         )
     }
 }
-
-// Loading from file with java.io API
-
-fun loadSvgPainter(
-    file: File,
-    density: Density,
-): Painter =
-    file.inputStream().buffered().use {
-        androidx.compose.ui.res
-            .loadSvgPainter(it, density)
-    }
-
-// Loading from network with java.net API
-
-fun loadImageBitmap(url: String): ImageBitmap = URL(url).openStream().buffered().use(::loadImageBitmap)
-
-fun loadSvgPainter(
-    url: String,
-    density: Density,
-): Painter =
-    URL(url).openStream().buffered().use {
-        androidx.compose.ui.res
-            .loadSvgPainter(it, density)
-    }
-
-fun loadXmlImageVector(
-    url: String,
-    density: Density,
-): ImageVector =
-    URL(url).openStream().buffered().use {
-        androidx.compose.ui.res.loadXmlImageVector(
-            InputSource(it),
-            density,
-        )
-    }

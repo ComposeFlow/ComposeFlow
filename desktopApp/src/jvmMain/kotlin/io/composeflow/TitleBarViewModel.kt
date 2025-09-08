@@ -2,7 +2,7 @@ package io.composeflow
 
 import io.composeflow.model.settings.ComposeBuilderSettings
 import io.composeflow.model.settings.SettingsRepository
-import io.composeflow.ui.jewel.TitleBarContent
+import io.composeflow.ui.utils.TitleBarContent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

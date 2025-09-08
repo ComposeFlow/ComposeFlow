@@ -14,15 +14,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
+import io.composeflow.VerticalAlignSpaceAround
+import io.composeflow.VerticalAlignSpaceBetween
+import io.composeflow.VerticalAlignSpaceEven
+import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.model.parameter.wrapper.ArrangementVerticalWrapper
-import io.composeflow.platform.AsyncImage
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconToggleButton
@@ -52,7 +51,6 @@ fun ArrangementVerticalPropertyEditor(
         fun runIconToggleButton(
             verticalArrangement: ArrangementVerticalWrapper,
             imageVector: ImageVector? = null,
-            resourcePath: String? = null,
             contentDesc: String,
         ) = run {
             val thisItemSelected = initialValue == verticalArrangement
@@ -85,26 +83,6 @@ fun ArrangementVerticalPropertyEditor(
                             modifier = Modifier.size(20.dp),
                         )
                     }
-
-                    // Load the image from the local resource if the icon isn't available as
-                    // part of the material icons
-                    val density = LocalDensity.current
-                    resourcePath?.let {
-                        AsyncImage(
-                            load = {
-                                useResource(resourcePath) {
-                                    loadSvgPainter(
-                                        it,
-                                        density,
-                                    )
-                                }
-                            },
-                            painterFor = { it },
-                            contentDescription = contentDesc,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
                 }
             }
         }
@@ -127,17 +105,17 @@ fun ArrangementVerticalPropertyEditor(
 
             runIconToggleButton(
                 ArrangementVerticalWrapper.SpaceBetween,
-                resourcePath = "vertical_align_space_between.svg",
+                imageVector = ComposeFlowIcons.VerticalAlignSpaceBetween,
                 contentDesc = stringResource(Res.string.vertical_space_between_arrangement),
             )
             runIconToggleButton(
                 ArrangementVerticalWrapper.SpaceEvenly,
-                resourcePath = "vertical_align_space_even.svg",
+                imageVector = ComposeFlowIcons.VerticalAlignSpaceEven,
                 contentDesc = stringResource(Res.string.vertical_space_evenly_arrangement),
             )
             runIconToggleButton(
                 ArrangementVerticalWrapper.SpaceAround,
-                resourcePath = "vertical_align_space_around.svg",
+                imageVector = ComposeFlowIcons.VerticalAlignSpaceAround,
                 contentDesc = stringResource(Res.string.vertical_space_around_arrangement),
             )
         }

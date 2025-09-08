@@ -301,7 +301,7 @@ class AiAssistantViewModel(
                                             if (toolCalls.isNotEmpty()) {
                                                 "Tool calls: ${
                                                     toolCalls.joinToString(", ") {
-                                                        it.tool_args.javaClass.simpleName.removeSuffix(
+                                                        (it.tool_args::class.simpleName ?: "Unknown").removeSuffix(
                                                             "Args",
                                                         )
                                                     }

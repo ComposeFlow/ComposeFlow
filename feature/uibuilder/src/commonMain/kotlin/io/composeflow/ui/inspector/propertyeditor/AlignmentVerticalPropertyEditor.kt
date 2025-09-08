@@ -14,18 +14,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.alignment_bottom
 import io.composeflow.alignment_center_vertical
 import io.composeflow.alignment_top
 import io.composeflow.model.parameter.wrapper.AlignmentVerticalWrapper
-import io.composeflow.platform.AsyncImage
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconToggleButton
@@ -51,7 +46,6 @@ fun AlignmentVerticalPropertyEditor(
         fun runIconToggleButton(
             verticalAlignment: AlignmentVerticalWrapper,
             imageVector: ImageVector? = null,
-            resourcePath: String? = null,
             contentDesc: String,
         ) = run {
             val thisItemSelected = initialValue == verticalAlignment
@@ -81,26 +75,6 @@ fun AlignmentVerticalPropertyEditor(
                             imageVector = imageVector,
                             contentDescription = contentDesc,
                             tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
-
-                    // Load the image from the local resource if the icon isn't available as
-                    // part of the material icons
-                    val density = LocalDensity.current
-                    resourcePath?.let {
-                        AsyncImage(
-                            load = {
-                                useResource(resourcePath) {
-                                    loadSvgPainter(
-                                        it,
-                                        density,
-                                    )
-                                }
-                            },
-                            painterFor = { it },
-                            contentDescription = contentDesc,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                             modifier = Modifier.size(20.dp),
                         )
                     }

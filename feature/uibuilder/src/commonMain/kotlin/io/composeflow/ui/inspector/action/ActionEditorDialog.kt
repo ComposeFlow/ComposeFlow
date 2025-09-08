@@ -29,6 +29,7 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -64,6 +65,8 @@ import io.composeflow.add_action
 import io.composeflow.add_conditional_action
 import io.composeflow.cancel
 import io.composeflow.confirm
+import io.composeflow.custom.ComposeFlowIcons
+import io.composeflow.custom.composeflowicons.Placeholder
 import io.composeflow.define_action
 import io.composeflow.edit
 import io.composeflow.invalid_action_exists
@@ -1577,19 +1580,10 @@ private fun EmptyActionContainer(
     onActionNodesUpdated: (ActionType, List<ActionNode>) -> Unit,
 ) {
     Column {
-        val density = LocalDensity.current
-        AsyncImage(
-            load = {
-                useResource("icons/placeholder.svg") {
-                    loadSvgPainter(
-                        it,
-                        density,
-                    )
-                }
-            },
-            painterFor = { it },
+        Icon(
+            imageVector = ComposeFlowIcons.Placeholder,
             contentDescription = "Empty actions",
-            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
             modifier = Modifier.size(140.dp),
         )
 

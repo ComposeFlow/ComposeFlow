@@ -28,7 +28,7 @@ import io.composeflow.ai.AiChatDialog
 import io.composeflow.auth.LocalFirebaseIdToken
 import io.composeflow.auth.isAiEnabled
 import io.composeflow.model.ProvideNavigator
-import io.composeflow.ui.jewel.TitleBarContent
+import io.composeflow.ui.utils.TitleBarContent
 import io.composeflow.ui.navigationrail.LeftNavigationRail
 import io.composeflow.ui.statusbar.StatusBar
 import io.composeflow.ui.statusbar.StatusBarViewModel
@@ -98,7 +98,7 @@ fun ProjectEditorContent(
         val toolbarViewModel =
             viewModel(
                 modelClass = ToolbarViewModel::class,
-                keys = listOf(firebaseIdToken?.user_id ?: "anonymous"),
+                keys = listOf(firebaseIdToken.user_id),
             ) {
                 ToolbarViewModel(
                     firebaseIdTokenArg = firebaseIdToken,

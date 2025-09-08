@@ -14,22 +14,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
+import io.composeflow.HorizontalAlignJustifySpaceAround
+import io.composeflow.HorizontalAlignJustifySpaceBetween
+import io.composeflow.HorizontalAlignJustifySpaceEven
 import io.composeflow.Res
 import io.composeflow.arrangement_horizontal_center
 import io.composeflow.arrangement_horizontal_end
 import io.composeflow.arrangement_horizontal_start
+import io.composeflow.custom.ComposeFlowIcons
 import io.composeflow.horizontal_arrangement
 import io.composeflow.horizontal_space_around_arrangement
 import io.composeflow.horizontal_space_between_arrangement
 import io.composeflow.horizontal_space_evenly_arrangement
 import io.composeflow.model.parameter.wrapper.ArrangementHorizontalWrapper
-import io.composeflow.platform.AsyncImage
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconToggleButton
@@ -52,7 +51,6 @@ fun ArrangementHorizontalPropertyEditor(
         fun runIconToggleButton(
             horizontalArrangement: ArrangementHorizontalWrapper,
             imageVector: ImageVector? = null,
-            resourcePath: String? = null,
             contentDesc: String,
         ) = run {
             val thisItemSelected = initialValue == horizontalArrangement
@@ -85,26 +83,6 @@ fun ArrangementHorizontalPropertyEditor(
                             modifier = Modifier.size(20.dp),
                         )
                     }
-
-                    // Load the image from the local resource if the icon isn't available as
-                    // part of the material icons
-                    val density = LocalDensity.current
-                    resourcePath?.let {
-                        AsyncImage(
-                            load = {
-                                useResource(resourcePath) {
-                                    loadSvgPainter(
-                                        it,
-                                        density,
-                                    )
-                                }
-                            },
-                            painterFor = { it },
-                            contentDescription = contentDesc,
-                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
                 }
             }
         }
@@ -127,17 +105,17 @@ fun ArrangementHorizontalPropertyEditor(
 
             runIconToggleButton(
                 ArrangementHorizontalWrapper.SpaceBetween,
-                resourcePath = "horizontal_align_justify_space_between.svg",
+                imageVector = ComposeFlowIcons.HorizontalAlignJustifySpaceBetween,
                 contentDesc = stringResource(Res.string.horizontal_space_between_arrangement),
             )
             runIconToggleButton(
                 ArrangementHorizontalWrapper.SpaceEvenly,
-                resourcePath = "horizontal_align_justify_space_even.svg",
+                imageVector = ComposeFlowIcons.HorizontalAlignJustifySpaceEven,
                 contentDesc = stringResource(Res.string.horizontal_space_evenly_arrangement),
             )
             runIconToggleButton(
                 ArrangementHorizontalWrapper.SpaceAround,
-                resourcePath = "horizontal_align_justify_space_around.svg",
+                imageVector = ComposeFlowIcons.HorizontalAlignJustifySpaceAround,
                 contentDesc = stringResource(Res.string.horizontal_space_around_arrangement),
             )
         }

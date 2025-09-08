@@ -37,7 +37,7 @@ import io.composeflow.sign_in_not_available_configure_auth
 import io.composeflow.sign_in_recommended_for_ai
 import io.composeflow.sign_in_with_google
 import io.composeflow.ui.common.ComposeFlowTheme
-import io.composeflow.ui.jewel.TitleBarContent
+import io.composeflow.ui.utils.TitleBarContent
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.top.TopScreen
 import io.composeflow.use_without_sign_in
