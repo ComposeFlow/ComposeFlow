@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CursorDropdownMenu
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddCircleOutline
 import androidx.compose.material.icons.outlined.Delete
@@ -46,7 +46,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.key
@@ -57,8 +56,6 @@ import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.add_action
@@ -81,7 +78,6 @@ import io.composeflow.model.project.appscreen.screen.composenode.ComposeNodeCall
 import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.property.BooleanProperty
 import io.composeflow.not_defined
-import io.composeflow.platform.AsyncImage
 import io.composeflow.remove
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.icon.ComposeFlowIcon
@@ -620,7 +616,7 @@ private fun SimpleActionNode(
     }
 
     if (actionNodeMenuOpened) {
-        CursorDropdownMenu(
+        PlatformCursorDropdownMenu(
             expanded = true,
             onDismissRequest = {
                 actionNodeMenuOpened = false
@@ -735,7 +731,7 @@ private fun ConditionalActionNode(
         }
     var menuOpened by remember { mutableStateOf(false) }
     if (menuOpened) {
-        CursorDropdownMenu(
+        PlatformCursorDropdownMenu(
             expanded = true,
             onDismissRequest = {
                 menuOpened = false
@@ -1120,7 +1116,7 @@ private fun ForkedActionNode(
         }
     var menuOpened by remember { mutableStateOf(false) }
     if (menuOpened) {
-        CursorDropdownMenu(
+        PlatformCursorDropdownMenu(
             expanded = true,
             onDismissRequest = {
                 menuOpened = false
@@ -1531,7 +1527,7 @@ private fun AddNewActionNodeButton(
     }
 
     if (openMenu) {
-        CursorDropdownMenu(
+        PlatformCursorDropdownMenu(
             expanded = true,
             onDismissRequest = {
                 openMenu = false

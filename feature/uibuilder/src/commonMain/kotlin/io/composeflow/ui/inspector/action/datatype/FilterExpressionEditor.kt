@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CursorDropdownMenu
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -105,7 +105,7 @@ fun AddFilterMenu(
     onCloseMenu: () -> Unit,
     onSingleFilterAdded: (() -> Unit)? = null,
 ) {
-    CursorDropdownMenu(
+    PlatformCursorDropdownMenu(
         expanded = true,
         onDismissRequest = {
             onCloseMenu()

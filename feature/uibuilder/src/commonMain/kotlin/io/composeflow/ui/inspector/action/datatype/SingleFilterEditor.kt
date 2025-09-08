@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CursorDropdownMenu
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
@@ -70,7 +70,7 @@ fun SingleFilterEditor(
         }
     var menuOpened by remember { mutableStateOf(false) }
     if (menuOpened) {
-        CursorDropdownMenu(
+        PlatformCursorDropdownMenu(
             expanded = true,
             onDismissRequest = {
                 menuOpened = false

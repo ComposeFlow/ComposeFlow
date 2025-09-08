@@ -18,8 +18,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.ExpandMore
-import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -151,7 +151,7 @@ fun ActionInspector(
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.secondary,
                     )
-                    DropdownMenu(
+                    PlatformCursorDropdownMenu(
                         expanded = actionTypeDropDownExpanded,
                         onDismissRequest = { actionTypeDropDownExpanded = false },
                     ) {

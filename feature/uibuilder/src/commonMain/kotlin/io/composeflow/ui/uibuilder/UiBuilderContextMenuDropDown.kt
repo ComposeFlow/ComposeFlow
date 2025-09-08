@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CursorDropdownMenu
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Redo
 import androidx.compose.material.icons.automirrored.outlined.Undo
@@ -89,7 +89,7 @@ fun UiBuilderContextMenuDropDown(
 ) {
     var wrapWithMenuExpanded by remember { mutableStateOf(false) }
     val focusedNodes = currentEditable.findFocusedNodes()
-    CursorDropdownMenu(
+    PlatformCursorDropdownMenu(
         expanded = true,
         onDismissRequest = {
             onCloseMenu()
@@ -294,7 +294,7 @@ fun UiBuilderContextMenuDropDown(
             })
 
             if (wrapWithMenuExpanded) {
-                CursorDropdownMenu(
+                PlatformCursorDropdownMenu(
                     expanded = true,
                     onDismissRequest = {
                         wrapWithMenuExpanded = false

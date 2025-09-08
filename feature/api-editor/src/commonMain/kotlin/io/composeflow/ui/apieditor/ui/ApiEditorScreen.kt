@@ -96,7 +96,7 @@ import io.composeflow.ui.LocalOnShowSnackbar
 import io.composeflow.ui.Tooltip
 import io.composeflow.ui.apieditor.ApiEditorViewModel
 import io.composeflow.ui.apieditor.model.ApiResponseUiState
-import io.composeflow.ui.dropdown.PlatformDropdownMenu
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
 import io.composeflow.ui.jsonpath.createJsonTreeWithJsonPath
@@ -322,7 +322,7 @@ private fun ApiEditorRowOptionMenu(
     onDismissRequest: () -> Unit,
     onDeleteApiDefinitionDialogOpen: () -> Unit,
 ) {
-    PlatformDropdownMenu(
+    PlatformCursorDropdownMenu(
         expanded = true,
         onDismissRequest = onDismissRequest,
     ) {
