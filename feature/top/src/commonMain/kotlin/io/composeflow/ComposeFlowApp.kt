@@ -8,12 +8,11 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.composeflow.ui.ProvideOnShowSnackbar
-import io.composeflow.ui.jewel.TitleBarContent
 import io.composeflow.ui.login.LOGIN_ROUTE
+import io.composeflow.ui.utils.TitleBarContent
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.viewmodel.viewModel

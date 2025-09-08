@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Note
 import androidx.compose.material.icons.outlined.BugReport
@@ -45,6 +44,7 @@ import io.composeflow.model.project.issue.NavigatableDestination
 import io.composeflow.model.project.issue.TrackableIssue
 import io.composeflow.no_issues_found_message
 import io.composeflow.ui.common.onSurfaceLight
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.modifier.hoverIconClickable
 import kotlinx.coroutines.launch
@@ -126,7 +126,7 @@ private fun IssuesPanel(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    CursorDropdownMenu(
+    PlatformCursorDropdownMenu(
         expanded = true,
         onDismissRequest = {
             onClosePanel()

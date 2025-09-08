@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Redo
 import androidx.compose.material.icons.automirrored.outlined.Undo
@@ -64,6 +63,7 @@ import io.composeflow.select_parent_composable
 import io.composeflow.send_to_back
 import io.composeflow.ui.CanvasNodeCallbacks
 import io.composeflow.ui.Tooltip
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.handleMessages
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.mousePointerEvents
@@ -89,7 +89,7 @@ fun UiBuilderContextMenuDropDown(
 ) {
     var wrapWithMenuExpanded by remember { mutableStateOf(false) }
     val focusedNodes = currentEditable.findFocusedNodes()
-    CursorDropdownMenu(
+    PlatformCursorDropdownMenu(
         expanded = true,
         onDismissRequest = {
             onCloseMenu()
@@ -294,7 +294,7 @@ fun UiBuilderContextMenuDropDown(
             })
 
             if (wrapWithMenuExpanded) {
-                CursorDropdownMenu(
+                PlatformCursorDropdownMenu(
                     expanded = true,
                     onDismissRequest = {
                         wrapWithMenuExpanded = false

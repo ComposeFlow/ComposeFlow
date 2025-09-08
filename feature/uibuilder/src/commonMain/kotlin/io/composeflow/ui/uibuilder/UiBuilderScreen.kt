@@ -71,7 +71,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -89,8 +88,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -110,6 +107,7 @@ import io.composeflow.chane_to_night_theme
 import io.composeflow.component
 import io.composeflow.component_name
 import io.composeflow.custom.ComposeFlowIcons
+import io.composeflow.custom.composeflowicons.ComposeLogo
 import io.composeflow.custom.composeflowicons.NounAi
 import io.composeflow.keyboard.getCtrlKeyStr
 import io.composeflow.model.InspectorTabDestination
@@ -130,7 +128,6 @@ import io.composeflow.model.project.component.Component
 import io.composeflow.model.project.issue.DestinationContext
 import io.composeflow.model.project.issue.NavigatableDestination
 import io.composeflow.palette
-import io.composeflow.platform.AsyncImage
 import io.composeflow.remove_navigation
 import io.composeflow.reset_position_and_zoom
 import io.composeflow.show_navigation
@@ -606,19 +603,10 @@ private fun LeftPane(
                                     selectedTabIndex = 2
                                 },
                                 icon = {
-                                    AsyncImage(
-                                        load = {
-                                            useResource("icons/compose_logo.svg") {
-                                                loadSvgPainter(
-                                                    it,
-                                                    density,
-                                                )
-                                            }
-                                        },
-                                        painterFor = { it },
-                                        contentDescription = componentPalette,
-                                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                                        modifier = Modifier.size(18.dp, 20.dp),
+                                    Icon(
+                                        imageVector = ComposeFlowIcons.ComposeLogo,
+                                        contentDescription = screenBuilder,
+                                        modifier = Modifier.size(20.dp),
                                     )
                                 },
                                 modifier = Modifier.testTag(UI_BUILDER_COMPONENT_TAB_TEST_TAG),

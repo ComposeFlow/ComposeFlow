@@ -2,7 +2,7 @@ package io.composeflow.ui.login
 
 import androidx.compose.runtime.Composable
 import io.composeflow.LoginResultUiState
-import io.composeflow.ui.jewel.TitleBarContent
+import io.composeflow.ui.utils.TitleBarContent
 import moe.tlaster.precompose.navigation.RouteBuilder
 import moe.tlaster.precompose.navigation.transition.NavTransition
 

@@ -1006,6 +1006,7 @@ fun Modifier.draggableFromPalette(
     // Pointer position relative to container where the drag event is dispatched
     var pointerPosition by remember { mutableStateOf(Offset.Zero) }
     var localToRoot by mutableStateOf(Offset.Zero)
+    val coroutineScope = rememberCoroutineScope()
 
     pointerInput(Unit) {
         detectTapGestures(
@@ -1036,10 +1037,12 @@ fun Modifier.draggableFromPalette(
                 paletteDraggable.defaultComposeNode(project)?.let { composeNode ->
                     composeNode.updateComposeNodeReferencesForTrait()
 
-                    paletteNodeCallbacks.onComposableDroppedToTarget(
-                        localToRoot + (pointerPosition - zoomableContainerStateHolder.offset) / zoomableContainerStateHolder.scale,
-                        composeNode,
-                    )
+                    coroutineScope.launch {
+                        paletteNodeCallbacks.onComposableDroppedToTarget(
+                            localToRoot + (pointerPosition - zoomableContainerStateHolder.offset) / zoomableContainerStateHolder.scale,
+                            composeNode,
+                        )
+                    }
                 }
 
                 paletteNodeCallbacks.onDraggedNodeUpdated(null)

@@ -117,7 +117,7 @@ import io.composeflow.ui.LocalOnAllDialogsClosed
 import io.composeflow.ui.LocalOnAnyDialogIsShown
 import io.composeflow.ui.PointerIconResizeHorizontal
 import io.composeflow.ui.Tooltip
-import io.composeflow.ui.dropdown.PlatformDropdownMenu
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.modifier.backgroundContainerNeutral
 import io.composeflow.ui.popup.SimpleConfirmationDialog
 import io.composeflow.ui.textfield.SmallOutlinedTextField
@@ -797,7 +797,7 @@ private fun LocaleHeaderCell(
             )
         }
 
-        PlatformDropdownMenu(
+        PlatformCursorDropdownMenu(
             expanded = showDropdown,
             onDismissRequest = { showDropdown = false },
         ) {

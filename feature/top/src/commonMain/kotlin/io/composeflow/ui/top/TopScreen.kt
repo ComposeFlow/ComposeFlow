@@ -60,10 +60,10 @@ import io.composeflow.ui.about.AboutScreen
 import io.composeflow.ui.common.ComposeFlowTheme
 import io.composeflow.ui.image.AsyncImage
 import io.composeflow.ui.jewel.ProvideLazyTreeStyle
-import io.composeflow.ui.jewel.TitleBarContent
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.project.ProjectScreen
 import io.composeflow.ui.settings.AccountSettingsScreen
+import io.composeflow.ui.utils.TitleBarContent
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
 import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme

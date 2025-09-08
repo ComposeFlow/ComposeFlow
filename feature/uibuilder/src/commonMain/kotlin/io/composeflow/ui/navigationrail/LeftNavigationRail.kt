@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -35,7 +36,6 @@ import io.composeflow.ui.Tooltip
 import moe.tlaster.precompose.navigation.NavOptions
 import moe.tlaster.precompose.navigation.Navigator
 import moe.tlaster.precompose.navigation.PopUpTo
-import org.jetbrains.jewel.ui.component.Icon
 import kotlin.math.absoluteValue
 
 @Composable
@@ -102,9 +102,9 @@ fun LeftNavigationRail(navigator: Navigator) {
                         ) {
                             val icon = if (isSelected) item.icon.tint(Color.White) else item.icon
                             Icon(
-                                modifier = Modifier.size(20.dp),
                                 imageVector = icon,
                                 contentDescription = "icon",
+                                modifier = Modifier.size(20.dp),
                             )
                         }
                     },

@@ -5,14 +5,11 @@ import co.touchlab.kermit.Logger
 import com.github.michaelbull.result.mapBoth
 import io.composeflow.ai.openrouter.tools.ToolArgs
 import io.composeflow.ai.openrouter.tools.ToolExecutionStatus
-import io.composeflow.di.ServiceLocator
 import io.composeflow.model.project.appscreen.screen.Screen
 import io.composeflow.model.project.appscreen.screen.createCopyOfNewName
 import io.composeflow.model.project.string.ResourceLocale
 import io.composeflow.model.project.string.StringResource
 import io.composeflow.serializer.decodeFromStringWithFallback
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withTimeout
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -26,10 +23,6 @@ const val DEBUG_YAML = false
 
 class LlmRepository(
     private val client: LlmClient = LlmClient(),
-    private val ioDispatcher: CoroutineDispatcher =
-        ServiceLocator.getOrPutWithKey(ServiceLocator.KEY_IO_DISPATCHER) {
-            Dispatchers.Default
-        },
 ) {
     companion object {
         private const val MAX_RETRY_COUNT = 4

@@ -1,4 +1,4 @@
-package io.composeflow.ui.jewel
+package io.composeflow.ui.utils
 
 import androidx.compose.runtime.Composable
 
