@@ -17,25 +17,26 @@ actual fun rememberWindowSize(): DpSize {
         mutableStateOf(
             DpSize(
                 window.innerWidth.dp,
-                window.innerHeight.dp
-            )
+                window.innerHeight.dp,
+            ),
         )
     }
-    
+
     DisposableEffect(Unit) {
         val updateSize: (Event) -> Unit = {
-            size = DpSize(
-                window.innerWidth.dp,
-                window.innerHeight.dp
-            )
+            size =
+                DpSize(
+                    window.innerWidth.dp,
+                    window.innerHeight.dp,
+                )
         }
-        
+
         window.addEventListener("resize", updateSize)
-        
+
         onDispose {
             window.removeEventListener("resize", updateSize)
         }
     }
-    
+
     return size
 }

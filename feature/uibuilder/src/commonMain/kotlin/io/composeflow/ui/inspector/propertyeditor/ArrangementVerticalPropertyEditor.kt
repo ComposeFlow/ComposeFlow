@@ -50,7 +50,7 @@ fun ArrangementVerticalPropertyEditor(
         @Composable
         fun runIconToggleButton(
             verticalArrangement: ArrangementVerticalWrapper,
-            imageVector: ImageVector? = null,
+            imageVector: ImageVector,
             contentDesc: String,
         ) = run {
             val thisItemSelected = initialValue == verticalArrangement
@@ -75,14 +75,12 @@ fun ArrangementVerticalPropertyEditor(
                             },
                         ),
                 ) {
-                    imageVector?.let {
-                        ComposeFlowIcon(
-                            imageVector = imageVector,
-                            contentDescription = contentDesc,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
+                    ComposeFlowIcon(
+                        imageVector = imageVector,
+                        contentDescription = contentDesc,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp),
+                    )
                 }
             }
         }

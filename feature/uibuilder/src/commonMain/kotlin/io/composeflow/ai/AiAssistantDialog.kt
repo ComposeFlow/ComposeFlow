@@ -56,13 +56,13 @@ import io.composeflow.ai_generating_response
 import io.composeflow.model.palette.PaletteRenderParams
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.Screen
+import io.composeflow.platform.rememberWindowSize
 import io.composeflow.ui.adaptive.ProvideDeviceSizeDp
 import io.composeflow.ui.common.AppTheme
 import io.composeflow.ui.emptyCanvasNodeCallbacks
 import io.composeflow.ui.popup.PositionCustomizablePopup
 import io.composeflow.ui.popup.rememberDefaultPopupPositionProvider
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
-import io.composeflow.platform.rememberWindowSize
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents.Companion.Format

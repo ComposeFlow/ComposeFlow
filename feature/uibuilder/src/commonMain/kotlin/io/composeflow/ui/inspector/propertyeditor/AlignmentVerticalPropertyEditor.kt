@@ -45,7 +45,7 @@ fun AlignmentVerticalPropertyEditor(
         @Composable
         fun runIconToggleButton(
             verticalAlignment: AlignmentVerticalWrapper,
-            imageVector: ImageVector? = null,
+            imageVector: ImageVector,
             contentDesc: String,
         ) = run {
             val thisItemSelected = initialValue == verticalAlignment
@@ -70,14 +70,12 @@ fun AlignmentVerticalPropertyEditor(
                             },
                         ),
                 ) {
-                    imageVector?.let {
-                        ComposeFlowIcon(
-                            imageVector = imageVector,
-                            contentDescription = contentDesc,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
+                    ComposeFlowIcon(
+                        imageVector = imageVector,
+                        contentDescription = contentDesc,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp),
+                    )
                 }
             }
         }

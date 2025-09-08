@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Redo
 import androidx.compose.material.icons.automirrored.outlined.Undo
@@ -64,6 +63,7 @@ import io.composeflow.select_parent_composable
 import io.composeflow.send_to_back
 import io.composeflow.ui.CanvasNodeCallbacks
 import io.composeflow.ui.Tooltip
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.handleMessages
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.mousePointerEvents

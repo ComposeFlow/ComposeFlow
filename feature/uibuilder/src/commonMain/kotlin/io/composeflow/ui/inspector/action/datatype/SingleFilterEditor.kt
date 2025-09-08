@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.MoreVert
@@ -41,6 +40,7 @@ import io.composeflow.model.project.firebase.FirestoreCollection
 import io.composeflow.model.property.DocumentIdProperty
 import io.composeflow.remove
 import io.composeflow.ui.dashedBorder
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
 import io.composeflow.ui.propertyeditor.BasicDropdownPropertyEditor

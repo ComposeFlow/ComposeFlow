@@ -71,7 +71,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -129,7 +128,6 @@ import io.composeflow.model.project.component.Component
 import io.composeflow.model.project.issue.DestinationContext
 import io.composeflow.model.project.issue.NavigatableDestination
 import io.composeflow.palette
-import io.composeflow.platform.AsyncImage
 import io.composeflow.remove_navigation
 import io.composeflow.reset_position_and_zoom
 import io.composeflow.show_navigation

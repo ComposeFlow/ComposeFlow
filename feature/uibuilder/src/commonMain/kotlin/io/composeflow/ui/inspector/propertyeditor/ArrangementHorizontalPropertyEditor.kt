@@ -50,7 +50,7 @@ fun ArrangementHorizontalPropertyEditor(
         @Composable
         fun runIconToggleButton(
             horizontalArrangement: ArrangementHorizontalWrapper,
-            imageVector: ImageVector? = null,
+            imageVector: ImageVector,
             contentDesc: String,
         ) = run {
             val thisItemSelected = initialValue == horizontalArrangement
@@ -75,14 +75,12 @@ fun ArrangementHorizontalPropertyEditor(
                             },
                         ),
                 ) {
-                    imageVector?.let {
-                        ComposeFlowIcon(
-                            imageVector = imageVector,
-                            contentDescription = contentDesc,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(20.dp),
-                        )
-                    }
+                    ComposeFlowIcon(
+                        imageVector = imageVector,
+                        contentDescription = contentDesc,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(20.dp),
+                    )
                 }
             }
         }

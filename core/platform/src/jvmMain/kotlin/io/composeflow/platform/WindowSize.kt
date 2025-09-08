@@ -14,7 +14,7 @@ actual fun rememberWindowSize(): DpSize {
     return remember(windowInfo) {
         DpSize(
             windowInfo.containerSize.width.dp,
-            windowInfo.containerSize.height.dp
+            windowInfo.containerSize.height.dp,
         )
     }
 }

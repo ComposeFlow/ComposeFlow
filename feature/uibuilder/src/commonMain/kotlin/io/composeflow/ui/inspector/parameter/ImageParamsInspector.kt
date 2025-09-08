@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.IconToggleButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.East
 import androidx.compose.material.icons.outlined.FilterCenterFocus
@@ -48,6 +47,7 @@ import io.composeflow.model.type.ComposeFlowType
 import io.composeflow.placeholder_content_desc
 import io.composeflow.ui.LocalOnShowSnackbar
 import io.composeflow.ui.Tooltip
+import io.composeflow.ui.icon.ComposeFlowIconToggleButton
 import io.composeflow.ui.inspector.ParamInspectorHeaderRow
 import io.composeflow.ui.labeledbox.LabeledBorderBox
 import io.composeflow.ui.modifier.hoverOverlay
@@ -309,7 +309,7 @@ private fun AlignmentInspector(
         ) = run {
             val thisItemSelected = selected == alignmentWrapper
             Tooltip(contentDesc) {
-                IconToggleButton(
+                ComposeFlowIconToggleButton(
                     checked = thisItemSelected,
                     onCheckedChange = {
                         composeNodeCallbacks.onTraitUpdated(

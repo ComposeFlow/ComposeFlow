@@ -134,7 +134,7 @@ fun OpenDatePickerContent(
                 maxValue =
                     when (val maxYear = initialAction.maxSelectableYear.value) {
                         is IntProperty.IntIntrinsicValue -> maxYear.value
-                        else -> Integer.MAX_VALUE
+                        else -> Int.MAX_VALUE
                     },
             )::validate,
             leadingIcon = {
@@ -164,7 +164,7 @@ fun OpenDatePickerContent(
                 minValue =
                     when (val minYear = initialAction.minSelectableYear.value) {
                         is IntProperty.IntIntrinsicValue -> minYear.value
-                        else -> Integer.MIN_VALUE
+                        else -> Int.MIN_VALUE
                     },
             )::validate,
             leadingIcon = {

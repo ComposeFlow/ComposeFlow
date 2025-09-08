@@ -14,7 +14,7 @@ actual fun PlatformCursorDropdownMenu(
     CursorDropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
-        modifier = modifier
+        modifier = modifier,
     ) {
         content()
     }

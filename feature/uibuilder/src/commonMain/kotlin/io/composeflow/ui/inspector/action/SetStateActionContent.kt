@@ -22,13 +22,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
 import io.composeflow.add_field_to_update
@@ -87,7 +87,6 @@ import io.composeflow.ui.Tooltip
 import io.composeflow.ui.datafield.FieldRow
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
-import io.composeflow.ui.jewel.SingleSelectionLazyTree
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.modifier.hoverOverlay
 import io.composeflow.ui.popup.PositionCustomizablePopup
@@ -96,14 +95,16 @@ import io.composeflow.ui.propertyeditor.AssignableEditableTextPropertyEditor
 import io.composeflow.ui.propertyeditor.AssignableInstantPropertyEditor
 import io.composeflow.ui.propertyeditor.BasicDropdownPropertyEditor
 import io.composeflow.ui.state.StateLabel
+import io.composeflow.ui.treeview.TreeView
+import io.composeflow.ui.treeview.node.Branch
+import io.composeflow.ui.treeview.node.BranchNode
+import io.composeflow.ui.treeview.node.Leaf
+import io.composeflow.ui.treeview.tree.Tree
+import io.composeflow.ui.treeview.tree.TreeScope
 import io.composeflow.unselect_all
 import io.composeflow.update_type
 import io.composeflow.value
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.foundation.lazy.SelectableLazyListState
-import org.jetbrains.jewel.foundation.lazy.tree.buildTree
-import org.jetbrains.jewel.foundation.lazy.tree.rememberTreeState
-import org.jetbrains.jewel.ui.component.styling.LocalLazyTreeStyle
 
 @Composable
 fun SetStateActionContent(
@@ -231,7 +232,6 @@ private fun EditStateArea(
 ) {
     Column {
         val state = project.findLocalStateOrNull(setValueToState.writeToStateId) ?: return
-        var operationDropdownOpen by remember { mutableStateOf(false) }
         Row {
             StateLabel(project = project, state, modifier = Modifier.padding(vertical = 8.dp))
             Spacer(Modifier.weight(1f))
@@ -267,7 +267,6 @@ private fun EditStateArea(
                         )
                     action.setValueToStates[indexInAction] = updatedAction
                     onActionUpdated(action)
-                    operationDropdownOpen = false
                 },
                 modifier = Modifier.width(300.dp),
             )
@@ -1090,7 +1089,7 @@ fun AddFieldToSetDialog(
                 }
 
                 fun removeDataFieldIfNotPresentInEdit(dataField: DataField) {
-                    editedSelectedFieldIds.removeIf { it.dataFieldId == dataField.id }
+                    editedSelectedFieldIds.removeAll { it.dataFieldId == dataField.id }
                 }
 
                 fun toggleDataFieldInEdit(dataField: DataField) {
@@ -1192,15 +1191,85 @@ private fun AddStateToSetDialog(
                         .currentEditable()
                         .getStateResults(project)
                         .groupBy { it.first }
+
+                // Data class to hold state information
+                data class StateTreeData(
+                    val stateHolderType: StateHolderType,
+                    val state: ReadableState,
+                )
+
+                @Composable
+                fun TreeScope.StateHolderBranch(
+                    holderType: StateHolderType,
+                    states: List<Pair<StateHolderType, ReadableState>>,
+                    project: Project,
+                    children: @Composable TreeScope.() -> Unit,
+                ) {
+                    Branch(
+                        content = StateTreeData(holderType, states.first().second),
+                        key = holderType.toString(),
+                        children = children,
+                        customName = { node ->
+                            when (val stateHolderType = node.content.stateHolderType) {
+                                StateHolderType.Global -> {
+                                    Text(
+                                        text = stringResource(Res.string.app_state),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                        modifier = Modifier.padding(end = 8.dp),
+                                    )
+                                }
+
+                                is StateHolderType.Screen -> {
+                                    val screen = project.findScreenOrNull(stateHolderType.screenId)
+                                    screen?.let { s ->
+                                        Text(
+                                            text = stringResource(Res.string.screen_states) + " [${s.name}]",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.secondary,
+                                        )
+                                    }
+                                }
+
+                                is StateHolderType.Component -> {
+                                    val component = project.findComponentOrThrow(stateHolderType.componentId)
+                                    Text(
+                                        text = stringResource(Res.string.component_states) + " [${component.name}]",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.secondary,
+                                    )
+                                }
+                            }
+                        },
+                    )
+                }
+
+                @Composable
+                fun TreeScope.StateLeaf(
+                    holderType: StateHolderType,
+                    state: WriteableState,
+                    project: Project,
+                ) {
+                    Leaf(
+                        content = StateTreeData(holderType, state),
+                        key = state.id,
+                        customName = { node ->
+                            StateLabel(project = project, state = node.content.state)
+                        },
+                    )
+                }
+
                 val tree =
-                    buildTree {
+                    Tree<StateTreeData> {
                         statesMap.forEach { entry ->
                             if (entry.value.isNotEmpty()) {
-                                addNode(entry.value.first(), id = entry.key) {
+                                val holderType = entry.key
+                                // Add branch for state holder type
+                                StateHolderBranch(holderType, entry.value, project) {
                                     entry.value.forEach { state ->
                                         val writeState = state.second
                                         if (writeState is WriteableState && writeState.userWritable) {
-                                            addLeaf(state, id = state.second.id)
+                                            StateLeaf(holderType, writeState, project)
                                         }
                                     }
                                 }
@@ -1208,84 +1277,46 @@ private fun AddStateToSetDialog(
                         }
                     }
                 val lazyListState = rememberLazyListState()
-                val selectableLazyListState = remember { SelectableLazyListState(lazyListState) }
-                val treeState = rememberTreeState(selectableLazyListState = selectableLazyListState)
-                selectedState?.let {
-                    treeState.selectedKeys = listOf(it.id)
-                } ?: { treeState.selectedKeys = emptyList() }
 
-                SingleSelectionLazyTree(
+                // Set initial selection
+                selectedState?.let { state ->
+                    tree.nodes.find { it.content.state.id == state.id }?.let { node ->
+                        tree.selectNode(node)
+                    }
+                }
+
+                // Expand all root nodes initially
+                LaunchedEffect(Unit) {
+                    if (!treeInitiallyExpanded) {
+                        tree.nodes.filter { it.depth == 0 }.forEach { rootNode ->
+                            if (rootNode is BranchNode) {
+                                tree.expandNode(rootNode)
+                            }
+                        }
+                        treeInitiallyExpanded = true
+                    }
+                }
+
+                TreeView(
                     tree = tree,
-                    treeState = treeState,
-                    style = LocalLazyTreeStyle.current,
-                    onSelectionChange = {
-                        if (it.isNotEmpty()) {
-                            when (it.first().depth) {
-                                0 -> {
-                                    selectedState = null
-                                    treeState.selectedKeys = emptyList()
-                                }
+                    listState = lazyListState,
+                    onClick = { treeNode, _, _ ->
+                        tree.clearSelection()
+                        tree.selectNode(treeNode)
 
-                                else -> {
-                                    val state = it.first().data.second
-                                    selectedState = state
-                                }
+                        when (treeNode.depth) {
+                            0 -> {
+                                // Clicked on state holder type - don't select
+                                selectedState = null
+                                tree.clearSelection()
+                            }
+                            else -> {
+                                // Clicked on actual state
+                                selectedState = treeNode.content.state as? WriteableState
                             }
                         }
                     },
-                    modifier =
-                        Modifier.onGloballyPositioned {
-                            if (!treeInitiallyExpanded) {
-                                treeState.openNodes(tree.roots.map { it.id })
-                                treeInitiallyExpanded = true
-                            }
-                        },
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        when (it.depth) {
-                            // The first level represents the state holder type
-                            0 -> {
-                                when (val stateHolderType = it.data.first) {
-                                    StateHolderType.Global -> {
-                                        Text(
-                                            text = stringResource(Res.string.app_state),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.secondary,
-                                            modifier = Modifier.padding(end = 8.dp),
-                                        )
-                                    }
-
-                                    is StateHolderType.Screen -> {
-                                        val screen =
-                                            project.findScreenOrNull(stateHolderType.screenId)
-                                        screen?.let { s ->
-                                            Text(
-                                                text = stringResource(Res.string.screen_states) + " [${s.name}]",
-                                                style = MaterialTheme.typography.bodyMedium,
-                                                color = MaterialTheme.colorScheme.secondary,
-                                            )
-                                        }
-                                    }
-
-                                    is StateHolderType.Component -> {
-                                        val component =
-                                            project.findComponentOrThrow(stateHolderType.componentId)
-                                        Text(
-                                            text = stringResource(Res.string.component_states) + " [${component.name}]",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.secondary,
-                                        )
-                                    }
-                                }
-                            }
-
-                            else -> {
-                                val state = it.data.second
-                                StateLabel(project = project, state = state)
-                            }
-                        }
-                    }
-                }
+                )
 
                 Spacer(Modifier.weight(1f))
                 HorizontalDivider(modifier = Modifier.padding(bottom = 8.dp))

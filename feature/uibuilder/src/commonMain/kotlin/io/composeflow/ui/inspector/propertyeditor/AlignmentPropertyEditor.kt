@@ -81,11 +81,11 @@ fun AlignmentPropertyEditor(
                             },
                         ),
                 ) {
-                        ComposeFlowIcon(
-                            imageVector = imageVector,
-                            contentDescription = contentDesc,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
+                    ComposeFlowIcon(
+                        imageVector = imageVector,
+                        contentDescription = contentDesc,
+                        tint = MaterialTheme.colorScheme.primary,
+                    )
                 }
             }
         }

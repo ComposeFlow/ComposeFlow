@@ -5,7 +5,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import com.wakaztahir.codeeditor.theme.CodeTheme
 import com.wakaztahir.codeeditor.theme.SyntaxColors
 
-actual class PlatformCodeTheme(val theme: CodeTheme)
+actual class PlatformCodeTheme(
+    val theme: CodeTheme,
+)
 
 class LightCodeTheme :
     CodeTheme(
