@@ -9,6 +9,10 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
 
     sourceSets {
         commonMain.dependencies {
@@ -31,24 +35,28 @@ kotlin {
             implementation(project(":feature:settings"))
             implementation(project(":feature:string-editor"))
             implementation(project(":feature:theme-editor"))
-            implementation(libs.compose.code.editor)
             implementation(libs.compose.color.picker)
             implementation(libs.compose.shimmer)
-            implementation(libs.datastore.core.okio)
-            implementation(libs.datastore.preferences.core)
-            implementation(libs.kotlinpoet)
             implementation(libs.ktor.core)
             implementation(libs.ktor.kotlinx.json)
             implementation(libs.kotlin.datetime)
             implementation(libs.kotlin.result)
             implementation(libs.kotlinx.serialization.jsonpath)
-            implementation(libs.jewel.int.ui.standalone)
-            implementation(libs.jewel.int.ui.decorated.window)
             implementation(libs.reorderable)
             implementation(libs.kaml)
-            implementation(libs.splitpane)
             api(libs.precompose)
             api(libs.precompose.viewmodel)
+        }
+
+        jvmMain.dependencies {
+            implementation(libs.compose.code.editor)
+            implementation(libs.datastore.core.okio)
+            implementation(libs.datastore.preferences.core)
+            implementation(libs.kotlinpoet)
+            implementation(libs.jewel.int.ui.standalone)
+            implementation(libs.jewel.int.ui.decorated.window)
+            implementation(libs.splitpane)
+            implementation(compose.desktop.common)
         }
 
         // Configure KSP for LLM tools
@@ -61,19 +69,17 @@ kotlin {
             // Set output directory for LLM tool JSON files
             arg("llmToolsOutputDir", "${project.layout.buildDirectory.get()}/generated/llm-tools")
         }
-        named("jvmMain") {
-            dependencies {
-                implementation(compose.desktop.common)
-            }
-        }
 
         commonTest.dependencies {
             implementation(project(":core:model"))
             implementation(project(":core:testing"))
-            implementation(kotlin("test-junit"))
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.coroutines.test)
         }
+        jvmTest.dependencies {
+            implementation(kotlin("test-junit"))
+        }
+
         all {
             optInComposeExperimentalApis()
             optInKotlinExperimentalApis()
