@@ -60,7 +60,7 @@ enum class TextDecorationWrapper(
         )
 
     object TextDecorationWrapperSerializer :
-        FallbackEnumSerializer<TextDecorationWrapper>(TextDecorationWrapper::class)
+        FallbackEnumSerializer<TextDecorationWrapper>(TextDecorationWrapper::class, TextDecorationWrapper.entries.toTypedArray())
 }
 
 @SerialName("TextStyleWrapper")
@@ -260,7 +260,7 @@ enum class TextStyleWrapper(
     override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("%M.typography.$styleName", MemberHolder.Material3.MaterialTheme)
 
     object TextStyleWrapperSerializer :
-        FallbackEnumSerializer<TextStyleWrapper>(TextStyleWrapper::class)
+        FallbackEnumSerializer<TextStyleWrapper>(TextStyleWrapper::class, TextStyleWrapper.entries.toTypedArray())
 }
 
 @SerialName("FontStyleWrapper")
@@ -286,7 +286,7 @@ enum class FontStyleWrapper(
         )
 
     object FontStyleWrapperSerializer :
-        FallbackEnumSerializer<FontStyleWrapper>(FontStyleWrapper::class)
+        FallbackEnumSerializer<FontStyleWrapper>(FontStyleWrapper::class, FontStyleWrapper.entries.toTypedArray())
 }
 
 @SerialName("TextAlignWrapper")
@@ -316,7 +316,7 @@ enum class TextAlignWrapper(
         )
 
     object TextAlignWrapperSerializer :
-        FallbackEnumSerializer<TextAlignWrapper>(TextAlignWrapper::class)
+        FallbackEnumSerializer<TextAlignWrapper>(TextAlignWrapper::class, TextAlignWrapper.entries.toTypedArray())
 }
 
 @SerialName("TextOverflowWrapper")
@@ -343,7 +343,7 @@ enum class TextOverflowWrapper(
         )
 
     object TextOverflowWrapperSerializer :
-        FallbackEnumSerializer<TextOverflowWrapper>(TextOverflowWrapper::class)
+        FallbackEnumSerializer<TextOverflowWrapper>(TextOverflowWrapper::class, TextOverflowWrapper.entries.toTypedArray())
 }
 
 @SerialName("ContentScaleWrapper")
@@ -374,7 +374,7 @@ enum class ContentScaleWrapper(
         )
 
     object ContentScaleWrapperSerializer :
-        FallbackEnumSerializer<ContentScaleWrapper>(ContentScaleWrapper::class)
+        FallbackEnumSerializer<ContentScaleWrapper>(ContentScaleWrapper::class, ContentScaleWrapper.entries.toTypedArray())
 }
 
 @SerialName("TextFieldColorsWrapper")
@@ -404,7 +404,7 @@ enum class TextFieldColorsWrapper : EnumWrapper {
         }
 
     object TextFieldColorsWrapperSerializer :
-        FallbackEnumSerializer<TextFieldColorsWrapper>(TextFieldColorsWrapper::class)
+        FallbackEnumSerializer<TextFieldColorsWrapper>(TextFieldColorsWrapper::class, TextFieldColorsWrapper.entries.toTypedArray())
 }
 
 @SerialName("NodeVisibility")
@@ -439,5 +439,5 @@ enum class NodeVisibility :
     override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("")
 
     object NodeVisibilitySerializer :
-        FallbackEnumSerializer<NodeVisibility>(NodeVisibility::class)
+        FallbackEnumSerializer<NodeVisibility>(NodeVisibility::class, NodeVisibility.entries.toTypedArray())
 }

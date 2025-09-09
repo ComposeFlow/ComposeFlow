@@ -130,7 +130,7 @@ data class NavigationDrawerTrait(
 }
 
 object NavigationDrawerTypeSerializer :
-    FallbackEnumSerializer<NavigationDrawerType>(NavigationDrawerType::class)
+    FallbackEnumSerializer<NavigationDrawerType>(NavigationDrawerType::class, NavigationDrawerType.entries.toTypedArray())
 
 @Serializable(NavigationDrawerTypeSerializer::class)
 enum class NavigationDrawerType {

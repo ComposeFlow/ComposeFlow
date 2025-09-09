@@ -222,7 +222,7 @@ data class CardTrait(
     }
 }
 
-object CardTypeSerializer : FallbackEnumSerializer<CardType>(CardType::class)
+object CardTypeSerializer : FallbackEnumSerializer<CardType>(CardType::class, CardType.entries.toTypedArray())
 
 @Serializable(CardTypeSerializer::class)
 enum class CardType {

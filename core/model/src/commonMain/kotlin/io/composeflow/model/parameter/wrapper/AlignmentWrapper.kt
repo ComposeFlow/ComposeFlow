@@ -5,7 +5,7 @@ import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.Serializable
 
 object AlignmentWrapperSerializer :
-    FallbackEnumSerializer<AlignmentWrapper>(AlignmentWrapper::class)
+    FallbackEnumSerializer<AlignmentWrapper>(AlignmentWrapper::class, AlignmentWrapper.entries.toTypedArray())
 
 @Serializable(AlignmentWrapperSerializer::class)
 enum class AlignmentWrapper(

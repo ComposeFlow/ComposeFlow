@@ -48,7 +48,10 @@ data class ColorWrapper(
 }
 
 object Material3ColorWrapperSerializer :
-    FallbackEnumSerializer<Material3ColorWrapper>(Material3ColorWrapper::class)
+    FallbackEnumSerializer<Material3ColorWrapper>(
+        Material3ColorWrapper::class,
+        Material3ColorWrapper.entries.toTypedArray(),
+    )
 
 /**
  * Wrapper class for [Color] to distinguish the same color by semantics.
