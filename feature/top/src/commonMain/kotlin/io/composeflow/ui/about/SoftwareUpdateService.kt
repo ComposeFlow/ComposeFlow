@@ -2,7 +2,7 @@ package io.composeflow.ui.about
 
 data class VersionInfo(
     val version: String,
-    val isUpdateAvailable: Boolean = false
+    val isUpdateAvailable: Boolean = false,
 )
 
 /**
@@ -11,7 +11,10 @@ data class VersionInfo(
  */
 expect class SoftwareUpdateService() {
     suspend fun getCurrentVersion(): VersionInfo?
+
     suspend fun checkForUpdates(): VersionInfo?
+
     fun canDoOnlineUpdates(): Boolean
+
     fun triggerUpdateUI()
 }

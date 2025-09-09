@@ -97,62 +97,61 @@ fun TopScreen(
         ComposeFlowTheme(useDarkTheme = useComposeFlowDarkTheme) {
             ProvideTopScreenTheme(useDarkTheme = useComposeFlowDarkTheme) {
                 ProvideCodeTheme(useDarkTheme = useComposeFlowDarkTheme) {
-                        var anyDialogShown by remember { mutableStateOf(false) }
-                        ProvideShowDialogCallback(
-                            onAnyDialogIsShown = {
-                                anyDialogShown = true
+                    var anyDialogShown by remember { mutableStateOf(false) }
+                    ProvideShowDialogCallback(
+                        onAnyDialogIsShown = {
+                            anyDialogShown = true
+                        },
+                    ) {
+                        ProvideCloseDialogCallback(
+                            onAllDialogsClosed = {
+                                anyDialogShown = false
                             },
                         ) {
-                            ProvideCloseDialogCallback(
-                                onAllDialogsClosed = {
-                                    anyDialogShown = false
-                                },
-                            ) {
-                                val overlayModifier =
-                                    if (anyDialogShown) {
-                                        Modifier
-                                            .alpha(0.2f)
-                                            .blur(
-                                                8.dp,
-                                                edgeTreatment = BlurredEdgeTreatment.Unbounded,
-                                            )
-                                    } else {
-                                        Modifier
-                                    }
+                            val overlayModifier =
+                                if (anyDialogShown) {
+                                    Modifier
+                                        .alpha(0.2f)
+                                        .blur(
+                                            8.dp,
+                                            edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                                        )
+                                } else {
+                                    Modifier
+                                }
 
-                                Box(modifier = overlayModifier) {
-                                    when (projectUiState) {
-                                        is ProjectUiState.HasNotSelected.ProjectListLoaded ->
-                                            TopNavigationDrawerScreen(
-                                                onCreateProject = viewModel::onCreateProject,
-                                                onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
-                                                onDeleteProject = viewModel::onDeleteProject,
-                                                onProjectSelected = viewModel::onProjectSelected,
-                                                onLogOut = onLogOut,
-                                                projectUiState = projectUiState,
-                                                useComposeFlowDarkTheme = useComposeFlowDarkTheme,
-                                                isAnonymous = isAnonymous,
-                                            )
+                            Box(modifier = overlayModifier) {
+                                when (projectUiState) {
+                                    is ProjectUiState.HasNotSelected.ProjectListLoaded ->
+                                        TopNavigationDrawerScreen(
+                                            onCreateProject = viewModel::onCreateProject,
+                                            onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
+                                            onDeleteProject = viewModel::onDeleteProject,
+                                            onProjectSelected = viewModel::onProjectSelected,
+                                            onLogOut = onLogOut,
+                                            projectUiState = projectUiState,
+                                            useComposeFlowDarkTheme = useComposeFlowDarkTheme,
+                                            isAnonymous = isAnonymous,
+                                        )
 
-                                        ProjectUiState.HasNotSelected.ProjectListLoading ->
-                                            TopNavigationDrawerScreen(
-                                                onCreateProject = viewModel::onCreateProject,
-                                                onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
-                                                onDeleteProject = viewModel::onDeleteProject,
-                                                onProjectSelected = viewModel::onProjectSelected,
-                                                onLogOut = onLogOut,
-                                                projectUiState = ProjectUiState.HasNotSelected.ProjectListLoading,
-                                                useComposeFlowDarkTheme = useComposeFlowDarkTheme,
-                                                isAnonymous = isAnonymous,
-                                            )
+                                    ProjectUiState.HasNotSelected.ProjectListLoading ->
+                                        TopNavigationDrawerScreen(
+                                            onCreateProject = viewModel::onCreateProject,
+                                            onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
+                                            onDeleteProject = viewModel::onDeleteProject,
+                                            onProjectSelected = viewModel::onProjectSelected,
+                                            onLogOut = onLogOut,
+                                            projectUiState = ProjectUiState.HasNotSelected.ProjectListLoading,
+                                            useComposeFlowDarkTheme = useComposeFlowDarkTheme,
+                                            isAnonymous = isAnonymous,
+                                        )
 
-                                        is ProjectUiState.Selected -> {
-                                            ProjectEditorView(
-                                                projectId = projectUiState.project.id,
-                                                onTitleBarRightContentSet = onTitleBarRightContentSet,
-                                                onTitleBarLeftContentSet = onTitleBarLeftContentSet,
-                                            )
-                                        }
+                                    is ProjectUiState.Selected -> {
+                                        ProjectEditorView(
+                                            projectId = projectUiState.project.id,
+                                            onTitleBarRightContentSet = onTitleBarRightContentSet,
+                                            onTitleBarLeftContentSet = onTitleBarLeftContentSet,
+                                        )
                                     }
                                 }
                             }
@@ -162,6 +161,7 @@ fun TopScreen(
             }
         }
     }
+}
 
 @Composable
 private fun DestinationScreenWrapper(content: @Composable () -> Unit) {

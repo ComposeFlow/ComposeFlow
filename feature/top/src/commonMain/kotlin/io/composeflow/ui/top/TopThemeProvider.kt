@@ -9,5 +9,5 @@ import androidx.compose.runtime.Composable
 @Composable
 expect fun ProvideTopScreenTheme(
     useDarkTheme: Boolean,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 )

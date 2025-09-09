@@ -5,6 +5,6 @@ actual class BillingService {
         // Billing is not available in WASM version
         return null
     }
-    
+
     actual fun isAvailable(): Boolean = false
 }

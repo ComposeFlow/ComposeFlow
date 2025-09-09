@@ -6,5 +6,6 @@ package io.composeflow.ui.about
  */
 expect class BillingService() {
     suspend fun createPricingTableLink(): String?
+
     fun isAvailable(): Boolean
 }

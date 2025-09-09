@@ -6,28 +6,27 @@ import kotlinx.coroutines.withContext
 
 actual class SoftwareUpdateService {
     private val updateController: SoftwareUpdateController? = SoftwareUpdateController.getInstance()
-    
-    actual suspend fun getCurrentVersion(): VersionInfo? {
-        return withContext(Dispatchers.IO) {
+
+    actual suspend fun getCurrentVersion(): VersionInfo? =
+        withContext(Dispatchers.IO) {
             updateController?.let {
                 VersionInfo(
                     version = it.currentVersion?.version ?: "Unknown",
-                    isUpdateAvailable = false
+                    isUpdateAvailable = false,
                 )
             }
         }
-    }
-    
-    actual suspend fun checkForUpdates(): VersionInfo? {
-        return withContext(Dispatchers.IO) {
+
+    actual suspend fun checkForUpdates(): VersionInfo? =
+        withContext(Dispatchers.IO) {
             try {
                 val remoteVersionObj = updateController?.currentVersionFromRepository
                 val currentVersionObj = updateController?.currentVersion
-                
+
                 if (remoteVersionObj != null && currentVersionObj != null) {
                     VersionInfo(
                         version = remoteVersionObj.version,
-                        isUpdateAvailable = remoteVersionObj.compareTo(currentVersionObj) > 0
+                        isUpdateAvailable = remoteVersionObj.compareTo(currentVersionObj) > 0,
                     )
                 } else {
                     null
@@ -36,12 +35,10 @@ actual class SoftwareUpdateService {
                 null
             }
         }
-    }
-    
-    actual fun canDoOnlineUpdates(): Boolean {
-        return updateController?.canTriggerUpdateCheckUI() == SoftwareUpdateController.Availability.AVAILABLE
-    }
-    
+
+    actual fun canDoOnlineUpdates(): Boolean =
+        updateController?.canTriggerUpdateCheckUI() == SoftwareUpdateController.Availability.AVAILABLE
+
     actual fun triggerUpdateUI() {
         updateController?.triggerUpdateCheckUI()
     }

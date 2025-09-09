@@ -8,19 +8,17 @@ import androidx.compose.ui.res.loadImageBitmap
 import androidx.compose.ui.res.useResource
 
 @Composable
-actual fun composeFlowLogoPainter(): Painter {
-    return remember {
+actual fun composeFlowLogoPainter(): Painter =
+    remember {
         useResource("ComposeFlow_inverted_800x600.png") {
             BitmapPainter(loadImageBitmap(it))
         }
     }
-}
 
 @Composable
-actual fun googleSignInButtonPainter(): Painter {
-    return remember {
+actual fun googleSignInButtonPainter(): Painter =
+    remember {
         useResource("btn_google_signin_dark.png") {
             BitmapPainter(loadImageBitmap(it))
         }
     }
-}
