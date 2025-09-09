@@ -24,8 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
 import io.composeflow.LoginResultUiState
 import io.composeflow.Res
@@ -105,20 +103,14 @@ private fun InitialContent(
             modifier = Modifier.width(480.dp),
         ) {
             Image(
-                bitmap =
-                    useResource("ComposeFlow_inverted_800x600.png") {
-                        loadImageBitmap(it)
-                    },
+                painter = composeFlowLogoPainter(),
                 contentDescription = stringResource(Res.string.composeflow_main_logo),
                 modifier = Modifier.scale(scale),
             )
 
             if (isAuthConfigured) {
                 Image(
-                    bitmap =
-                        useResource("btn_google_signin_dark.png") {
-                            loadImageBitmap(it)
-                        },
+                    painter = googleSignInButtonPainter(),
                     contentDescription = stringResource(Res.string.sign_in_with_google),
                     modifier =
                         Modifier

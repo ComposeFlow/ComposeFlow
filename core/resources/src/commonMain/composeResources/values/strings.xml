@@ -490,6 +490,7 @@ instead of in the canvas.</string>
     <string name="center_x">Center X</string>
     <string name="center_y">Center Y</string>
     <string name="radius">Radius</string>
+    <string name="pricing_page">Pricing page</string>
 
     <!-- Onboarding strings -->
     <string name="onboarding_welcome_title">Welcome to ComposeFlow!</string>

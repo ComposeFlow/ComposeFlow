@@ -59,14 +59,12 @@ import io.composeflow.ui.TopDestination
 import io.composeflow.ui.about.AboutScreen
 import io.composeflow.ui.common.ComposeFlowTheme
 import io.composeflow.ui.image.AsyncImage
-import io.composeflow.ui.jewel.ProvideLazyTreeStyle
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.project.ProjectScreen
 import io.composeflow.ui.settings.AccountSettingsScreen
 import io.composeflow.ui.utils.TitleBarContent
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.intui.standalone.theme.IntUiTheme
 
 @Composable
 fun TopScreen(
@@ -97,65 +95,63 @@ fun TopScreen(
 
     CompositionLocalProvider(LocalImageLoader provides ImageLoader.createDefault()) {
         ComposeFlowTheme(useDarkTheme = useComposeFlowDarkTheme) {
-            IntUiTheme(isDark = useComposeFlowDarkTheme) {
-                ProvideLazyTreeStyle {
-                    ProvideCodeTheme(useDarkTheme = useComposeFlowDarkTheme) {
-                        var anyDialogShown by remember { mutableStateOf(false) }
-                        ProvideShowDialogCallback(
-                            onAnyDialogIsShown = {
-                                anyDialogShown = true
+            ProvideTopScreenTheme(useDarkTheme = useComposeFlowDarkTheme) {
+                ProvideCodeTheme(useDarkTheme = useComposeFlowDarkTheme) {
+                    var anyDialogShown by remember { mutableStateOf(false) }
+                    ProvideShowDialogCallback(
+                        onAnyDialogIsShown = {
+                            anyDialogShown = true
+                        },
+                    ) {
+                        ProvideCloseDialogCallback(
+                            onAllDialogsClosed = {
+                                anyDialogShown = false
                             },
                         ) {
-                            ProvideCloseDialogCallback(
-                                onAllDialogsClosed = {
-                                    anyDialogShown = false
-                                },
-                            ) {
-                                val overlayModifier =
-                                    if (anyDialogShown) {
-                                        Modifier
-                                            .alpha(0.2f)
-                                            .blur(
-                                                8.dp,
-                                                edgeTreatment = BlurredEdgeTreatment.Unbounded,
-                                            )
-                                    } else {
-                                        Modifier
-                                    }
+                            val overlayModifier =
+                                if (anyDialogShown) {
+                                    Modifier
+                                        .alpha(0.2f)
+                                        .blur(
+                                            8.dp,
+                                            edgeTreatment = BlurredEdgeTreatment.Unbounded,
+                                        )
+                                } else {
+                                    Modifier
+                                }
 
-                                Box(modifier = overlayModifier) {
-                                    when (projectUiState) {
-                                        is ProjectUiState.HasNotSelected.ProjectListLoaded ->
-                                            TopNavigationDrawerScreen(
-                                                onCreateProject = viewModel::onCreateProject,
-                                                onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
-                                                onDeleteProject = viewModel::onDeleteProject,
-                                                onProjectSelected = viewModel::onProjectSelected,
-                                                onLogOut = onLogOut,
-                                                projectUiState = projectUiState,
-                                                useComposeFlowDarkTheme = useComposeFlowDarkTheme,
-                                                isAnonymous = isAnonymous,
-                                            )
+                            Box(modifier = overlayModifier) {
+                                when (projectUiState) {
+                                    is ProjectUiState.HasNotSelected.ProjectListLoaded ->
+                                        TopNavigationDrawerScreen(
+                                            onCreateProject = viewModel::onCreateProject,
+                                            onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
+                                            onDeleteProject = viewModel::onDeleteProject,
+                                            onProjectSelected = viewModel::onProjectSelected,
+                                            onLogOut = onLogOut,
+                                            projectUiState = projectUiState,
+                                            useComposeFlowDarkTheme = useComposeFlowDarkTheme,
+                                            isAnonymous = isAnonymous,
+                                        )
 
-                                        ProjectUiState.HasNotSelected.ProjectListLoading ->
-                                            TopNavigationDrawerScreen(
-                                                onCreateProject = viewModel::onCreateProject,
-                                                onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
-                                                onDeleteProject = viewModel::onDeleteProject,
-                                                onProjectSelected = viewModel::onProjectSelected,
-                                                onLogOut = onLogOut,
-                                                projectUiState = ProjectUiState.HasNotSelected.ProjectListLoading,
-                                                useComposeFlowDarkTheme = useComposeFlowDarkTheme,
-                                                isAnonymous = isAnonymous,
-                                            )
+                                    ProjectUiState.HasNotSelected.ProjectListLoading ->
+                                        TopNavigationDrawerScreen(
+                                            onCreateProject = viewModel::onCreateProject,
+                                            onCreateProjectWithScreens = viewModel::onCreateProjectWithScreens,
+                                            onDeleteProject = viewModel::onDeleteProject,
+                                            onProjectSelected = viewModel::onProjectSelected,
+                                            onLogOut = onLogOut,
+                                            projectUiState = ProjectUiState.HasNotSelected.ProjectListLoading,
+                                            useComposeFlowDarkTheme = useComposeFlowDarkTheme,
+                                            isAnonymous = isAnonymous,
+                                        )
 
-                                        is ProjectUiState.Selected -> {
-                                            ProjectEditorView(
-                                                projectId = projectUiState.project.id,
-                                                onTitleBarRightContentSet = onTitleBarRightContentSet,
-                                                onTitleBarLeftContentSet = onTitleBarLeftContentSet,
-                                            )
-                                        }
+                                    is ProjectUiState.Selected -> {
+                                        ProjectEditorView(
+                                            projectId = projectUiState.project.id,
+                                            onTitleBarRightContentSet = onTitleBarRightContentSet,
+                                            onTitleBarLeftContentSet = onTitleBarLeftContentSet,
+                                        )
                                     }
                                 }
                             }

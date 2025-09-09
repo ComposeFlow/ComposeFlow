@@ -8,7 +8,10 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm()
-
+    @OptIn(org.jetbrains.kotlin.gradle.ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(project(":core:ai"))
@@ -24,18 +27,18 @@ kotlin {
             implementation(project(":feature:settings"))
             implementation(project(":core:config"))
             implementation(libs.compose.image.loader)
-            implementation(libs.datastore.core.okio)
-            implementation(libs.datastore.preferences.core)
             implementation(libs.filekit.compose)
             implementation(libs.kotlin.result)
-            implementation(libs.jewel.int.ui.standalone)
-            implementation(libs.jewel.int.ui.decorated.window)
-            implementation(libs.conveyor.control)
             api(libs.precompose)
             api(libs.precompose.viewmodel)
         }
+        jvmMain.dependencies {
+            implementation(libs.conveyor.control)
+            implementation(libs.jewel.int.ui.standalone)
+            implementation(libs.jewel.int.ui.decorated.window)
+        }
 
-        commonTest.dependencies {
+        jvmTest.dependencies {
             implementation(kotlin("test-junit"))
         }
 
