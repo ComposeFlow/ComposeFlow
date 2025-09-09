@@ -34,7 +34,6 @@ kotlin {
             implementation(project(":core:ui"))
             implementation(project(":feature:top"))
             implementation(project(":feature:uibuilder"))
-            implementation(libs.datastore.preferences.core)
             implementation(libs.jewel.int.ui.standalone)
             implementation(libs.jewel.int.ui.decorated.window)
             implementation(libs.ktor.kotlinx.json)
