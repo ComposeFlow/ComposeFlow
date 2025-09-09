@@ -21,29 +21,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
-import com.github.michaelbull.result.mapBoth
-import dev.hydraulic.conveyor.control.SoftwareUpdateController
-import io.composeflow.BillingClient
 import io.composeflow.BuildConfig
 import io.composeflow.ComposeFlow_Logo_Symbol
 import io.composeflow.Res
 import io.composeflow.check_for_update
 import io.composeflow.no_updates_available
 import io.composeflow.open_source_licenses
+import io.composeflow.pricing_page
 import io.composeflow.ui.LocalOnAllDialogsClosed
 import io.composeflow.ui.LocalOnAnyDialogIsShown
 import io.composeflow.ui.openInBrowser
 import io.composeflow.ui.popup.LicenseDialog
 import io.composeflow.ui.popup.SimpleConfirmationDialog
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-
-val updateController: SoftwareUpdateController? = SoftwareUpdateController.getInstance()
-val canDoOnlineUpdates get() = updateController?.canTriggerUpdateCheckUI() == SoftwareUpdateController.Availability.AVAILABLE
-val billingClient = BillingClient()
 
 @Composable
 fun AboutScreen(modifier: Modifier = Modifier) {
@@ -94,22 +86,18 @@ fun AboutScreen(modifier: Modifier = Modifier) {
 private fun VersionCell() {
     Column {
         val coroutineScope = rememberCoroutineScope()
-        var remoteVersion by remember { mutableStateOf("Checking...") }
-        var updateAvailable by remember { mutableStateOf(false) }
+        val updateService = remember { SoftwareUpdateService() }
+        var currentVersion by remember { mutableStateOf<VersionInfo?>(null) }
+        var remoteVersion by remember { mutableStateOf<VersionInfo?>(null) }
         var noUpdatesAvailableDialogOpen by remember { mutableStateOf(false) }
+
         LaunchedEffect(Unit) {
-            coroutineScope.launch(Dispatchers.IO) {
-                try {
-                    val remoteVersionObj: SoftwareUpdateController.Version? =
-                        updateController?.currentVersionFromRepository
-                    remoteVersion = remoteVersionObj?.version ?: "Unknown"
-                    updateAvailable =
-                        (remoteVersionObj?.compareTo(updateController.currentVersion) ?: 0) > 0
-                } catch (e: Exception) {
-                    remoteVersion = "Error: ${e.message}"
-                }
+            coroutineScope.launch {
+                currentVersion = updateService.getCurrentVersion()
+                remoteVersion = updateService.checkForUpdates()
             }
         }
+
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "App version",
@@ -117,39 +105,38 @@ private fun VersionCell() {
             )
             Spacer(Modifier.size(8.dp))
             Text(
-                updateController?.currentVersion?.version ?: "Checking version...",
+                currentVersion?.version ?: "Checking version...",
                 style = MaterialTheme.typography.bodyMedium,
             )
         }
 
-        TextButton(
-            onClick = {
-                if (updateAvailable && canDoOnlineUpdates) {
-                    updateController?.triggerUpdateCheckUI()
-                } else {
-                    noUpdatesAvailableDialogOpen = true
-                }
-            },
-        ) {
-            Text(stringResource(Res.string.check_for_update))
-        }
-
-        if (!BuildConfig.isRelease) {
+        // Only show update button if the platform supports it
+        if (updateService.canDoOnlineUpdates()) {
             TextButton(
                 onClick = {
-                    coroutineScope.launch {
-                        billingClient.createPricingTableLink().mapBoth(
-                            success = {
-                                openInBrowser(it)
-                            },
-                            failure = {
-                                Logger.e("Failed to create pricing table link", it)
-                            },
-                        )
+                    if (remoteVersion?.isUpdateAvailable == true) {
+                        updateService.triggerUpdateUI()
+                    } else {
+                        noUpdatesAvailableDialogOpen = true
                     }
                 },
             ) {
-                Text("料金ページ")
+                Text(stringResource(Res.string.check_for_update))
+            }
+        }
+
+        val billingService = remember { BillingService() }
+        if (!BuildConfig.isRelease && billingService.isAvailable()) {
+            TextButton(
+                onClick = {
+                    coroutineScope.launch {
+                        billingService.createPricingTableLink()?.let {
+                            openInBrowser(it)
+                        }
+                    }
+                },
+            ) {
+                Text(stringResource(Res.string.pricing_page))
             }
         }
 
