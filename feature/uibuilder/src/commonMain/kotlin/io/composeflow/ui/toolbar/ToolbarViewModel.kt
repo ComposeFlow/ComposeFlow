@@ -1,5 +1,6 @@
 package io.composeflow.ui.toolbar
 
+import androidx.annotation.VisibleForTesting
 import com.github.michaelbull.result.onSuccess
 import io.composeflow.Res
 import io.composeflow.appbuilder.AppRunner
@@ -46,7 +47,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
-import org.jetbrains.annotations.VisibleForTesting
 import org.jetbrains.compose.resources.getString
 
 class ToolbarViewModel(

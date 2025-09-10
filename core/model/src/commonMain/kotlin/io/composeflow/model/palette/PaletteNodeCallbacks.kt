@@ -4,7 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 
 data class PaletteNodeCallbacks(
-    val onComposableDroppedToTarget: (
+    val onComposableDroppedToTarget: suspend (
         dropPosition: Offset,
         composeNode: ComposeNode,
     ) -> Unit,

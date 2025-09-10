@@ -497,7 +497,7 @@ class UiBuilderOperator {
                         is io.composeflow.model.project.issue.DestinationContext.ApiEditorScreen ->
                             "API: ${context.apiId}"
                     }
-                Logger.i { "Issue: $contextInfo - ${trackableIssue.issue.javaClass.simpleName}" }
+                Logger.i { "Issue: $contextInfo - ${trackableIssue.issue::class.simpleName}" }
             }
         } catch (e: Exception) {
             Logger.e(e) { "Error retrieving project issues" }

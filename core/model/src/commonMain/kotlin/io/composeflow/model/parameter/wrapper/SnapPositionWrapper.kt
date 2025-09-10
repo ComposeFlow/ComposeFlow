@@ -6,7 +6,10 @@ import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.Serializable
 
 object SnapPositionWrapperSerializer :
-    FallbackEnumSerializer<SnapPositionWrapper>(SnapPositionWrapper::class)
+    FallbackEnumSerializer<SnapPositionWrapper>(
+        SnapPositionWrapper::class,
+        SnapPositionWrapper.entries.toTypedArray(),
+    )
 
 @Serializable(SnapPositionWrapperSerializer::class)
 enum class SnapPositionWrapper {

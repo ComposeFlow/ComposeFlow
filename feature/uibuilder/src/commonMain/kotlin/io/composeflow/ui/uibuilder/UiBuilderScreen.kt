@@ -71,7 +71,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.isCtrlPressed
@@ -89,8 +88,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -110,6 +107,7 @@ import io.composeflow.chane_to_night_theme
 import io.composeflow.component
 import io.composeflow.component_name
 import io.composeflow.custom.ComposeFlowIcons
+import io.composeflow.custom.composeflowicons.ComposeLogo
 import io.composeflow.custom.composeflowicons.NounAi
 import io.composeflow.keyboard.getCtrlKeyStr
 import io.composeflow.model.InspectorTabDestination
@@ -130,7 +128,6 @@ import io.composeflow.model.project.component.Component
 import io.composeflow.model.project.issue.DestinationContext
 import io.composeflow.model.project.issue.NavigatableDestination
 import io.composeflow.palette
-import io.composeflow.platform.AsyncImage
 import io.composeflow.remove_navigation
 import io.composeflow.reset_position_and_zoom
 import io.composeflow.show_navigation
@@ -155,9 +152,6 @@ import io.composeflow.ui.handleMessages
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.inspector.InspectorTab
 import io.composeflow.ui.inspector.modifier.AddModifierDialog
-import io.composeflow.ui.jewel.SplitLayoutState
-import io.composeflow.ui.jewel.StatefulHorizontalSplitLayout
-import io.composeflow.ui.jewel.rememberSplitLayoutState
 import io.composeflow.ui.modifier.backgroundContainerNeutral
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.modifierForCanvas
@@ -166,6 +160,10 @@ import io.composeflow.ui.palette.PaletteIcon
 import io.composeflow.ui.palette.PaletteTab
 import io.composeflow.ui.popup.SingleTextInputDialog
 import io.composeflow.ui.screenbuilder.ScreenBuilderTab
+import io.composeflow.ui.splitlayout.SplitLayoutState
+import io.composeflow.ui.splitlayout.StatefulHorizontalSplitLayout
+import io.composeflow.ui.splitlayout.VerticalSplitLayout
+import io.composeflow.ui.splitlayout.rememberSplitLayoutState
 import io.composeflow.ui.tab.ComposeFlowTab
 import io.composeflow.ui.uibuilder.onboarding.OnboardingManager
 import io.composeflow.ui.uibuilder.onboarding.OnboardingOverlay
@@ -179,7 +177,6 @@ import io.composeflow.zoom_out
 import kotlinx.coroutines.CoroutineScope
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.ui.component.VerticalSplitLayout
 import kotlin.math.roundToInt
 
 @Composable
@@ -554,11 +551,11 @@ private fun LeftPane(
     ) {
         val maxHeight = maxHeight.value.dp
         VerticalSplitLayout(
-            initialDividerPosition = maxHeight / 2,
-            minRatio = 0.25f,
-            maxRatio = 0.75f,
-            first = { firstModifier ->
-                Column(modifier = firstModifier) {
+            initialSliderPosition = maxHeight / 2,
+            minSliderRatio = 0.25f,
+            maxSliderRatio = 0.75f,
+            topContent = {
+                Column {
                     var selectedTabIndex by remember { mutableStateOf(0) }
                     TabRow(
                         selectedTabIndex = selectedTabIndex,
@@ -606,19 +603,10 @@ private fun LeftPane(
                                     selectedTabIndex = 2
                                 },
                                 icon = {
-                                    AsyncImage(
-                                        load = {
-                                            useResource("icons/compose_logo.svg") {
-                                                loadSvgPainter(
-                                                    it,
-                                                    density,
-                                                )
-                                            }
-                                        },
-                                        painterFor = { it },
-                                        contentDescription = componentPalette,
-                                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                                        modifier = Modifier.size(18.dp, 20.dp),
+                                    Icon(
+                                        imageVector = ComposeFlowIcons.ComposeLogo,
+                                        contentDescription = screenBuilder,
+                                        modifier = Modifier.size(20.dp),
                                     )
                                 },
                                 modifier = Modifier.testTag(UI_BUILDER_COMPONENT_TAB_TEST_TAG),
@@ -661,7 +649,7 @@ private fun LeftPane(
                     }
                 }
             },
-            second = { secondModifier ->
+            bottomContent = {
                 ComposeNodeTree(
                     project = project,
                     copiedNodes = copiedNodes,
@@ -675,10 +663,11 @@ private fun LeftPane(
                     onShowActionTab = onShowActionTab,
                     onShowSnackbar = onShowSnackbar,
                     modifier =
-                        secondModifier.onboardingTarget(
-                            TargetArea.ProjectStructure,
-                            onboardingManager,
-                        ),
+                        Modifier
+                            .onboardingTarget(
+                                TargetArea.ProjectStructure,
+                                onboardingManager,
+                            ),
                 )
             },
         )

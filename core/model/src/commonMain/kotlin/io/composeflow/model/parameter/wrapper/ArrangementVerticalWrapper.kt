@@ -5,7 +5,10 @@ import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.Serializable
 
 object ArrangementVerticalWrapperSerializer :
-    FallbackEnumSerializer<ArrangementVerticalWrapper>(ArrangementVerticalWrapper::class)
+    FallbackEnumSerializer<ArrangementVerticalWrapper>(
+        ArrangementVerticalWrapper::class,
+        ArrangementVerticalWrapper.entries.toTypedArray(),
+    )
 
 @Serializable(ArrangementVerticalWrapperSerializer::class)
 enum class ArrangementVerticalWrapper(

@@ -16,10 +16,6 @@ gradlePlugin {
             id = "io.compose.flow.compose.multiplatform",
             implementationClass = "ComposeMultiplatformPlugin",
         )
-        registerPlugin(
-            id = "io.compose.flow.publishing",
-            implementationClass = "PublishingConventionPlugin",
-        )
     }
 }
 

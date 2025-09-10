@@ -50,24 +50,24 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.rememberComponentRectPositionProvider
 import io.composeflow.Res
 import io.composeflow.ai.subaction.ScreenPromptsCreatedContent
 import io.composeflow.ai_generating_response
 import io.composeflow.model.palette.PaletteRenderParams
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.Screen
+import io.composeflow.platform.rememberWindowSize
 import io.composeflow.ui.adaptive.ProvideDeviceSizeDp
 import io.composeflow.ui.common.AppTheme
 import io.composeflow.ui.emptyCanvasNodeCallbacks
 import io.composeflow.ui.popup.PositionCustomizablePopup
+import io.composeflow.ui.popup.rememberDefaultPopupPositionProvider
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents.Companion.Format
 import kotlinx.datetime.format.Padding
 import kotlinx.datetime.offsetAt
-import moe.tlaster.precompose.LocalWindow
 import moe.tlaster.precompose.viewmodel.viewModel
 import org.jetbrains.compose.resources.stringResource
 
@@ -99,15 +99,12 @@ fun AiAssistantDialog(
             onRenderedErrorDetected = viewModel::onRenderedErrorDetected,
             onConfirmProjectWithScreens = onConfirmProjectWithScreens,
         )
+    val windowSize = rememberWindowSize()
     PositionCustomizablePopup(
         onDismissRequest = {
             onCloseClick()
         },
-        popupPositionProvider =
-            rememberComponentRectPositionProvider(
-                anchor = Alignment.Center,
-                alignment = Alignment.Center,
-            ),
+        popupPositionProvider = rememberDefaultPopupPositionProvider(),
         onKeyEvent = {
             if (it.key == Key.Escape) {
                 onCloseClick()
@@ -119,9 +116,8 @@ fun AiAssistantDialog(
     ) {
         val horizontalPadding = 32.dp
         val verticalPadding = 32.dp
-        val windowSize = LocalWindow.current.size
-        val widthDp = windowSize.width.dp - horizontalPadding * 2
-        val heightDp = windowSize.height.dp - verticalPadding * 2
+        val widthDp = windowSize.width - horizontalPadding * 2
+        val heightDp = windowSize.height - verticalPadding * 2
         Surface(modifier = modifier.size(widthDp, heightDp)) {
             Row(modifier = Modifier.fillMaxSize()) {
                 AiConversationArea(

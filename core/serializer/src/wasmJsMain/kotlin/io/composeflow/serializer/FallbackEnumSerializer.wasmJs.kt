@@ -17,7 +17,11 @@ import kotlin.reflect.KClass
  */
 actual class FallbackEnumSerializerInternal<T : Enum<T>> actual constructor(
     enumClass: KClass<T>,
+    private val values: Array<T>,
 ) : KSerializer<T> {
+    private val fallback =
+        values.firstOrNull()
+            ?: throw IllegalArgumentException("Enum class has no values")
     private val enumClassName = enumClass.simpleName ?: "Unknown"
 
     actual override val descriptor: SerialDescriptor =
@@ -33,10 +37,20 @@ actual class FallbackEnumSerializerInternal<T : Enum<T>> actual constructor(
 
     actual override fun deserialize(decoder: Decoder): T {
         val stringValue = decoder.decodeString().trim()
-        Logger.w("FallbackEnumSerializerInternal.deserialize called on WASM - enum deserialization not fully supported")
 
-        // On WASM, we can't easily access enum constants without reflection
-        // This is a limitation that would need to be handled differently
-        throw UnsupportedOperationException("Enum deserialization not supported on WASM target")
+        // Fast path: exact match
+        val exactMatch = values.find { it.name == stringValue }
+        if (exactMatch != null) return exactMatch
+
+        // Fallback: case-insensitive match
+        val caseInsensitiveMatch = values.find { it.name.equals(stringValue, ignoreCase = true) }
+        if (caseInsensitiveMatch != null) return caseInsensitiveMatch
+
+        // Last resort: use fallback and log
+        if (stringValue.isNotEmpty()) {
+            Logger.w("Warning: Unknown $enumClassName value '$stringValue', falling back to '${fallback.name}'")
+        }
+
+        return fallback
     }
 }

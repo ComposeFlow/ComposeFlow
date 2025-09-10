@@ -2082,7 +2082,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-object OutlinedSerializer : FallbackEnumSerializer<Outlined>(Outlined::class)
+object OutlinedSerializer : FallbackEnumSerializer<Outlined>(Outlined::class, Outlined.entries.toTypedArray())
 
 /**
  * Enum of Outlined icons from material-icons-core and material-icons-extended libraries.

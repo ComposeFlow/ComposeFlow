@@ -440,6 +440,7 @@ data class TopAppBarTrait(
 
 object TopAppBarTypeWrapperSerializer : FallbackEnumSerializer<TopAppBarTypeWrapper>(
     TopAppBarTypeWrapper::class,
+    TopAppBarTypeWrapper.entries.toTypedArray(),
 )
 
 @Serializable(TopAppBarTypeWrapperSerializer::class)
@@ -452,6 +453,7 @@ enum class TopAppBarTypeWrapper {
 
 object ScrollBehaviorWrapperSerializer : FallbackEnumSerializer<ScrollBehaviorWrapper>(
     ScrollBehaviorWrapper::class,
+    ScrollBehaviorWrapper.entries.toTypedArray(),
 )
 
 @Serializable(ScrollBehaviorWrapperSerializer::class)

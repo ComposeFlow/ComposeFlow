@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,10 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.unit.dp
 import io.composeflow.LoginResultUiState
 import io.composeflow.Res
@@ -37,9 +36,9 @@ import io.composeflow.sign_in_not_available_configure_auth
 import io.composeflow.sign_in_recommended_for_ai
 import io.composeflow.sign_in_with_google
 import io.composeflow.ui.common.ComposeFlowTheme
-import io.composeflow.ui.jewel.TitleBarContent
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.top.TopScreen
+import io.composeflow.ui.utils.TitleBarContent
 import io.composeflow.use_without_sign_in
 import org.jetbrains.compose.resources.stringResource
 
@@ -98,37 +97,32 @@ private fun InitialContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize(),
     ) {
-        val density = LocalDensity.current
-        val scale = density.density / 2
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier.width(480.dp),
         ) {
             Image(
-                bitmap =
-                    useResource("ComposeFlow_inverted_800x600.png") {
-                        loadImageBitmap(it)
-                    },
+                painter = composeFlowLogoPainter(),
                 contentDescription = stringResource(Res.string.composeflow_main_logo),
-                modifier = Modifier.scale(scale),
+                modifier =
+                    Modifier
+                        .size(width = 400.dp, height = 330.dp),
             )
 
             if (isAuthConfigured) {
                 Image(
-                    bitmap =
-                        useResource("btn_google_signin_dark.png") {
-                            loadImageBitmap(it)
-                        },
+                    painter = googleSignInButtonPainter(),
                     contentDescription = stringResource(Res.string.sign_in_with_google),
                     modifier =
                         Modifier
-                            .scale(scale * 1.7f)
+                            .size(35.dp)
                             .hoverIconClickable()
+                            .clip(MaterialTheme.shapes.large)
                             .clickable {
                                 onGoogleSignInClicked()
                             },
                 )
-
                 Spacer(modifier = Modifier.height(32.dp))
 
                 OrDivider()

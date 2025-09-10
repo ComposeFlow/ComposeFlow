@@ -69,7 +69,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 import org.jetbrains.compose.resources.getString
@@ -406,7 +405,7 @@ class UiBuilderViewModel(
         return result
     }
 
-    fun onComposableDroppedToTarget(
+    suspend fun onComposableDroppedToTarget(
         dropPosition: Offset,
         composeNode: ComposeNode,
     ): EventResult {
@@ -424,54 +423,52 @@ class UiBuilderViewModel(
         return eventResult
     }
 
-    private fun onAddComposeNodeToContainerNode(
+    private suspend fun onAddComposeNodeToContainerNode(
         containerNodeId: String,
         composeNode: ComposeNode,
         indexToDrop: Int,
     ): EventResult {
-        return runBlocking {
-            val preValidationResult =
-                uiBuilderOperator.onPreAddComposeNodeToContainerNode(
-                    project,
-                    containerNodeId,
-                    composeNode,
-                )
-            if (preValidationResult.errorMessages.isNotEmpty()) {
-                return@runBlocking preValidationResult
-            }
-
-            // Track compose node added
-            try {
-                val containerNode = project.findComposeNodeOrNull(containerNodeId)
-                AnalyticsTracker.trackComposeNodeAdded(
-                    nodeType = composeNode.trait.value.toString(),
-                    containerType = containerNode?.trait?.value?.toString(),
-                    source = "palette",
-                )
-            } catch (_: Exception) {
-                // Analytics is optional, don't fail on errors
-            }
-
-            recordOperation(
-                project = project,
-                userOperation =
-                    UserOperation.ComposableDropped(
-                        node =
-                            composeNode.restoreInstance(
-                                sameId = true,
-                            ),
-                    ),
-            )
-
-            uiBuilderOperator.onAddComposeNodeToContainerNode(
+        val preValidationResult =
+            uiBuilderOperator.onPreAddComposeNodeToContainerNode(
                 project,
                 containerNodeId,
                 composeNode,
-                indexToDrop,
             )
-            saveProject(project)
-            EventResult()
+        if (preValidationResult.errorMessages.isNotEmpty()) {
+            return preValidationResult
         }
+
+        // Track compose node added
+        try {
+            val containerNode = project.findComposeNodeOrNull(containerNodeId)
+            AnalyticsTracker.trackComposeNodeAdded(
+                nodeType = composeNode.trait.value.toString(),
+                containerType = containerNode?.trait?.value?.toString(),
+                source = "palette",
+            )
+        } catch (_: Exception) {
+            // Analytics is optional, don't fail on errors
+        }
+
+        recordOperation(
+            project = project,
+            userOperation =
+                UserOperation.ComposableDropped(
+                    node =
+                        composeNode.restoreInstance(
+                            sameId = true,
+                        ),
+                ),
+        )
+
+        uiBuilderOperator.onAddComposeNodeToContainerNode(
+            project,
+            containerNodeId,
+            composeNode,
+            indexToDrop,
+        )
+        saveProject(project)
+        return EventResult()
     }
 
     fun onNodeDropToPosition(
@@ -864,7 +861,7 @@ class UiBuilderViewModel(
         // Track screen creation
         try {
             AnalyticsTracker.trackScreenCreated(
-                screenType = screen.javaClass.simpleName,
+                screenType = screen::class.simpleName ?: "Unknown",
                 creationMethod = "manual",
             )
         } catch (_: Exception) {

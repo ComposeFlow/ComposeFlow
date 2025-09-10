@@ -5,7 +5,10 @@ import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.Serializable
 
 object TileModeWrapperSerializer :
-    FallbackEnumSerializer<TileModeWrapper>(TileModeWrapper::class)
+    FallbackEnumSerializer<TileModeWrapper>(
+        TileModeWrapper::class,
+        TileModeWrapper.entries.toTypedArray(),
+    )
 
 @Serializable(TileModeWrapperSerializer::class)
 enum class TileModeWrapper {

@@ -8,6 +8,7 @@ import kotlin.reflect.KClass
 
 expect class FallbackEnumSerializerInternal<T : Enum<T>>(
     enumClass: KClass<T>,
+    values: Array<T>,
 ) : KSerializer<T> {
     override val descriptor: SerialDescriptor
 
@@ -25,8 +26,13 @@ expect class FallbackEnumSerializerInternal<T : Enum<T>>(
  */
 open class FallbackEnumSerializer<T : Enum<T>>(
     enumClass: KClass<T>,
+    values: Array<T>,
 ) : KSerializer<T> {
-    private val delegate = FallbackEnumSerializerInternal(enumClass).withLocationAwareExceptions()
+    private val delegate =
+        FallbackEnumSerializerInternal(
+            enumClass,
+            values,
+        ).withLocationAwareExceptions()
 
     override val descriptor: SerialDescriptor = delegate.descriptor
 

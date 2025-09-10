@@ -56,7 +56,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-object RoundedSerializer : FallbackEnumSerializer<Rounded>(Rounded::class)
+object RoundedSerializer : FallbackEnumSerializer<Rounded>(Rounded::class, Rounded.entries.toTypedArray())
 
 /**
  * Enum of rounded icons from material-icons-core

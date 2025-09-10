@@ -56,6 +56,7 @@ plugins {
 rootProject.name = "ComposeFlow"
 
 include(":desktopApp")
+include(":wasmApp")
 include(":generate-jsonschema-cli")
 include(":core:ai")
 include(":core:analytics")

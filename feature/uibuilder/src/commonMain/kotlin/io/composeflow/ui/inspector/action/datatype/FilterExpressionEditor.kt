@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,6 +24,7 @@ import io.composeflow.model.datatype.SingleFilter
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 import io.composeflow.model.project.firebase.FirestoreCollection
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -105,7 +105,7 @@ fun AddFilterMenu(
     onCloseMenu: () -> Unit,
     onSingleFilterAdded: (() -> Unit)? = null,
 ) {
-    CursorDropdownMenu(
+    PlatformCursorDropdownMenu(
         expanded = true,
         onDismissRequest = {
             onCloseMenu()

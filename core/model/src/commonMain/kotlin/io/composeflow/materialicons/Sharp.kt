@@ -56,7 +56,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-object SharpSerializer : FallbackEnumSerializer<Sharp>(Sharp::class)
+object SharpSerializer : FallbackEnumSerializer<Sharp>(Sharp::class, Sharp.entries.toTypedArray())
 
 /**
  * Enum of Sharp icons from material-icons-core and material-icons-extended libraries

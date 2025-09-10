@@ -2,7 +2,6 @@ plugins {
     id("io.compose.flow.kmp.library")
     alias(libs.plugins.kotlin.serialization)
     id("io.compose.flow.compose.multiplatform")
-    `maven-publish`
 }
 
 kotlin {
@@ -14,7 +13,9 @@ kotlin {
 
     sourceSets {
         commonMain.dependencies {
-            implementation(project(":core:ai"))
+            //  Needed to use api.
+            //  This makes the transitive dependencies available to modules that depend on this module
+            api(project(":core:ai"))
             implementation(project(":core:di"))
             implementation(project(":core:platform"))
             implementation(project(":core:serializer"))

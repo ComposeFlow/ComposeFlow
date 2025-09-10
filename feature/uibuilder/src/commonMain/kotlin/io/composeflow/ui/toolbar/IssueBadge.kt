@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CursorDropdownMenu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Note
 import androidx.compose.material.icons.outlined.BugReport
@@ -20,6 +19,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,12 +43,13 @@ import io.composeflow.model.project.issue.DestinationContext
 import io.composeflow.model.project.issue.NavigatableDestination
 import io.composeflow.model.project.issue.TrackableIssue
 import io.composeflow.no_issues_found_message
+import io.composeflow.ui.common.onSurfaceLight
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.modifier.hoverIconClickable
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.navigation.Navigator
 import org.jetbrains.compose.resources.stringResource
-import org.jetbrains.jewel.ui.component.Text
 
 private val ValidContainerColor = Color(0xFF5B8657)
 private val ErrorContainerColor = Color(0xFFA84E4B)
@@ -125,7 +126,7 @@ private fun IssuesPanel(
     modifier: Modifier = Modifier,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    CursorDropdownMenu(
+    PlatformCursorDropdownMenu(
         expanded = true,
         onDismissRequest = {
             onClosePanel()
@@ -149,7 +150,7 @@ private fun IssuesPanel(
                         Text(
                             stringResource(Res.string.no_issues_found_message) + "  \uD83D\uDE80",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = onSurfaceLight,
                         )
                     }
                 },
@@ -216,7 +217,7 @@ private fun IssuesPanel(
                                                             modifier = Modifier.size(20.dp),
                                                         )
                                                         Text(
-                                                            text = it.label.value,
+                                                            text = composeNode.label.value,
                                                             style = MaterialTheme.typography.titleSmall,
                                                             color = MaterialTheme.colorScheme.onSurface,
                                                             modifier = Modifier.padding(start = 8.dp),
