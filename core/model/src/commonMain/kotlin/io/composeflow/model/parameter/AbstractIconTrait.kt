@@ -277,7 +277,7 @@ abstract class AbstractIconTrait(
 }
 
 object IconAssetTypeSerializer :
-    FallbackEnumSerializer<IconAssetType>(IconAssetType::class)
+    FallbackEnumSerializer<IconAssetType>(IconAssetType::class, IconAssetType.entries.toTypedArray())
 
 @Serializable(IconAssetTypeSerializer::class)
 enum class IconAssetType {

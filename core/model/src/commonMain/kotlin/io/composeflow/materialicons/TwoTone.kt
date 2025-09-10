@@ -56,7 +56,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-object TwoToneSerializer : FallbackEnumSerializer<TwoTone>(TwoTone::class)
+object TwoToneSerializer : FallbackEnumSerializer<TwoTone>(TwoTone::class, TwoTone.entries.toTypedArray())
 
 /**
  * Enum of TwoTone icons from material-icons-core

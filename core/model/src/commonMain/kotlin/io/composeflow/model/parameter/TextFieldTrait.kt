@@ -636,6 +636,7 @@ data class TextFieldTrait(
 
 object TextFieldTypeSerializer : FallbackEnumSerializer<TextFieldType>(
     TextFieldType::class,
+    TextFieldType.entries.toTypedArray(),
 )
 
 @Serializable(TextFieldTypeSerializer::class)

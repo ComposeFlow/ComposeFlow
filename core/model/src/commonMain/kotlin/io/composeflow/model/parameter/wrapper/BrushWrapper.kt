@@ -307,7 +307,10 @@ data class BrushWrapper(
     }
 }
 
-object BrushTypeSerializer : FallbackEnumSerializer<BrushType>(BrushType::class)
+object BrushTypeSerializer : FallbackEnumSerializer<BrushType>(
+    BrushType::class,
+    BrushType.entries.toTypedArray(),
+)
 
 @Serializable(BrushTypeSerializer::class)
 enum class BrushType(

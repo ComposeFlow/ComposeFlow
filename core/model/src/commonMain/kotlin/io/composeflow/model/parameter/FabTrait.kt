@@ -328,6 +328,7 @@ data class FabTrait(
 
 object FabElevationWrapperSerializer : FallbackEnumSerializer<FabElevationWrapper>(
     FabElevationWrapper::class,
+    FabElevationWrapper.entries.toTypedArray(),
 )
 
 @Serializable(FabElevationWrapperSerializer::class)
@@ -338,6 +339,7 @@ enum class FabElevationWrapper {
 
 object FabPositionWrapperSerializer : FallbackEnumSerializer<FabPositionWrapper>(
     FabPositionWrapper::class,
+    FabPositionWrapper.entries.toTypedArray(),
 )
 
 @Serializable(FabPositionWrapperSerializer::class)
@@ -346,7 +348,7 @@ enum class FabPositionWrapper {
     Center,
 }
 
-object FabTypeSerializer : FallbackEnumSerializer<FabType>(FabType::class)
+object FabTypeSerializer : FallbackEnumSerializer<FabType>(FabType::class, FabType.entries.toTypedArray())
 
 @Serializable(FabTypeSerializer::class)
 enum class FabType {

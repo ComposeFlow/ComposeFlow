@@ -56,7 +56,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
-object FilledSerializer : FallbackEnumSerializer<Filled>(Filled::class)
+object FilledSerializer : FallbackEnumSerializer<Filled>(
+    Filled::class,
+    Filled.entries.toTypedArray(),
+)
 
 /**
  * Enum of Filled icons from material-icons-core

@@ -5,7 +5,10 @@ import io.composeflow.serializer.FallbackEnumSerializer
 import kotlinx.serialization.Serializable
 
 object AlignmentHorizontalWrapperSerializer :
-    FallbackEnumSerializer<AlignmentHorizontalWrapper>(AlignmentHorizontalWrapper::class)
+    FallbackEnumSerializer<AlignmentHorizontalWrapper>(
+        AlignmentHorizontalWrapper::class,
+        AlignmentHorizontalWrapper.entries.toTypedArray(),
+    )
 
 @Serializable(AlignmentHorizontalWrapperSerializer::class)
 enum class AlignmentHorizontalWrapper(

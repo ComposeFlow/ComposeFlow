@@ -353,5 +353,8 @@ enum class ButtonType {
 
     abstract fun toMemberName(): MemberNameWrapper
 
-    object Serializer : FallbackEnumSerializer<ButtonType>(ButtonType::class)
+    object Serializer : FallbackEnumSerializer<ButtonType>(
+        ButtonType::class,
+        entries.toTypedArray(),
+    )
 }

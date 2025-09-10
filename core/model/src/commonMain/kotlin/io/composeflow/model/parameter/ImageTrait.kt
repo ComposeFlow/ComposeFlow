@@ -345,7 +345,7 @@ data class ImageTrait(
 const val DEFAULT_URL = "https://picsum.photos/480"
 
 object ImageAssetTypeSerializer :
-    FallbackEnumSerializer<ImageAssetType>(ImageAssetType::class)
+    FallbackEnumSerializer<ImageAssetType>(ImageAssetType::class, ImageAssetType.entries.toTypedArray())
 
 @Serializable(ImageAssetTypeSerializer::class)
 enum class ImageAssetType {

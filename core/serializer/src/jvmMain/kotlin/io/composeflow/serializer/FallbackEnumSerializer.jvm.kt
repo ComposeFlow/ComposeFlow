@@ -17,6 +17,7 @@ import kotlin.reflect.KClass
  */
 actual class FallbackEnumSerializerInternal<T : Enum<T>> actual constructor(
     enumClass: KClass<T>,
+    values: Array<T>,
 ) : KSerializer<T> {
     private val values = enumClass.java.enumConstants ?: arrayOf()
     private val fallback =
