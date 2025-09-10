@@ -19,25 +19,27 @@ actual fun createLocalProjectSaver(): ProjectSaver = WasmProjectSaverImpl()
 @Serializable
 data class ProjectData(
     val yamlContent: String,
-    val lastModified: Long
+    val lastModified: Long,
 )
 
 @Serializable
 data class UserProjects(
-    val projectIds: Set<String>
+    val projectIds: Set<String>,
 )
 
 class WasmProjectSaverImpl : ProjectSaver {
-    private val json = Json {
-        prettyPrint = false
-        ignoreUnknownKeys = true
-    }
+    private val json =
+        Json {
+            prettyPrint = false
+            ignoreUnknownKeys = true
+        }
 
-    private fun projectKey(userId: String, projectId: String): String =
-        "composeflow_project_${userId}_${projectId}"
+    private fun projectKey(
+        userId: String,
+        projectId: String,
+    ): String = "composeflow_project_${userId}_$projectId"
 
-    private fun userProjectsKey(userId: String): String =
-        "composeflow_user_projects_$userId"
+    private fun userProjectsKey(userId: String): String = "composeflow_user_projects_$userId"
 
     override suspend fun saveProjectYaml(
         userId: String,
@@ -49,22 +51,24 @@ class WasmProjectSaverImpl : ProjectSaver {
 
         // Save project data
         val nowMillis = Date.now().toLong()
-        val projectData = ProjectData(
-            yamlContent = yamlContent,
-            lastModified = nowMillis
-        )
+        val projectData =
+            ProjectData(
+                yamlContent = yamlContent,
+                lastModified = nowMillis,
+            )
         localStorage[key] = json.encodeToString(projectData)
 
         // Update user's project list
         val projectsKey = userProjectsKey(userId)
-        val existingProjects = try {
-            localStorage[projectsKey]?.let {
-                json.decodeFromString<UserProjects>(it).projectIds
-            } ?: emptySet()
-        } catch (e: Exception) {
-            Logger.w(throwable = e) { "Failed to parse user projects" }
-            emptySet()
-        }
+        val existingProjects =
+            try {
+                localStorage[projectsKey]?.let {
+                    json.decodeFromString<UserProjects>(it).projectIds
+                } ?: emptySet()
+            } catch (e: Exception) {
+                Logger.w(throwable = e) { "Failed to parse user projects" }
+                emptySet()
+            }
 
         val updatedProjects = UserProjects(existingProjects + projectId)
         localStorage[projectsKey] = json.encodeToString(updatedProjects)
@@ -102,13 +106,14 @@ class WasmProjectSaverImpl : ProjectSaver {
 
         // Update user's project list
         val projectsKey = userProjectsKey(userId)
-        val existingProjects = try {
-            localStorage[projectsKey]?.let {
-                json.decodeFromString<UserProjects>(it).projectIds
-            } ?: emptySet()
-        } catch (_: Exception) {
-            emptySet()
-        }
+        val existingProjects =
+            try {
+                localStorage[projectsKey]?.let {
+                    json.decodeFromString<UserProjects>(it).projectIds
+                } ?: emptySet()
+            } catch (_: Exception) {
+                emptySet()
+            }
 
         val updatedProjects = existingProjects - projectId
         if (updatedProjects.isEmpty()) {
