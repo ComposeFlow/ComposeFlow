@@ -5,7 +5,6 @@ plugins {
     id("io.compose.flow.kmp.library")
     id("com.github.gmazzo.buildconfig")
     id("io.compose.flow.publishing")
-    `maven-publish`
 }
 
 kotlin {

@@ -2,7 +2,6 @@ plugins {
     id("io.compose.flow.kmp.library")
     id("org.jetbrains.compose")
     alias(libs.plugins.compose.compiler)
-    `maven-publish`
 }
 
 kotlin {
