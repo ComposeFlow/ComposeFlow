@@ -240,10 +240,26 @@ class LlmRepository(
             val windowedToolArgs = applySlidingWindow(previousToolArgs)
 
             Logger.i("Preparing architecture: $promptString, Retry count: $retryCount")
+
+            val promptWithGuidance =
+                """
+                $promptString
+
+                IMPORTANT: Focus ONLY on preparing the data architecture:
+                - Define data types/models needed across the app
+                - Define app states and state management structure
+
+                DO NOT:
+                - Generate or manipulate UI components
+                - Access screen details or UI elements
+
+                This is a pre-generation phase where only the architectural foundation is being established.
+                """.trimIndent()
+
             val response =
                 client.invokeHandleGeneralRequest(
                     firebaseIdToken = firebaseIdToken,
-                    promptString = "Prepare the project architecture for the following: $promptString",
+                    promptString = promptWithGuidance,
                     projectContextString = projectContext?.toContextString() ?: "",
                     previousToolArgs = windowedToolArgs,
                 )
