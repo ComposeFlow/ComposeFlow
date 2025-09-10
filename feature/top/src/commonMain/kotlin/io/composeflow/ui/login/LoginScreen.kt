@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,8 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.composeflow.LoginResultUiState
 import io.composeflow.Res
@@ -96,16 +97,17 @@ private fun InitialContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize(),
     ) {
-        val density = LocalDensity.current
-        val scale = density.density / 2
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
             modifier = Modifier.width(480.dp),
         ) {
             Image(
                 painter = composeFlowLogoPainter(),
                 contentDescription = stringResource(Res.string.composeflow_main_logo),
-                modifier = Modifier.scale(scale),
+                modifier =
+                    Modifier
+                        .size(width = 400.dp, height = 330.dp),
             )
 
             if (isAuthConfigured) {
@@ -114,13 +116,13 @@ private fun InitialContent(
                     contentDescription = stringResource(Res.string.sign_in_with_google),
                     modifier =
                         Modifier
-                            .scale(scale * 1.7f)
+                            .size(35.dp)
                             .hoverIconClickable()
+                            .clip(MaterialTheme.shapes.large)
                             .clickable {
                                 onGoogleSignInClicked()
                             },
                 )
-
                 Spacer(modifier = Modifier.height(32.dp))
 
                 OrDivider()
