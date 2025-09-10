@@ -1,24 +1,14 @@
 package io.composeflow.ui.login
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.loadImageBitmap
-import androidx.compose.ui.res.useResource
+import io.composeflow.Res
+import io.composeflow.composeflow_logo_with_text
+import io.composeflow.ic_google
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
-actual fun composeFlowLogoPainter(): Painter =
-    remember {
-        useResource("ComposeFlow_inverted_800x600.png") {
-            BitmapPainter(loadImageBitmap(it))
-        }
-    }
+actual fun composeFlowLogoPainter(): Painter = painterResource(Res.drawable.composeflow_logo_with_text)
 
 @Composable
-actual fun googleSignInButtonPainter(): Painter =
-    remember {
-        useResource("btn_google_signin_dark.png") {
-            BitmapPainter(loadImageBitmap(it))
-        }
-    }
+actual fun googleSignInButtonPainter(): Painter = painterResource(Res.drawable.ic_google)
