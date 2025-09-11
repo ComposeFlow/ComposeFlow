@@ -76,6 +76,7 @@ fun <T> TreeView(
     onClick: ((node: Node<T>, ctrl: Boolean, shift: Boolean) -> Unit)? = null,
     onDoubleClick: OnNodeClick<T> = tree::toggleExpansion,
     onLongClick: OnNodeClick<T> = tree::toggleSelection,
+    onRightClick: OnNodeClick<T> = tree::onNodeClick,
     onHover: OnNodeHover<T> = ::onNodeHover,
     style: TreeViewStyle<T> =
         TreeViewStyle(
@@ -103,6 +104,7 @@ fun <T> TreeView(
                 style = style,
                 onClick = onClick,
                 onLongClick = onLongClick,
+                onRightClick = onRightClick,
                 onDoubleClick = onDoubleClick,
                 onHover = onHover,
             )

@@ -174,16 +174,19 @@ fun ComposeNodeTree(
             listState = lazyListState,
             onClick = { treeNode, isCtrlOrMetaPressed, isShitPressed ->
                 project.screenHolder.clearIsFocused()
-
                 val nodes =
                     tree.handleMultipleSelection(treeNode, isCtrlOrMetaPressed, isShitPressed)
                 nodes.forEach {
                     it.content.setFocus()
                 }
             },
+            onRightClick = { node ->
+                project.screenHolder.clearIsFocused()
+                node.content.setFocus()
+                contextMenuExpanded = true
+            },
             onHover = { node, isHovered ->
                 node.content.isHovered.value = isHovered
-
                 tree.setHovered(node, isHovered)
             },
         )
