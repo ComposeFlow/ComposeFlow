@@ -62,7 +62,6 @@ fun LeftNavigationRail(navigator: Navigator) {
                 .fillMaxHeight(),
     ) {
         TopLevelDestination.entries.forEachIndexed { index, item ->
-            @Suppress("KotlinConstantConditions")
             if (BuildConfig.isRelease) {
                 if (item == TopLevelDestination.StringEditor) {
                     return@forEachIndexed
@@ -104,6 +103,7 @@ fun LeftNavigationRail(navigator: Navigator) {
                             Icon(
                                 imageVector = icon,
                                 contentDescription = "icon",
+                                tint = Color.Unspecified,
                                 modifier = Modifier.size(20.dp),
                             )
                         }
