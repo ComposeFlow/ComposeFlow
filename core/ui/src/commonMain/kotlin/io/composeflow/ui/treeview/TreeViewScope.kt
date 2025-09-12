@@ -22,6 +22,7 @@ data class TreeViewScope<T> internal constructor(
     val style: TreeViewStyle<T>,
     val onClick: ((node: Node<T>, ctrl: Boolean, shift: Boolean) -> Unit)? = null,
     val onLongClick: OnNodeClick<T>,
+    val onRightClick: OnNodeClick<T>,
     val onDoubleClick: OnNodeClick<T>,
     val onHover: OnNodeHover<T>,
 )

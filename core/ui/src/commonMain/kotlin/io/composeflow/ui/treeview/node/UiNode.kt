@@ -26,9 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerButton
+import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.isCtrlPressed
 import androidx.compose.ui.input.pointer.isMetaPressed
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.isSecondaryPressed
 import androidx.compose.ui.input.pointer.isShiftPressed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -206,12 +210,21 @@ fun <T> TreeViewScope<T>.clickableNode(
                 awaitPointerEventScope {
                     var lastClickTime = 0L
                     var clickJob: Job? = null
+                    var pressedButton: PointerButton? = null
 
                     while (true) {
                         val event = awaitPointerEvent()
                         val change = event.changes.firstOrNull() ?: continue
-
                         if (change.isConsumed) continue
+
+                        if (change.changedToDownIgnoreConsumed()) {
+                            pressedButton =
+                                when {
+                                    event.buttons.isPrimaryPressed -> PointerButton.Primary
+                                    event.buttons.isSecondaryPressed -> PointerButton.Secondary
+                                    else -> null
+                                }
+                        }
 
                         if (change.changedToUpIgnoreConsumed()) {
                             val now = Clock.System.now().toEpochMilliseconds()
@@ -223,18 +236,27 @@ fun <T> TreeViewScope<T>.clickableNode(
 
                             clickJob?.cancel()
 
-                            if (timeSinceLast.compareTo(doubleClickThreshold) < 0) {
-                                onDoubleClick?.invoke(node)
-                                lastClickTime = 0L
-                            } else {
-                                clickJob =
-                                    launch {
-                                        delay(doubleClickThreshold)
-                                        onClick?.invoke(node, ctrlOrMeta, shift)
+                            when (pressedButton) {
+                                PointerButton.Primary -> {
+                                    if (timeSinceLast < doubleClickThreshold) {
+                                        onDoubleClick?.invoke(node)
+                                        lastClickTime = 0L
+                                    } else {
+                                        clickJob =
+                                            launch {
+                                                delay(doubleClickThreshold)
+                                                onClick?.invoke(node, ctrlOrMeta, shift)
+                                            }
+                                        lastClickTime = now
                                     }
-                                lastClickTime = now
+                                }
+                                PointerButton.Secondary -> {
+                                    onRightClick?.invoke(node)
+                                }
+                                else -> Unit
                             }
 
+                            pressedButton = null
                             change.consume()
                         }
                     }
