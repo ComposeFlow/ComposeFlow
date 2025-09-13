@@ -4,6 +4,7 @@ import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.model.enumwrapper.NodeVisibility
+import io.composeflow.model.enumwrapper.NodeVisibilityPropertyFallbackSerializer
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 import io.composeflow.model.project.CanvasEditable
 import io.composeflow.model.project.Project
@@ -20,6 +21,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("VisibilityParams")
 data class VisibilityParams(
+    @Serializable(with = NodeVisibilityPropertyFallbackSerializer::class)
     val nodeVisibility: AssignableProperty = EnumProperty(value = NodeVisibility.AlwaysVisible),
     val visibilityCondition: AssignableProperty = BooleanProperty.Empty,
     val formFactorVisibility: FormFactorVisibility = FormFactorVisibility(),

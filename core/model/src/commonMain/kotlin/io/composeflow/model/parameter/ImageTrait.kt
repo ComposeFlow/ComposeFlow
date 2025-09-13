@@ -27,6 +27,7 @@ import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.model.enumwrapper.ContentScalePropertyFallbackSerializer
 import io.composeflow.model.enumwrapper.ContentScaleWrapper
 import io.composeflow.model.modifier.ModifierWrapper
 import io.composeflow.model.modifier.generateModifierCode
@@ -51,45 +52,10 @@ import io.composeflow.ui.image.AsyncImage
 import io.composeflow.ui.modifierForCanvas
 import io.composeflow.ui.utils.asImageComposable
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.builtins.nullable
-import kotlinx.serialization.descriptors.SerialDescriptor
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
-
-/**
- * Custom serializer for contentScaleWrapper that falls back to EnumProperty(ContentScaleWrapper.Crop)
- * when serialization/deserialization fails for any reason.
- */
-object ContentScaleWrapperFallbackSerializer : KSerializer<AssignableProperty?> {
-    private val delegateSerializer = AssignableProperty.serializer().nullable
-
-    override val descriptor: SerialDescriptor = delegateSerializer.descriptor
-
-    override fun serialize(
-        encoder: Encoder,
-        value: AssignableProperty?,
-    ) {
-        try {
-            delegateSerializer.serialize(encoder, value)
-        } catch (e: Exception) {
-            // If serialization fails, serialize the fallback value
-            delegateSerializer.serialize(encoder, EnumProperty(ContentScaleWrapper.Crop))
-        }
-    }
-
-    override fun deserialize(decoder: Decoder): AssignableProperty? =
-        try {
-            delegateSerializer.deserialize(decoder)
-        } catch (e: Exception) {
-            // If deserialization fails, return the fallback value
-            EnumProperty(ContentScaleWrapper.Crop)
-        }
-}
 
 @Serializable
 @SerialName("ImageTrait")
@@ -105,7 +71,7 @@ data class ImageTrait(
     val blobInfoWrapper: BlobInfoWrapper? = null,
     val placeholderUrl: PlaceholderUrl = PlaceholderUrl.NoUsage,
     val alignmentWrapper: AlignmentWrapper? = null,
-    @Serializable(with = ContentScaleWrapperFallbackSerializer::class)
+    @Serializable(with = ContentScalePropertyFallbackSerializer::class)
     val contentScaleWrapper: AssignableProperty? = null,
     val alpha: Float? = null,
 ) : ComposeTrait {
