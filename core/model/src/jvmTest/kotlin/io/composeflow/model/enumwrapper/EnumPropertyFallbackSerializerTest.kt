@@ -143,7 +143,7 @@ class EnumPropertyFallbackSerializerTest {
             )
             val wrapper = decodeFromStringWithFallback(Wrapper.serializer(), invalidYaml)
             assertIs<EnumProperty>(wrapper.property)
-            assertEquals(io.composeflow.model.enumwrapper.FontStyleWrapper.Normal, wrapper.property.value)
+            assertEquals(FontStyleWrapper.Normal, wrapper.property.value)
         }
         run {
             @Serializable
@@ -153,7 +153,7 @@ class EnumPropertyFallbackSerializerTest {
             )
             val wrapper = decodeFromStringWithFallback(Wrapper.serializer(), invalidYaml)
             assertIs<EnumProperty>(wrapper.property)
-            assertEquals(io.composeflow.model.enumwrapper.TextAlignWrapper.Start, wrapper.property.value)
+            assertEquals(TextAlignWrapper.Start, wrapper.property.value)
         }
         run {
             @Serializable
@@ -163,7 +163,7 @@ class EnumPropertyFallbackSerializerTest {
             )
             val wrapper = decodeFromStringWithFallback(Wrapper.serializer(), invalidYaml)
             assertIs<EnumProperty>(wrapper.property)
-            assertEquals(io.composeflow.model.enumwrapper.TextOverflowWrapper.Clip, wrapper.property.value)
+            assertEquals(TextOverflowWrapper.Clip, wrapper.property.value)
         }
         run {
             @Serializable
