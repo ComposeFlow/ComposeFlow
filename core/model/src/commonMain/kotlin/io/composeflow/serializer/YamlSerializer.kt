@@ -24,6 +24,7 @@ private val yamlConfiguration =
         breakScalarsAt = Int.MAX_VALUE,
         polymorphismStyle = PolymorphismStyle.Tag,
         encodeDefaults = false,
+        decodeEnumCaseInsensitive = true,
     )
 
 /**

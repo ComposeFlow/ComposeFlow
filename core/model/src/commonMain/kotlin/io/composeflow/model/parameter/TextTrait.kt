@@ -19,10 +19,15 @@ import io.composeflow.Res
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
+import io.composeflow.model.enumwrapper.FontStylePropertyFallbackSerializer
 import io.composeflow.model.enumwrapper.FontStyleWrapper
+import io.composeflow.model.enumwrapper.TextAlignPropertyFallbackSerializer
 import io.composeflow.model.enumwrapper.TextAlignWrapper
+import io.composeflow.model.enumwrapper.TextDecorationPropertyFallbackSerializer
 import io.composeflow.model.enumwrapper.TextDecorationWrapper
+import io.composeflow.model.enumwrapper.TextOverflowPropertyFallbackSerializer
 import io.composeflow.model.enumwrapper.TextOverflowWrapper
+import io.composeflow.model.enumwrapper.TextStylePropertyFallbackSerializer
 import io.composeflow.model.enumwrapper.TextStyleWrapper
 import io.composeflow.model.modifier.generateModifierCode
 import io.composeflow.model.palette.PaletteRenderParams
@@ -53,12 +58,17 @@ data class TextTrait(
     val text: AssignableProperty = StringProperty.StringIntrinsicValue(),
     val placeholderText: PlaceholderText = PlaceholderText.NoUsage,
     val colorWrapper: AssignableProperty? = null,
+    @Serializable(with = FontStylePropertyFallbackSerializer::class)
     val fontStyle: AssignableProperty? = null,
+    @Serializable(with = TextDecorationPropertyFallbackSerializer::class)
     val textDecoration: AssignableProperty? = null,
+    @Serializable(with = TextAlignPropertyFallbackSerializer::class)
     val textAlign: AssignableProperty? = null,
+    @Serializable(with = TextOverflowPropertyFallbackSerializer::class)
     val overflow: AssignableProperty? = null,
     val softWrap: Boolean? = null,
     val maxLines: Int? = null,
+    @Serializable(with = TextStylePropertyFallbackSerializer::class)
     val textStyleWrapper: AssignableProperty? = null,
     val parseHtml: Boolean? = null,
 ) : ComposeTrait {
