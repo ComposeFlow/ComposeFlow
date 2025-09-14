@@ -72,6 +72,13 @@ sealed class ToolArgs {
     ) : ToolArgs()
 
     @Serializable
+    @SerialName("update_trait")
+    data class UpdateTraitArgs(
+        val composeNodeId: String,
+        val traitYaml: String,
+    ) : ToolArgs()
+
+    @Serializable
     @SerialName("move_compose_node_to_container")
     data class MoveComposeNodeToContainerArgs(
         val composeNodeId: String,

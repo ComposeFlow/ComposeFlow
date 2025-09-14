@@ -8,6 +8,7 @@ import io.composeflow.ksp.LlmTool
 import io.composeflow.model.modifier.ModifierWrapper
 import io.composeflow.model.palette.TraitCategory
 import io.composeflow.model.parameter.BottomAppBarTrait
+import io.composeflow.model.parameter.ComposeTrait
 import io.composeflow.model.parameter.FabTrait
 import io.composeflow.model.parameter.NavigationDrawerTrait
 import io.composeflow.model.parameter.TopAppBarTrait
@@ -369,6 +370,52 @@ class UiBuilderOperator {
             result.errorMessages.add("Error removing modifier at index $index: ${e.message}")
         }
         return result
+    }
+
+    @LlmTool(
+        name = "update_trait",
+        description = "Updates the trait of a Compose UI component.",
+    )
+    fun onUpdateTrait(
+        project: Project,
+        @LlmParam(description = "The ID of the node whose trait will be updated.")
+        composeNodeId: String,
+        @LlmParam(description = "The YAML representation of the new trait.")
+        traitYaml: String,
+    ): EventResult {
+        val result = EventResult()
+        try {
+            val node = project.screenHolder.currentEditable().findNodeById(composeNodeId)
+            if (node == null) {
+                Logger.e { "Node with ID $composeNodeId not found." }
+                result.errorMessages.add("Node with ID $composeNodeId not found.")
+                return result
+            }
+
+            val trait: ComposeTrait = decodeFromStringWithFallback(traitYaml)
+            onUpdateTrait(project, composeNodeId, trait)
+        } catch (e: Exception) {
+            Logger.e(e) { "Error updating trait for node $composeNodeId" }
+            // TODO Use string resource for error messages
+            //      https://github.com/ComposeFlow/ComposeFlow/issues/175
+            result.errorMessages.add("Error updating trait: ${e.message}")
+        }
+        return result
+    }
+
+    fun onUpdateTrait(
+        project: Project,
+        composeNodeId: String,
+        trait: ComposeTrait,
+    ) {
+        val node = project.screenHolder.currentEditable().findNodeById(composeNodeId)
+        node?.let {
+            val oldTrait = it.trait.value
+            it.trait.value = trait
+            if (it.label.value == oldTrait.iconText()) {
+                it.label.value = trait.iconText()
+            }
+        }
     }
 
     @LlmTool(
