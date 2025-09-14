@@ -1034,19 +1034,19 @@ fun Modifier.draggableFromPalette(
                 )
             },
             onDragEnd = {
-                paletteDraggable.defaultComposeNode(project)?.let { composeNode ->
-                    composeNode.updateComposeNodeReferencesForTrait()
+                coroutineScope.launch {
+                    paletteDraggable.defaultComposeNode(project)?.let { composeNode ->
+                        composeNode.updateComposeNodeReferencesForTrait()
 
-                    coroutineScope.launch {
                         paletteNodeCallbacks.onComposableDroppedToTarget(
                             localToRoot + (pointerPosition - zoomableContainerStateHolder.offset) / zoomableContainerStateHolder.scale,
                             composeNode,
                         )
                     }
-                }
 
-                paletteNodeCallbacks.onDraggedNodeUpdated(null)
-                paletteNodeCallbacks.onDragEnd()
+                    paletteNodeCallbacks.onDraggedNodeUpdated(null)
+                    paletteNodeCallbacks.onDragEnd()
+                }
             },
         )
     }.onGloballyPositioned {
