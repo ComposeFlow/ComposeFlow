@@ -66,6 +66,13 @@ sealed interface OpenRouterToolResult {
     ) : OpenRouterToolResult
 
     @Serializable
+    data class UpdateTraitArgs(
+        override val tool_name: String = "update_trait",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.UpdateTraitArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
     data class MoveComposeNodeToContainerArgs(
         override val tool_name: String = "move_compose_node_to_container",
         override val tool_call_id: String,

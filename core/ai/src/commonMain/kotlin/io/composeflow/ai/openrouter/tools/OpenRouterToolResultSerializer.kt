@@ -108,6 +108,15 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                             ),
                         )
 
+                    is OpenRouterToolResult.UpdateTraitArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.UpdateTraitArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
                     is OpenRouterToolResult.MoveComposeNodeToContainerArgs ->
                         put(
                             "tool_args",
@@ -430,6 +439,19 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                         processedToolArgsElement,
                     )
                 OpenRouterToolResult.SwapModifiersArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "update_trait" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.UpdateTraitArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.UpdateTraitArgs(
                     tool_name = toolName,
                     tool_call_id = toolCallId,
                     tool_args = toolArgs,

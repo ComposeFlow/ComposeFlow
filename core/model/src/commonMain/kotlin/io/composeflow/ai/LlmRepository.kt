@@ -430,6 +430,11 @@ class LlmRepository(
                 estimatedSize += 40 // fromIndex + toIndex
             }
 
+            is ToolArgs.UpdateTraitArgs -> {
+                estimatedSize += toolArg.composeNodeId.length
+                estimatedSize += toolArg.traitYaml.length
+            }
+
             is ToolArgs.MoveComposeNodeToContainerArgs -> {
                 estimatedSize += toolArg.composeNodeId.length
                 estimatedSize += toolArg.containerNodeId.length

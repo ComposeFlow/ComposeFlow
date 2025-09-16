@@ -93,6 +93,14 @@ class ToolDispatcher(
                 )
             }
 
+            is ToolArgs.UpdateTraitArgs -> {
+                uiBuilderOperator.onUpdateTrait(
+                    project,
+                    toolArgs.composeNodeId,
+                    toolArgs.traitYaml,
+                )
+            }
+
             is ToolArgs.UpdateModifierArgs -> {
                 uiBuilderOperator.onUpdateModifier(
                     project,
