@@ -76,6 +76,7 @@ kotlin {
             implementation(kotlin("test-junit"))
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(compose.desktop.currentOs)
         }
 
         all {
