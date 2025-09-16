@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Change to the root directory of the project
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/.." || exit 1
 
 # Now we're in the root directory, so all paths are relative to the root
 ./gradlew :generate-jsonschema-cli:run
@@ -22,38 +22,44 @@ COMPOSEFLOW_API_DIR="${COMPOSEFLOW_API_DIR:-../composeflow-api-ts}"
 PROMPTS_DIR="$COMPOSEFLOW_API_DIR/prompts"
 EXAMPLE_YAML_DIR="$PROMPTS_DIR/example_yaml"
 
-# Move minified_schema.json to composeflow-api-ts if the directory exists
+# Move Schema files to composeflow-api-ts if the directory exists
+SCHEMA_FILES=(
+    "minified_schema.json"
+    "ai_response_schema.json"
+    "create_project_ai_response_schema.json"
+)
 if [ -d "$PROMPTS_DIR" ]; then
-    echo "Moving minified_schema.json to $PROMPTS_DIR..."
-    if [ -f "minified_schema.json" ]; then
-        cp "minified_schema.json" "$PROMPTS_DIR/"
-        echo "✓ Copied minified_schema.json"
-    else
-        echo "⚠ minified_schema.json not found"
-    fi
+    echo "Moving schema files to $PROMPTS_DIR..."
+
+    for schema_file in "${SCHEMA_FILES[@]}"; do
+        if [ -f "$schema_file" ]; then
+            cp "$schema_file" "$PROMPTS_DIR/"
+            echo "✓ Copied $schema_file"
+        else
+            echo "⚠ $schema_file not found"
+        fi
+    done
 else
-    echo "⚠ Target directory $PROMPTS_DIR does not exist, skipping minified_schema.json move"
+    echo "⚠ Target directory $PROMPTS_DIR does not exist, skipping schema files move"
 fi
 
 # Move YAML template files to composeflow-api-ts if the directory exists
+YAML_TEMPLATES=(
+    "core/model/src/commonMain/resources/login_screen_template.yaml"
+    "core/model/src/commonMain/resources/messages_screen_template.yaml"
+)
 if [ -d "$EXAMPLE_YAML_DIR" ]; then
     echo "Moving YAML template files to $EXAMPLE_YAML_DIR..."
-    
-    # Move login screen template
-    if [ -f "core/model/src/commonMain/resources/login_screen_template.yaml" ]; then
-        cp "core/model/src/commonMain/resources/login_screen_template.yaml" "$EXAMPLE_YAML_DIR/"
-        echo "✓ Copied login_screen_template.yaml"
-    else
-        echo "⚠ login_screen_template.yaml not found"
-    fi
-    
-    # Move messages screen template
-    if [ -f "core/model/src/commonMain/resources/messages_screen_template.yaml" ]; then
-        cp "core/model/src/commonMain/resources/messages_screen_template.yaml" "$EXAMPLE_YAML_DIR/"
-        echo "✓ Copied messages_screen_template.yaml"
-    else
-        echo "⚠ messages_screen_template.yaml not found"
-    fi
+
+    for yaml_path in "${YAML_TEMPLATES[@]}"; do
+        yaml_file=$(basename "$yaml_path")
+        if [ -f "$yaml_path" ]; then
+            cp "$yaml_path" "$EXAMPLE_YAML_DIR/"
+            echo "✓ Copied $yaml_file"
+        else
+            echo "⚠ $yaml_file not found at $yaml_path"
+        fi
+    done
 else
     echo "⚠ Target directory $EXAMPLE_YAML_DIR does not exist, skipping YAML file move"
 fi
