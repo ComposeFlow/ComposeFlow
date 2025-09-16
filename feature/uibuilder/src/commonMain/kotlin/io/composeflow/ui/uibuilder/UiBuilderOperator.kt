@@ -3,6 +3,21 @@ package io.composeflow.ui.uibuilder
 import co.touchlab.kermit.Logger
 import io.composeflow.Res
 import io.composeflow.can_not_add_this_node
+import io.composeflow.error_adding_compose_node_to_container
+import io.composeflow.error_adding_modifier_to_node
+import io.composeflow.error_cannot_drop_node_to
+import io.composeflow.error_container_node_not_found
+import io.composeflow.error_invalid_modifier_index
+import io.composeflow.error_listing_screens
+import io.composeflow.error_moving_component_to_position
+import io.composeflow.error_node_not_found
+import io.composeflow.error_removing_modifier_at_index
+import io.composeflow.error_retrieving_project_issues
+import io.composeflow.error_retrieving_screen_details
+import io.composeflow.error_screen_not_found
+import io.composeflow.error_swapping_modifiers
+import io.composeflow.error_updating_modifier_at_index
+import io.composeflow.error_updating_trait
 import io.composeflow.ksp.LlmParam
 import io.composeflow.ksp.LlmTool
 import io.composeflow.model.modifier.ModifierWrapper
@@ -42,7 +57,7 @@ class UiBuilderOperator {
         val containerNode = project.screenHolder.currentEditable().findNodeById(containerNodeId)
         if (containerNode == null) {
             eventResult.errorMessages.add(
-                "Container node with ID $containerNodeId not found.",
+                getString(Res.string.error_container_node_not_found, containerNodeId),
             )
             return eventResult
         }
@@ -53,7 +68,7 @@ class UiBuilderOperator {
         }
         if (!containerNode.trait.value.isDroppable()) {
             eventResult.errorMessages.add(
-                "You can't drop a node to ${containerNode.trait.value.iconText()}",
+                getString(Res.string.error_cannot_drop_node_to, containerNode.trait.value.iconText()),
             )
             return eventResult
         }
@@ -139,7 +154,7 @@ class UiBuilderOperator {
             }
         } catch (e: Exception) {
             Logger.e(e) { "Error adding compose node to container" }
-            result.errorMessages.add("Error adding compose node to container: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_adding_compose_node_to_container, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -253,7 +268,7 @@ class UiBuilderOperator {
         name = "add_modifier",
         description = "Adds a new modifier to a Compose UI component. Modifiers are used to change the appearance or behavior of components, such as adding padding, setting size, or changing colors.",
     )
-    fun onAddModifier(
+    suspend fun onAddModifier(
         project: Project,
         @LlmParam(description = "The ID of the node to add the modifier to.")
         composeNodeId: String,
@@ -265,7 +280,7 @@ class UiBuilderOperator {
             val node = project.screenHolder.currentEditable().findNodeById(composeNodeId)
             if (node == null) {
                 Logger.e { "Node with ID $composeNodeId not found." }
-                result.errorMessages.add("Node with ID $composeNodeId not found.")
+                result.errorMessages.add(getString(Res.string.error_node_not_found, composeNodeId))
                 return result
             }
 
@@ -277,7 +292,7 @@ class UiBuilderOperator {
             )
         } catch (e: Exception) {
             Logger.e(e) { "Error adding modifier to node" }
-            result.errorMessages.add("Error adding modifier to node: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_adding_modifier_to_node, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -295,7 +310,7 @@ class UiBuilderOperator {
         name = "update_modifier",
         description = "Updates an existing modifier on a Compose UI component at a specific index.",
     )
-    fun onUpdateModifier(
+    suspend fun onUpdateModifier(
         project: Project,
         @LlmParam(description = "The ID of the node whose modifier will be updated.")
         composeNodeId: String,
@@ -309,13 +324,13 @@ class UiBuilderOperator {
             val node = project.screenHolder.currentEditable().findNodeById(composeNodeId)
             if (node == null) {
                 Logger.e { "Node with ID $composeNodeId not found." }
-                result.errorMessages.add("Node with ID $composeNodeId not found.")
+                result.errorMessages.add(getString(Res.string.error_node_not_found, composeNodeId))
                 return result
             }
 
             if (index < 0 || index >= node.modifierList.size) {
                 Logger.e { "Invalid modifier index: $index. Node has ${node.modifierList.size} modifiers." }
-                result.errorMessages.add("Invalid modifier index: $index. Node has ${node.modifierList.size} modifiers.")
+                result.errorMessages.add(getString(Res.string.error_invalid_modifier_index, index, node.modifierList.size))
                 return result
             }
 
@@ -323,7 +338,7 @@ class UiBuilderOperator {
             onUpdateModifier(project, composeNodeId, index, modifier)
         } catch (e: Exception) {
             Logger.e(e) { "Error updating modifier at index $index" }
-            result.errorMessages.add("Error updating modifier at index $index: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_updating_modifier_at_index, index, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -342,7 +357,7 @@ class UiBuilderOperator {
         name = "remove_modifier",
         description = "Removes a modifier from a Compose UI component at a specific index.",
     )
-    fun onRemoveModifier(
+    suspend fun onRemoveModifier(
         project: Project,
         @LlmParam(description = "The ID of the node whose modifier will be removed.")
         composeNodeId: String,
@@ -354,20 +369,20 @@ class UiBuilderOperator {
             val node = project.screenHolder.currentEditable().findNodeById(composeNodeId)
             if (node == null) {
                 Logger.e { "Node with ID $composeNodeId not found." }
-                result.errorMessages.add("Node with ID $composeNodeId not found.")
+                result.errorMessages.add(getString(Res.string.error_node_not_found, composeNodeId))
                 return result
             }
 
             if (index < 0 || index >= node.modifierList.size) {
                 Logger.e { "Invalid modifier index: $index. Node has ${node.modifierList.size} modifiers." }
-                result.errorMessages.add("Invalid modifier index: $index. Node has ${node.modifierList.size} modifiers.")
+                result.errorMessages.add(getString(Res.string.error_invalid_modifier_index, index, node.modifierList.size))
                 return result
             }
 
             node.modifierList.removeAt(index)
         } catch (e: Exception) {
             Logger.e(e) { "Error removing modifier at index $index" }
-            result.errorMessages.add("Error removing modifier at index $index: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_removing_modifier_at_index, index, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -376,7 +391,7 @@ class UiBuilderOperator {
         name = "update_trait",
         description = "Updates the trait of a Compose UI component.",
     )
-    fun onUpdateTrait(
+    suspend fun onUpdateTrait(
         project: Project,
         @LlmParam(description = "The ID of the node whose trait will be updated.")
         composeNodeId: String,
@@ -388,7 +403,7 @@ class UiBuilderOperator {
             val node = project.screenHolder.currentEditable().findNodeById(composeNodeId)
             if (node == null) {
                 Logger.e { "Node with ID $composeNodeId not found." }
-                result.errorMessages.add("Node with ID $composeNodeId not found.")
+                result.errorMessages.add(getString(Res.string.error_node_not_found, composeNodeId))
                 return result
             }
 
@@ -396,9 +411,7 @@ class UiBuilderOperator {
             onUpdateTrait(project, composeNodeId, trait)
         } catch (e: Exception) {
             Logger.e(e) { "Error updating trait for node $composeNodeId" }
-            // TODO Use string resource for error messages
-            //      https://github.com/ComposeFlow/ComposeFlow/issues/175
-            result.errorMessages.add("Error updating trait: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_updating_trait, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -422,7 +435,7 @@ class UiBuilderOperator {
         name = "swap_modifiers",
         description = "Swaps the positions of two modifiers on a Compose UI component.",
     )
-    fun onSwapModifiers(
+    suspend fun onSwapModifiers(
         project: Project,
         @LlmParam(description = "The ID of the node whose modifiers will be swapped.")
         composeNodeId: String,
@@ -436,7 +449,7 @@ class UiBuilderOperator {
             val node = project.screenHolder.currentEditable().findNodeById(composeNodeId)
             if (node == null) {
                 Logger.e { "Node with ID $composeNodeId not found." }
-                result.errorMessages.add("Node with ID $composeNodeId not found.")
+                result.errorMessages.add(getString(Res.string.error_node_not_found, composeNodeId))
                 return result
             }
 
@@ -446,9 +459,7 @@ class UiBuilderOperator {
                 toIndex >= node.modifierList.size
             ) {
                 Logger.e { "Invalid modifier indices: from=$fromIndex, to=$toIndex. Node has ${node.modifierList.size} modifiers." }
-                result.errorMessages.add(
-                    "Invalid modifier indices: from=$fromIndex, to=$toIndex. Node has ${node.modifierList.size} modifiers.",
-                )
+                result.errorMessages.add(getString(Res.string.error_invalid_modifier_index, fromIndex, node.modifierList.size))
                 return result
             }
 
@@ -457,7 +468,7 @@ class UiBuilderOperator {
             node.modifierList.add(toIndex, item)
         } catch (e: Exception) {
             Logger.e(e) { "Error swapping modifiers at indices $fromIndex and $toIndex" }
-            result.errorMessages.add("Error swappigng modifiers at indices $fromIndex and $toIndex: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_swapping_modifiers, fromIndex, toIndex, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -466,7 +477,7 @@ class UiBuilderOperator {
         name = "move_compose_node_to_container",
         description = "Moves a UI component to a specific position within a container component. This allows reordering components within their parent container or moving them to a different container.",
     )
-    fun onMoveComposeNodeToContainer(
+    suspend fun onMoveComposeNodeToContainer(
         project: Project,
         @LlmParam(description = "The ID of the node to be moved.")
         composeNodeId: String,
@@ -485,10 +496,12 @@ class UiBuilderOperator {
         try {
             val composeNode =
                 project.screenHolder.currentEditable().findNodeById(composeNodeId)
-                    ?: return EventResult().also { it.errorMessages.add("Node '$composeNodeId' not found") }
+                    ?: return eventResult.also { it.errorMessages.add(getString(Res.string.error_node_not_found, composeNodeId)) }
             val containerNode =
                 project.screenHolder.currentEditable().findNodeById(containerNodeId)
-                    ?: return EventResult().also { it.errorMessages.add("Container '$containerNodeId' not found") }
+                    ?: return eventResult.also {
+                        it.errorMessages.add(getString(Res.string.error_container_node_not_found, containerNodeId))
+                    }
             containerNode.insertChildAt(index = index, child = composeNode)
             if (containerNode == composeNode.parentNode) {
                 // This means two identical nodes exist at the same time before the old node is
@@ -500,12 +513,12 @@ class UiBuilderOperator {
             }
         } catch (e: Exception) {
             Logger.e(e) { "Error moving component to position" }
-            eventResult.errorMessages.add("Error moving component to position: ${e.message}")
+            eventResult.errorMessages.add(getString(Res.string.error_moving_component_to_position, e.message ?: "Unknown error"))
         }
         return eventResult
     }
 
-    fun onPreMoveComposeNodeToPosition(
+    suspend fun onPreMoveComposeNodeToPosition(
         project: Project,
         composeNodeId: String,
         containerNodeId: String,
@@ -513,10 +526,10 @@ class UiBuilderOperator {
         val result = EventResult()
         val composeNode =
             project.screenHolder.currentEditable().findNodeById(composeNodeId)
-                ?: return result.also { it.errorMessages.add("Node '$composeNodeId' not found") }
+                ?: return result.also { it.errorMessages.add(getString(Res.string.error_node_not_found, composeNodeId)) }
         val containerNode =
             project.screenHolder.currentEditable().findNodeById(containerNodeId)
-                ?: return result.also { it.errorMessages.add("Node '$containerNodeId' not found") }
+                ?: return result.also { it.errorMessages.add(getString(Res.string.error_container_node_not_found, containerNodeId)) }
         val errorMessages = composeNode.checkConstraints(containerNode)
         if (errorMessages.isNotEmpty()) {
             result.errorMessages.addAll(errorMessages)
@@ -528,7 +541,7 @@ class UiBuilderOperator {
         name = "get_project_issues",
         description = "Retrieves all current issues in the project including invalid references, type mismatches, configuration problems, and other validation errors. This helps identify and resolve problems in the UI design.",
     )
-    fun onGetProjectIssues(project: Project): EventResult {
+    suspend fun onGetProjectIssues(project: Project): EventResult {
         val result = EventResult()
         try {
             val issues = project.generateTrackableIssues()
@@ -548,7 +561,7 @@ class UiBuilderOperator {
             }
         } catch (e: Exception) {
             Logger.e(e) { "Error retrieving project issues" }
-            result.errorMessages.add("Error retrieving project issues: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_retrieving_project_issues, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -557,7 +570,7 @@ class UiBuilderOperator {
         name = "list_screens",
         description = "Lists all screens in the project with their IDs and names. This helps understand the available screens in the project for navigation and modification purposes.",
     )
-    fun onListScreens(project: Project): EventResult {
+    suspend fun onListScreens(project: Project): EventResult {
         val result = EventResult()
         try {
             val screens = project.screenHolder.screens
@@ -573,7 +586,7 @@ class UiBuilderOperator {
             // Success - no action needed, data will be stored in ToolArgs.result by ToolDispatcher
         } catch (e: Exception) {
             Logger.e(e) { "Error listing screens" }
-            result.errorMessages.add("Error listing screens: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_listing_screens, e.message ?: "Unknown error"))
         }
         return result
     }
@@ -582,7 +595,7 @@ class UiBuilderOperator {
         name = "get_screen_details",
         description = "Retrieves detailed information about a specific screen including its complete structure as YAML. This provides full access to screen configuration, components, and state for analysis or modification.",
     )
-    fun onGetScreenDetails(
+    suspend fun onGetScreenDetails(
         project: Project,
         @LlmParam(description = "The ID of the screen to retrieve details for.")
         screenId: String,
@@ -592,14 +605,14 @@ class UiBuilderOperator {
             val screen = project.screenHolder.findScreen(screenId)
             if (screen == null) {
                 Logger.e { "Screen with ID '$screenId' not found" }
-                result.errorMessages.add("Screen with ID '$screenId' not found")
+                result.errorMessages.add(getString(Res.string.error_screen_not_found, screenId))
             } else {
                 Logger.i { "Retrieved details for screen: ${screen.name} (${screen.id})" }
                 // Success - screen details will be stored in ToolArgs.result by ToolDispatcher
             }
         } catch (e: Exception) {
             Logger.e(e) { "Error retrieving screen details for ID: $screenId" }
-            result.errorMessages.add("Error retrieving screen details: ${e.message}")
+            result.errorMessages.add(getString(Res.string.error_retrieving_screen_details, e.message ?: "Unknown error"))
         }
         return result
     }
