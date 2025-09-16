@@ -175,170 +175,180 @@ class UiBuilderOperatorTest {
     // ========== Modifier Tests - LLM Methods ==========
 
     @Test
-    fun testOnAddModifier_NodeNotFound() {
-        val modifier = createPaddingModifier()
-        val modifierYaml = encodeToString(modifier)
+    fun testOnAddModifier_NodeNotFound() =
+        runTest {
+            val modifier = createPaddingModifier()
+            val modifierYaml = encodeToString(modifier)
 
-        val result =
-            uiBuilderOperator.onAddModifier(
-                project = project,
-                composeNodeId = "non-existent-id",
-                modifierYaml = modifierYaml,
-            )
+            val result =
+                uiBuilderOperator.onAddModifier(
+                    project = project,
+                    composeNodeId = "non-existent-id",
+                    modifierYaml = modifierYaml,
+                )
 
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("not found"))
-    }
-
-    @Test
-    fun testOnUpdateModifier_NodeNotFound() {
-        val modifier = createPaddingModifier()
-        val modifierYaml = encodeToString(modifier)
-
-        val result =
-            uiBuilderOperator.onUpdateModifier(
-                project = project,
-                composeNodeId = "non-existent-id",
-                index = 0,
-                modifierYaml = modifierYaml,
-            )
-
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("not found"))
-    }
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("not found"))
+        }
 
     @Test
-    fun testOnUpdateModifier_InvalidIndex() {
-        val node = createButtonNode()
-        rootNode.addChild(node)
-        val modifier = createPaddingModifier()
-        val modifierYaml = encodeToString(modifier)
+    fun testOnUpdateModifier_NodeNotFound() =
+        runTest {
+            val modifier = createPaddingModifier()
+            val modifierYaml = encodeToString(modifier)
 
-        val result =
-            uiBuilderOperator.onUpdateModifier(
-                project = project,
-                composeNodeId = node.id,
-                index = 5, // Invalid index for empty modifier list
-                modifierYaml = modifierYaml,
-            )
+            val result =
+                uiBuilderOperator.onUpdateModifier(
+                    project = project,
+                    composeNodeId = "non-existent-id",
+                    index = 0,
+                    modifierYaml = modifierYaml,
+                )
 
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("Invalid modifier index"))
-    }
-
-    @Test
-    fun testOnRemoveModifier_NodeNotFound() {
-        val result =
-            uiBuilderOperator.onRemoveModifier(
-                project = project,
-                composeNodeId = "non-existent-id",
-                index = 0,
-            )
-
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("not found"))
-    }
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("not found"))
+        }
 
     @Test
-    fun testOnRemoveModifier_InvalidIndex() {
-        val node = createButtonNode()
-        rootNode.addChild(node)
+    fun testOnUpdateModifier_InvalidIndex() =
+        runTest {
+            val node = createButtonNode()
+            rootNode.addChild(node)
+            val modifier = createPaddingModifier()
+            val modifierYaml = encodeToString(modifier)
 
-        // Clear any default modifiers to ensure we're testing with no modifiers
-        node.modifierList.clear()
+            val result =
+                uiBuilderOperator.onUpdateModifier(
+                    project = project,
+                    composeNodeId = node.id,
+                    index = 5, // Invalid index for empty modifier list
+                    modifierYaml = modifierYaml,
+                )
 
-        val result =
-            uiBuilderOperator.onRemoveModifier(
-                project = project,
-                composeNodeId = node.id,
-                index = 0, // No modifiers exist
-            )
-
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("Invalid modifier index"))
-    }
-
-    @Test
-    fun testOnSwapModifiers_NodeNotFound() {
-        val result =
-            uiBuilderOperator.onSwapModifiers(
-                project = project,
-                composeNodeId = "non-existent-id",
-                fromIndex = 0,
-                toIndex = 1,
-            )
-
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("not found"))
-    }
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("Invalid modifier index"))
+        }
 
     @Test
-    fun testOnSwapModifiers_InvalidIndices() {
-        val node = createButtonNode()
-        rootNode.addChild(node)
-        val modifier = createPaddingModifier()
-        node.modifierList.add(modifier)
+    fun testOnRemoveModifier_NodeNotFound() =
+        runTest {
+            val result =
+                uiBuilderOperator.onRemoveModifier(
+                    project = project,
+                    composeNodeId = "non-existent-id",
+                    index = 0,
+                )
 
-        val result =
-            uiBuilderOperator.onSwapModifiers(
-                project = project,
-                composeNodeId = node.id,
-                fromIndex = 0,
-                toIndex = 5, // Invalid index
-            )
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("not found"))
+        }
 
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("Invalid modifier indices"))
-    }
+    @Test
+    fun testOnRemoveModifier_InvalidIndex() =
+        runTest {
+            val node = createButtonNode()
+            rootNode.addChild(node)
+
+            // Clear any default modifiers to ensure we're testing with no modifiers
+            node.modifierList.clear()
+
+            val result =
+                uiBuilderOperator.onRemoveModifier(
+                    project = project,
+                    composeNodeId = node.id,
+                    index = 0, // No modifiers exist
+                )
+
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("Invalid modifier index"))
+        }
+
+    @Test
+    fun testOnSwapModifiers_NodeNotFound() =
+        runTest {
+            val result =
+                uiBuilderOperator.onSwapModifiers(
+                    project = project,
+                    composeNodeId = "non-existent-id",
+                    fromIndex = 0,
+                    toIndex = 1,
+                )
+
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("not found"))
+        }
+
+    @Test
+    fun testOnSwapModifiers_InvalidIndices() =
+        runTest {
+            val node = createButtonNode()
+            rootNode.addChild(node)
+            val modifier = createPaddingModifier()
+            node.modifierList.add(modifier)
+
+            val result =
+                uiBuilderOperator.onSwapModifiers(
+                    project = project,
+                    composeNodeId = node.id,
+                    fromIndex = 0,
+                    toIndex = 5, // Invalid index
+                )
+
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("Invalid modifier indices"))
+        }
 
     // ========== Node Movement Tests ==========
 
     @Test
-    fun testOnPreMoveComposeNodeToPosition_NodeNotFound() {
-        val container = createColumnNode()
-        rootNode.addChild(container)
+    fun testOnPreMoveComposeNodeToPosition_NodeNotFound() =
+        runTest {
+            val container = createColumnNode()
+            rootNode.addChild(container)
 
-        val result =
-            uiBuilderOperator.onPreMoveComposeNodeToPosition(
-                project = project,
-                composeNodeId = "non-existent-id",
-                containerNodeId = container.id,
-            )
+            val result =
+                uiBuilderOperator.onPreMoveComposeNodeToPosition(
+                    project = project,
+                    composeNodeId = "non-existent-id",
+                    containerNodeId = container.id,
+                )
 
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("not found"))
-    }
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("not found"))
+        }
 
     @Test
-    fun testOnPreMoveComposeNodeToPosition_ContainerNotFound() {
-        val nodeToMove = createButtonNode()
-        rootNode.addChild(nodeToMove)
+    fun testOnPreMoveComposeNodeToPosition_ContainerNotFound() =
+        runTest {
+            val nodeToMove = createButtonNode()
+            rootNode.addChild(nodeToMove)
 
-        val result =
-            uiBuilderOperator.onPreMoveComposeNodeToPosition(
-                project = project,
-                composeNodeId = nodeToMove.id,
-                containerNodeId = "non-existent-id",
-            )
+            val result =
+                uiBuilderOperator.onPreMoveComposeNodeToPosition(
+                    project = project,
+                    composeNodeId = nodeToMove.id,
+                    containerNodeId = "non-existent-id",
+                )
 
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("not found"))
-    }
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("not found"))
+        }
 
     // ========== Error Handling Tests ==========
 
     @Test
-    fun testInvalidYamlHandling() {
-        val result =
-            uiBuilderOperator.onAddModifier(
-                project = project,
-                composeNodeId = "some-id",
-                modifierYaml = "invalid-yaml-content",
-            )
+    fun testInvalidYamlHandling() =
+        runTest {
+            val result =
+                uiBuilderOperator.onAddModifier(
+                    project = project,
+                    composeNodeId = "some-id",
+                    modifierYaml = "invalid-yaml-content",
+                )
 
-        // Should have error messages due to invalid YAML or missing node
-        assertFalse(result.errorMessages.isEmpty())
-    }
+            // Should have error messages due to invalid YAML or missing node
+            assertFalse(result.errorMessages.isEmpty())
+        }
 
     // ========== Serialization Tests ==========
 
@@ -622,366 +632,384 @@ class UiBuilderOperatorTest {
         }
 
     @Test
-    fun testAddComposeNode_MoveOperation_DoesNotApplyIdUniqueness() {
-        // Test that move operations currently don't apply ID uniqueness logic
-        // (This is documenting current behavior - move operations should potentially
-        // be enhanced to apply ID uniqueness in the future)
-        val column1 = createColumnNode().copy(id = "Column1")
-        val column2 = createColumnNode().copy(id = "Column2")
-        val sharedId = "MovedButton"
+    fun testAddComposeNode_MoveOperation_DoesNotApplyIdUniqueness() =
+        runTest {
+            // Test that move operations currently don't apply ID uniqueness logic
+            // (This is documenting current behavior - move operations should potentially
+            // be enhanced to apply ID uniqueness in the future)
+            val column1 = createColumnNode().copy(id = "Column1")
+            val column2 = createColumnNode().copy(id = "Column2")
+            val sharedId = "MovedButton"
 
-        // Setup: both columns have buttons with the same ID
-        val button1 = createButtonNode().copy(id = sharedId)
-        val button2 = createButtonNode().copy(id = sharedId)
+            // Setup: both columns have buttons with the same ID
+            val button1 = createButtonNode().copy(id = sharedId)
+            val button2 = createButtonNode().copy(id = sharedId)
 
-        rootNode.addChild(column1)
-        rootNode.addChild(column2)
-        column1.addChild(button1)
-        column2.addChild(button2)
+            rootNode.addChild(column1)
+            rootNode.addChild(column2)
+            column1.addChild(button1)
+            column2.addChild(button2)
 
-        // Move button from column1 to column2 (this will create ID conflict)
-        val result =
-            uiBuilderOperator.onMoveComposeNodeToContainer(
-                project = project,
-                composeNodeId = button1.id,
-                containerNodeId = column2.id,
-                index = 0,
-            )
+            // Move button from column1 to column2 (this will create ID conflict)
+            val result =
+                uiBuilderOperator.onMoveComposeNodeToContainer(
+                    project = project,
+                    composeNodeId = button1.id,
+                    containerNodeId = column2.id,
+                    index = 0,
+                )
 
-        assertTrue(result.isSuccessful())
+            assertTrue(result.isSuccessful())
 
-        // Currently, move operations don't apply ID uniqueness, so we may have duplicates
-        // column2 should now have 2 buttons
-        assertTrue(column2.children.size == 2)
+            // Currently, move operations don't apply ID uniqueness, so we may have duplicates
+            // column2 should now have 2 buttons
+            assertTrue(column2.children.size == 2)
 
-        // Both buttons may have the same ID (current behavior)
-        val button1InColumn2 = column2.children[0]
-        val button2InColumn2 = column2.children[1]
+            // Both buttons may have the same ID (current behavior)
+            val button1InColumn2 = column2.children[0]
+            val button2InColumn2 = column2.children[1]
 
-        // The moved button should be the first child
-        assertTrue(button1InColumn2.id == sharedId)
-        assertTrue(button2InColumn2.id == sharedId)
+            // The moved button should be the first child
+            assertTrue(button1InColumn2.id == sharedId)
+            assertTrue(button2InColumn2.id == sharedId)
 
-        // Note: This test documents current behavior. In the future, move operations
-        // could be enhanced to apply ID uniqueness similar to add operations.
-    }
+            // Note: This test documents current behavior. In the future, move operations
+            // could be enhanced to apply ID uniqueness similar to add operations.
+        }
 
     // ========== Project Issues Tests ==========
 
     @Test
-    fun testOnGetProjectIssues_EmptyProject() {
-        val result = uiBuilderOperator.onGetProjectIssues(project)
+    fun testOnGetProjectIssues_EmptyProject() =
+        runTest {
+            val result = uiBuilderOperator.onGetProjectIssues(project)
 
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-        // Empty project should have no issues or very minimal issues
-        assertTrue(result.issues.isEmpty() || result.issues.size <= 1)
-    }
-
-    @Test
-    fun testOnGetProjectIssues_ValidProject() {
-        // Add some valid nodes to the project
-        val containerNode = createColumnNode()
-        val buttonNode = createButtonNode()
-        rootNode.addChild(containerNode)
-        containerNode.addChild(buttonNode)
-
-        val result = uiBuilderOperator.onGetProjectIssues(project)
-
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-        // Valid project structure should have minimal or no issues
-        assertTrue(result.issues.size >= 0) // Allow for any number of issues
-    }
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+            // Empty project should have no issues or very minimal issues
+            assertTrue(result.issues.isEmpty() || result.issues.size <= 1)
+        }
 
     @Test
-    fun testOnGetProjectIssues_WithValidNodes_ReturnsSuccessfully() {
-        // Create a more complex but valid structure
-        val columnNode = createColumnNode()
-        val buttonNode = createButtonNode()
-        val textNode = createTextNode()
+    fun testOnGetProjectIssues_ValidProject() =
+        runTest {
+            // Add some valid nodes to the project
+            val containerNode = createColumnNode()
+            val buttonNode = createButtonNode()
+            rootNode.addChild(containerNode)
+            containerNode.addChild(buttonNode)
 
-        rootNode.addChild(columnNode)
-        columnNode.addChild(buttonNode)
-        columnNode.addChild(textNode)
+            val result = uiBuilderOperator.onGetProjectIssues(project)
 
-        val result = uiBuilderOperator.onGetProjectIssues(project)
-
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-        assertNotNull(result.issues) // Issues list should be initialized
-    }
-
-    @Test
-    fun testOnGetProjectIssues_ReturnsEventResultWithIssues() {
-        val result = uiBuilderOperator.onGetProjectIssues(project)
-
-        // Verify the result structure
-        assertNotNull(result)
-        assertNotNull(result.issues)
-        assertNotNull(result.errorMessages)
-
-        // Should succeed regardless of number of issues
-        assertTrue(result.errorMessages.isEmpty())
-    }
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+            // Valid project structure should have minimal or no issues
+            assertTrue(result.issues.size >= 0) // Allow for any number of issues
+        }
 
     @Test
-    fun testOnGetProjectIssues_WithNestedStructure() {
-        // Create nested structure to test issue detection across hierarchy
-        val outerColumn = createColumnNode()
-        val innerColumn = createColumnNode()
-        val button1 = createButtonNode()
-        val button2 = createButtonNode()
+    fun testOnGetProjectIssues_WithValidNodes_ReturnsSuccessfully() =
+        runTest {
+            // Create a more complex but valid structure
+            val columnNode = createColumnNode()
+            val buttonNode = createButtonNode()
+            val textNode = createTextNode()
 
-        rootNode.addChild(outerColumn)
-        outerColumn.addChild(innerColumn)
-        innerColumn.addChild(button1)
-        outerColumn.addChild(button2)
+            rootNode.addChild(columnNode)
+            columnNode.addChild(buttonNode)
+            columnNode.addChild(textNode)
 
-        val result = uiBuilderOperator.onGetProjectIssues(project)
+            val result = uiBuilderOperator.onGetProjectIssues(project)
 
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-        assertNotNull(result.issues)
-    }
-
-    @Test
-    fun testOnGetProjectIssues_WithScreenOnlyNodes() {
-        // Test with screen-only nodes like FAB
-        val fabNode = createFabNode()
-        screen.fabNode.value = fabNode
-
-        val result = uiBuilderOperator.onGetProjectIssues(project)
-
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-        assertNotNull(result.issues)
-    }
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+            assertNotNull(result.issues) // Issues list should be initialized
+        }
 
     @Test
-    fun testOnGetProjectIssues_ConsistentResults() {
-        // Test that calling the method multiple times returns consistent results
-        val result1 = uiBuilderOperator.onGetProjectIssues(project)
-        val result2 = uiBuilderOperator.onGetProjectIssues(project)
+    fun testOnGetProjectIssues_ReturnsEventResultWithIssues() =
+        runTest {
+            val result = uiBuilderOperator.onGetProjectIssues(project)
 
-        assertTrue(result1.isSuccessful())
-        assertTrue(result2.isSuccessful())
+            // Verify the result structure
+            assertNotNull(result)
+            assertNotNull(result.issues)
+            assertNotNull(result.errorMessages)
 
-        // Both calls should return the same number of issues for the same project state
-        assertTrue(result1.issues.size == result2.issues.size)
-    }
+            // Should succeed regardless of number of issues
+            assertTrue(result.errorMessages.isEmpty())
+        }
+
+    @Test
+    fun testOnGetProjectIssues_WithNestedStructure() =
+        runTest {
+            // Create nested structure to test issue detection across hierarchy
+            val outerColumn = createColumnNode()
+            val innerColumn = createColumnNode()
+            val button1 = createButtonNode()
+            val button2 = createButtonNode()
+
+            rootNode.addChild(outerColumn)
+            outerColumn.addChild(innerColumn)
+            innerColumn.addChild(button1)
+            outerColumn.addChild(button2)
+
+            val result = uiBuilderOperator.onGetProjectIssues(project)
+
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+            assertNotNull(result.issues)
+        }
+
+    @Test
+    fun testOnGetProjectIssues_WithScreenOnlyNodes() =
+        runTest {
+            // Test with screen-only nodes like FAB
+            val fabNode = createFabNode()
+            screen.fabNode.value = fabNode
+
+            val result = uiBuilderOperator.onGetProjectIssues(project)
+
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+            assertNotNull(result.issues)
+        }
+
+    @Test
+    fun testOnGetProjectIssues_ConsistentResults() =
+        runTest {
+            // Test that calling the method multiple times returns consistent results
+            val result1 = uiBuilderOperator.onGetProjectIssues(project)
+            val result2 = uiBuilderOperator.onGetProjectIssues(project)
+
+            assertTrue(result1.isSuccessful())
+            assertTrue(result2.isSuccessful())
+
+            // Both calls should return the same number of issues for the same project state
+            assertTrue(result1.issues.size == result2.issues.size)
+        }
 
     // ========== Screen Management Tests ==========
 
     @Test
-    fun testOnListScreens_EmptyProject() {
-        // Clear all screens except the default one
-        val result = uiBuilderOperator.onListScreens(project)
+    fun testOnListScreens_EmptyProject() =
+        runTest {
+            // Clear all screens except the default one
+            val result = uiBuilderOperator.onListScreens(project)
 
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
 
-        // Project should have at least one default screen
-        val screens = project.screenHolder.screens
-        assertTrue(screens.isNotEmpty())
-    }
-
-    @Test
-    fun testOnListScreens_WithMultipleScreens() {
-        // Add additional screens to the project
-        val screen1 = Screen(id = "screen1", name = "Home Screen")
-        screen1.title.value = "Home"
-        screen1.label.value = "home"
-        screen1.isDefault.value = true
-        screen1.showOnNavigation.value = true
-
-        val screen2 = Screen(id = "screen2", name = "Settings Screen")
-        screen2.title.value = "Settings"
-        screen2.label.value = "settings"
-        screen2.isDefault.value = false
-        screen2.showOnNavigation.value = true
-
-        project.screenHolder.screens.add(screen1)
-        project.screenHolder.screens.add(screen2)
-
-        val result = uiBuilderOperator.onListScreens(project)
-
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-
-        // Verify that all screens are included (original + 2 added)
-        val totalScreens = project.screenHolder.screens.size
-        assertTrue(totalScreens >= 3) // At least the original + 2 new screens
-    }
-
-    @Test
-    fun testOnListScreens_ScreenProperties() {
-        // Test that screen properties are properly accessible
-        val testScreen = Screen(id = "test-screen", name = "Test Screen")
-        testScreen.title.value = "Test Title"
-        testScreen.label.value = "test_label"
-        testScreen.isDefault.value = false
-        testScreen.isSelected.value = true
-        testScreen.showOnNavigation.value = false
-
-        project.screenHolder.screens.add(testScreen)
-
-        val result = uiBuilderOperator.onListScreens(project)
-
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-
-        // Verify the screen exists in the project
-        val foundScreen = project.screenHolder.screens.find { it.id == "test-screen" }
-        assertNotNull(foundScreen)
-        assertTrue(foundScreen!!.name == "Test Screen")
-        assertTrue(foundScreen.title.value == "Test Title")
-        assertTrue(foundScreen.label.value == "test_label")
-        assertFalse(foundScreen.isDefault.value)
-        assertTrue(foundScreen.isSelected.value)
-        assertFalse(foundScreen.showOnNavigation.value)
-    }
-
-    @Test
-    fun testOnGetScreenDetails_ValidScreenId() {
-        // Use the default screen from the project
-        val defaultScreen = project.screenHolder.screens.first()
-        val screenId = defaultScreen.id
-
-        val result = uiBuilderOperator.onGetScreenDetails(project, screenId)
-
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-    }
-
-    @Test
-    fun testOnGetScreenDetails_InvalidScreenId() {
-        val result = uiBuilderOperator.onGetScreenDetails(project, "non-existent-screen")
-
-        assertFalse(result.isSuccessful())
-        assertFalse(result.errorMessages.isEmpty())
-        assertTrue(result.errorMessages.first().contains("Screen with ID 'non-existent-screen' not found"))
-    }
-
-    @Test
-    fun testOnGetScreenDetails_WithScreenContent() {
-        // Add some content to the screen
-        val defaultScreen = project.screenHolder.screens.first()
-        val rootNode = defaultScreen.getRootNode()
-
-        val columnNode = createColumnNode()
-        val buttonNode = createButtonNode()
-        rootNode.addChild(columnNode)
-        columnNode.addChild(buttonNode)
-
-        val result = uiBuilderOperator.onGetScreenDetails(project, defaultScreen.id)
-
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
-
-        // Verify the screen contains the added content
-        val retrievedScreen = project.screenHolder.findScreen(defaultScreen.id)
-        assertNotNull(retrievedScreen)
-        val retrievedRootNode = retrievedScreen!!.getRootNode()
-        assertTrue(retrievedRootNode.children.isNotEmpty())
-
-        val retrievedColumn = retrievedRootNode.children.first()
-        assertTrue(retrievedColumn.trait.value is ColumnTrait)
-
-        // Check if the column has children - it should, but let's be more defensive
-        if (retrievedColumn.children.isNotEmpty()) {
-            val retrievedButton = retrievedColumn.children.first()
-            assertTrue(retrievedButton.trait.value is ButtonTrait)
+            // Project should have at least one default screen
+            val screens = project.screenHolder.screens
+            assertTrue(screens.isNotEmpty())
         }
-    }
 
     @Test
-    fun testOnGetScreenDetails_WithSpecialScreenElements() {
-        val defaultScreen = project.screenHolder.screens.first()
+    fun testOnListScreens_WithMultipleScreens() =
+        runTest {
+            // Add additional screens to the project
+            val screen1 = Screen(id = "screen1", name = "Home Screen")
+            screen1.title.value = "Home"
+            screen1.label.value = "home"
+            screen1.isDefault.value = true
+            screen1.showOnNavigation.value = true
 
-        // Add FAB to screen (screen-only element)
-        val fabNode = createFabNode()
-        defaultScreen.fabNode.value = fabNode
+            val screen2 = Screen(id = "screen2", name = "Settings Screen")
+            screen2.title.value = "Settings"
+            screen2.label.value = "settings"
+            screen2.isDefault.value = false
+            screen2.showOnNavigation.value = true
 
-        val result = uiBuilderOperator.onGetScreenDetails(project, defaultScreen.id)
+            project.screenHolder.screens.add(screen1)
+            project.screenHolder.screens.add(screen2)
 
-        assertTrue(result.isSuccessful())
-        assertTrue(result.errorMessages.isEmpty())
+            val result = uiBuilderOperator.onListScreens(project)
 
-        // Verify FAB is present on the screen
-        assertNotNull(defaultScreen.fabNode.value)
-        assertTrue(
-            defaultScreen.fabNode.value!!
-                .trait.value is FabTrait,
-        )
-    }
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
 
-    @Test
-    fun testOnGetScreenDetails_ErrorHandling() {
-        // Test with null screen ID (should be caught by method signature)
-        val result = uiBuilderOperator.onGetScreenDetails(project, "")
-
-        // Empty string should be treated as not found
-        assertFalse(result.isSuccessful())
-        assertFalse(result.errorMessages.isEmpty())
-    }
+            // Verify that all screens are included (original + 2 added)
+            val totalScreens = project.screenHolder.screens.size
+            assertTrue(totalScreens >= 3) // At least the original + 2 new screens
+        }
 
     @Test
-    fun testScreenManagement_IntegrationTest() {
-        // Create a more complex screen setup
-        val screen1 = Screen(id = "home", name = "Home")
-        screen1.title.value = "Home Screen"
-        screen1.isDefault.value = true
+    fun testOnListScreens_ScreenProperties() =
+        runTest {
+            // Test that screen properties are properly accessible
+            val testScreen = Screen(id = "test-screen", name = "Test Screen")
+            testScreen.title.value = "Test Title"
+            testScreen.label.value = "test_label"
+            testScreen.isDefault.value = false
+            testScreen.isSelected.value = true
+            testScreen.showOnNavigation.value = false
 
-        val screen2 = Screen(id = "profile", name = "Profile")
-        screen2.title.value = "Profile Screen"
-        screen2.isDefault.value = false
+            project.screenHolder.screens.add(testScreen)
 
-        project.screenHolder.screens.clear()
-        project.screenHolder.screens.add(screen1)
-        project.screenHolder.screens.add(screen2)
+            val result = uiBuilderOperator.onListScreens(project)
 
-        // Test listing screens
-        val listResult = uiBuilderOperator.onListScreens(project)
-        assertTrue(listResult.isSuccessful())
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
 
-        // Test getting details for each screen
-        val homeResult = uiBuilderOperator.onGetScreenDetails(project, "home")
-        assertTrue(homeResult.isSuccessful())
-
-        val profileResult = uiBuilderOperator.onGetScreenDetails(project, "profile")
-        assertTrue(profileResult.isSuccessful())
-
-        // Test getting details for non-existent screen
-        val invalidResult = uiBuilderOperator.onGetScreenDetails(project, "invalid")
-        assertFalse(invalidResult.isSuccessful())
-        assertTrue(invalidResult.errorMessages.first().contains("not found"))
-    }
+            // Verify the screen exists in the project
+            val foundScreen = project.screenHolder.screens.find { it.id == "test-screen" }
+            assertNotNull(foundScreen)
+            assertTrue(foundScreen!!.name == "Test Screen")
+            assertTrue(foundScreen.title.value == "Test Title")
+            assertTrue(foundScreen.label.value == "test_label")
+            assertFalse(foundScreen.isDefault.value)
+            assertTrue(foundScreen.isSelected.value)
+            assertFalse(foundScreen.showOnNavigation.value)
+        }
 
     @Test
-    fun testScreenManagement_ConsistentResults() {
-        // Test that multiple calls return consistent results
-        val listResult1 = uiBuilderOperator.onListScreens(project)
-        val listResult2 = uiBuilderOperator.onListScreens(project)
+    fun testOnGetScreenDetails_ValidScreenId() =
+        runTest {
+            // Use the default screen from the project
+            val defaultScreen = project.screenHolder.screens.first()
+            val screenId = defaultScreen.id
 
-        assertTrue(listResult1.isSuccessful())
-        assertTrue(listResult2.isSuccessful())
+            val result = uiBuilderOperator.onGetScreenDetails(project, screenId)
 
-        // Both calls should return the same number of screens
-        assertTrue(project.screenHolder.screens.size == project.screenHolder.screens.size)
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+        }
 
-        val screenId =
-            project.screenHolder.screens
-                .first()
-                .id
-        val detailsResult1 = uiBuilderOperator.onGetScreenDetails(project, screenId)
-        val detailsResult2 = uiBuilderOperator.onGetScreenDetails(project, screenId)
+    @Test
+    fun testOnGetScreenDetails_InvalidScreenId() =
+        runTest {
+            val result = uiBuilderOperator.onGetScreenDetails(project, "non-existent-screen")
 
-        assertTrue(detailsResult1.isSuccessful())
-        assertTrue(detailsResult2.isSuccessful())
+            assertFalse(result.isSuccessful())
+            assertFalse(result.errorMessages.isEmpty())
+            assertTrue(result.errorMessages.first().contains("Screen with ID 'non-existent-screen' not found"))
+        }
 
-        // Both calls should succeed consistently
-        assertTrue(detailsResult1.errorMessages.isEmpty())
-        assertTrue(detailsResult2.errorMessages.isEmpty())
-    }
+    @Test
+    fun testOnGetScreenDetails_WithScreenContent() =
+        runTest {
+            // Add some content to the screen
+            val defaultScreen = project.screenHolder.screens.first()
+            val rootNode = defaultScreen.getRootNode()
+
+            val columnNode = createColumnNode()
+            val buttonNode = createButtonNode()
+            rootNode.addChild(columnNode)
+            columnNode.addChild(buttonNode)
+
+            val result = uiBuilderOperator.onGetScreenDetails(project, defaultScreen.id)
+
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+
+            // Verify the screen contains the added content
+            val retrievedScreen = project.screenHolder.findScreen(defaultScreen.id)
+            assertNotNull(retrievedScreen)
+            val retrievedRootNode = retrievedScreen!!.getRootNode()
+            assertTrue(retrievedRootNode.children.isNotEmpty())
+
+            val retrievedColumn = retrievedRootNode.children.first()
+            assertTrue(retrievedColumn.trait.value is ColumnTrait)
+
+            // Check if the column has children - it should, but let's be more defensive
+            if (retrievedColumn.children.isNotEmpty()) {
+                val retrievedButton = retrievedColumn.children.first()
+                assertTrue(retrievedButton.trait.value is ButtonTrait)
+            }
+        }
+
+    @Test
+    fun testOnGetScreenDetails_WithSpecialScreenElements() =
+        runTest {
+            val defaultScreen = project.screenHolder.screens.first()
+
+            // Add FAB to screen (screen-only element)
+            val fabNode = createFabNode()
+            defaultScreen.fabNode.value = fabNode
+
+            val result = uiBuilderOperator.onGetScreenDetails(project, defaultScreen.id)
+
+            assertTrue(result.isSuccessful())
+            assertTrue(result.errorMessages.isEmpty())
+
+            // Verify FAB is present on the screen
+            assertNotNull(defaultScreen.fabNode.value)
+            assertTrue(
+                defaultScreen.fabNode.value!!
+                    .trait.value is FabTrait,
+            )
+        }
+
+    @Test
+    fun testOnGetScreenDetails_ErrorHandling() =
+        runTest {
+            // Test with null screen ID (should be caught by method signature)
+            val result = uiBuilderOperator.onGetScreenDetails(project, "")
+
+            // Empty string should be treated as not found
+            assertFalse(result.isSuccessful())
+            assertFalse(result.errorMessages.isEmpty())
+        }
+
+    @Test
+    fun testScreenManagement_IntegrationTest() =
+        runTest {
+            // Create a more complex screen setup
+            val screen1 = Screen(id = "home", name = "Home")
+            screen1.title.value = "Home Screen"
+            screen1.isDefault.value = true
+
+            val screen2 = Screen(id = "profile", name = "Profile")
+            screen2.title.value = "Profile Screen"
+            screen2.isDefault.value = false
+
+            project.screenHolder.screens.clear()
+            project.screenHolder.screens.add(screen1)
+            project.screenHolder.screens.add(screen2)
+
+            // Test listing screens
+            val listResult = uiBuilderOperator.onListScreens(project)
+            assertTrue(listResult.isSuccessful())
+
+            // Test getting details for each screen
+            val homeResult = uiBuilderOperator.onGetScreenDetails(project, "home")
+            assertTrue(homeResult.isSuccessful())
+
+            val profileResult = uiBuilderOperator.onGetScreenDetails(project, "profile")
+            assertTrue(profileResult.isSuccessful())
+
+            // Test getting details for non-existent screen
+            val invalidResult = uiBuilderOperator.onGetScreenDetails(project, "invalid")
+            assertFalse(invalidResult.isSuccessful())
+            assertTrue(invalidResult.errorMessages.first().contains("not found"))
+        }
+
+    @Test
+    fun testScreenManagement_ConsistentResults() =
+        runTest {
+            // Test that multiple calls return consistent results
+            val listResult1 = uiBuilderOperator.onListScreens(project)
+            val listResult2 = uiBuilderOperator.onListScreens(project)
+
+            assertTrue(listResult1.isSuccessful())
+            assertTrue(listResult2.isSuccessful())
+
+            // Both calls should return the same number of screens
+            assertTrue(project.screenHolder.screens.size == project.screenHolder.screens.size)
+
+            val screenId =
+                project.screenHolder.screens
+                    .first()
+                    .id
+            val detailsResult1 = uiBuilderOperator.onGetScreenDetails(project, screenId)
+            val detailsResult2 = uiBuilderOperator.onGetScreenDetails(project, screenId)
+
+            assertTrue(detailsResult1.isSuccessful())
+            assertTrue(detailsResult2.isSuccessful())
+
+            // Both calls should succeed consistently
+            assertTrue(detailsResult1.errorMessages.isEmpty())
+            assertTrue(detailsResult2.errorMessages.isEmpty())
+        }
 }
