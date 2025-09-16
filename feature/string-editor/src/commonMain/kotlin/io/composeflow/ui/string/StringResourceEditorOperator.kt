@@ -62,7 +62,11 @@ class StringResourceEditorOperator {
 
     @LlmTool(
         name = "add_string_resources",
-        "Adds one or more string resources to the project. String resources are used for internationalization and localization of text in the application.",
+        "Adds one or more string resources to the project. " +
+            "String resources are used for internationalization and localization of text in the application. " +
+            "The IDs for string resources are generated automatically. " +
+            "When you refer to an added string resource later, you need to use the ID, not the key. " +
+            "You can check the generated IDs using the list_string_resources tool.",
     )
     suspend fun onAddStringResources(
         project: Project,
