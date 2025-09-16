@@ -76,6 +76,8 @@ kotlin {
             implementation(kotlin("test-junit"))
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.coroutines.test)
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.desktop.uiTestJUnit4)
             implementation(compose.desktop.currentOs)
         }
 
