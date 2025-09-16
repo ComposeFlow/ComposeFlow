@@ -37,10 +37,7 @@ import org.jetbrains.compose.resources.StringResource
 @Serializable
 @SerialName("TabsTrait")
 data object TabsTrait : ComposeTrait {
-    override fun defaultConstraints(): Set<Constraint> =
-        defaultConstraints().toMutableSet().apply {
-            add(Constraint.NestedTabs)
-        }
+    override fun defaultConstraints(): Set<Constraint> = setOf(Constraint.NestedTabs)
 
     override fun defaultComposeNode(project: Project): ComposeNode {
         val tabContainer =
