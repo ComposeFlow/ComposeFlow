@@ -622,6 +622,7 @@ instead of in the canvas.</string>
     <string name="error_updating_modifier_at_index">Error updating modifier at index %1$d: %2$s</string>
     <string name="error_removing_modifier_at_index">Error removing modifier at index %1$d: %2$s</string>
     <string name="error_updating_trait">Error updating trait: %1$s</string>
+    <string name="error_invalid_modifier_indices">Invalid modifier indices: from=%1$d, to=%2$d. Node has %3$d modifiers.</string>
     <string name="error_swapping_modifiers">Error swapping modifiers at indices %1$d and %2$d: %3$s</string>
     <string name="error_moving_component_to_position">Error moving component to position: %1$s</string>
     <string name="error_retrieving_project_issues">Error retrieving project issues: %1$s</string>

@@ -8,6 +8,7 @@ import io.composeflow.error_adding_modifier_to_node
 import io.composeflow.error_cannot_drop_node_to
 import io.composeflow.error_container_node_not_found
 import io.composeflow.error_invalid_modifier_index
+import io.composeflow.error_invalid_modifier_indices
 import io.composeflow.error_listing_screens
 import io.composeflow.error_moving_component_to_position
 import io.composeflow.error_node_not_found
@@ -459,7 +460,9 @@ class UiBuilderOperator {
                 toIndex >= node.modifierList.size
             ) {
                 Logger.e { "Invalid modifier indices: from=$fromIndex, to=$toIndex. Node has ${node.modifierList.size} modifiers." }
-                result.errorMessages.add(getString(Res.string.error_invalid_modifier_index, fromIndex, node.modifierList.size))
+                result.errorMessages.add(
+                    getString(Res.string.error_invalid_modifier_indices, fromIndex, toIndex, node.modifierList.size),
+                )
                 return result
             }
 
