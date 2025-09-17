@@ -33,9 +33,6 @@ import io.composeflow.serializer.encodeToString
 import io.composeflow.ui.EventResult
 import org.jetbrains.compose.resources.getString
 
-// TODO: Wire this class with ToolDispatcher to enable AI to edit string resources.
-//       https://github.com/ComposeFlow/ComposeFlow/issues/34
-
 /**
  * Handles operations related to string resource editor, such as adding, updating, or removing string resources.
  * Operations in this class are exposed to the LLM to allow them to call it as tools as well as used
@@ -62,7 +59,11 @@ class StringResourceEditorOperator {
 
     @LlmTool(
         name = "add_string_resources",
-        "Adds one or more string resources to the project. String resources are used for internationalization and localization of text in the application.",
+        "Adds one or more string resources to the project. " +
+            "String resources are used for internationalization and localization of text in the application. " +
+            "The IDs for string resources are generated automatically. " +
+            "When you refer to an added string resource later, you need to use the ID, not the key. " +
+            "You can check the generated IDs using the list_string_resources tool.",
     )
     suspend fun onAddStringResources(
         project: Project,
@@ -71,15 +72,15 @@ class StringResourceEditorOperator {
                 "The YAML representation of StringResource(s) to be added. " +
                     "Can be a single StringResource or a list of StringResources. Keys will be made unique if necessary.",
         )
-        stringResourceYaml: String,
+        stringResourcesYaml: String,
     ): EventResult =
         try {
             // Try to parse as list first, fallback to single resource
             val stringResources =
                 try {
-                    decodeFromStringWithFallback<List<StringResource>>(stringResourceYaml)
+                    decodeFromStringWithFallback<List<StringResource>>(stringResourcesYaml)
                 } catch (_: Exception) {
-                    listOf(decodeFromStringWithFallback<StringResource>(stringResourceYaml))
+                    listOf(decodeFromStringWithFallback<StringResource>(stringResourcesYaml))
                 }
             addStringResources(project, stringResources)
         } catch (e: Exception) {
@@ -173,18 +174,18 @@ class StringResourceEditorOperator {
         project: Project,
         @LlmParam(
             description =
-                "The YAML representation of the updated StringResource(s). " +
-                    "Can be a single StringResource or a list of StringResources. Must include the ID of each resource to update.",
+                "The YAML representation of StringResourceUpdate(s). " +
+                    "Can be a single StringResourceUpdate or a list of StringResourceUpdate objects. Each update must include the ID of the resource to update.",
         )
-        stringResourceYaml: String,
+        stringResourceUpdatesYaml: String,
     ): EventResult =
         try {
             // Try to parse as list first, fallback to single resource
             val updates =
                 try {
-                    decodeFromStringWithFallback<List<StringResourceUpdate>>(stringResourceYaml)
+                    decodeFromStringWithFallback<List<StringResourceUpdate>>(stringResourceUpdatesYaml)
                 } catch (_: Exception) {
-                    listOf(decodeFromStringWithFallback<StringResourceUpdate>(stringResourceYaml))
+                    listOf(decodeFromStringWithFallback<StringResourceUpdate>(stringResourceUpdatesYaml))
                 }
             updateStringResources(project, updates)
         } catch (e: Exception) {

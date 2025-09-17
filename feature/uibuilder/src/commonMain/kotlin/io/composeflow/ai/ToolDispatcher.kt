@@ -8,6 +8,7 @@ import io.composeflow.serializer.encodeToString
 import io.composeflow.ui.EventResult
 import io.composeflow.ui.appstate.AppStateEditorOperator
 import io.composeflow.ui.datatype.DataTypeEditorOperator
+import io.composeflow.ui.string.StringResourceEditorOperator
 import io.composeflow.ui.uibuilder.UiBuilderOperator
 import io.composeflow.ui.uibuilder.toScreenSummary
 
@@ -18,6 +19,7 @@ class ToolDispatcher(
     private val uiBuilderOperator: UiBuilderOperator = UiBuilderOperator(),
     private val appStateEditorOperator: AppStateEditorOperator = AppStateEditorOperator(),
     private val dataTypeEditorOperator: DataTypeEditorOperator = DataTypeEditorOperator(),
+    private val stringResourceEditorOperator: StringResourceEditorOperator = StringResourceEditorOperator(),
 ) {
     /**
      * Dispatches a tool execution request to the appropriate operator.
@@ -377,6 +379,103 @@ class ToolDispatcher(
                     Logger.e(e) { "Error getting screen details" }
                     toolArgs.result = "Error getting screen details: ${e.message}"
                     EventResult().apply { errorMessages.add("Failed to get screen details: ${e.message}") }
+                }
+            }
+
+            is ToolArgs.AddStringResourcesArgs -> {
+                val result =
+                    stringResourceEditorOperator.onAddStringResources(
+                        project,
+                        toolArgs.stringResourcesYaml,
+                    )
+                if (result.errorMessages.isNotEmpty()) {
+                    toolArgs.result = result.errorMessages.joinToString("; ")
+                }
+                result
+            }
+
+            is ToolArgs.DeleteStringResourcesArgs -> {
+                val result =
+                    stringResourceEditorOperator.onDeleteStringResources(
+                        project,
+                        toolArgs.stringResourceIds,
+                    )
+                if (result.errorMessages.isNotEmpty()) {
+                    toolArgs.result = result.errorMessages.joinToString("; ")
+                }
+                result
+            }
+
+            is ToolArgs.UpdateStringResourcesArgs -> {
+                val result =
+                    stringResourceEditorOperator.onUpdateStringResources(
+                        project,
+                        toolArgs.stringResourceUpdatesYaml,
+                    )
+                if (result.errorMessages.isNotEmpty()) {
+                    toolArgs.result = result.errorMessages.joinToString("; ")
+                }
+                result
+            }
+
+            is ToolArgs.UpdateSupportedLocalesArgs -> {
+                val result =
+                    stringResourceEditorOperator.onUpdateSupportedLocales(
+                        project,
+                        toolArgs.localesYaml,
+                    )
+                if (result.errorMessages.isNotEmpty()) {
+                    toolArgs.result = result.errorMessages.joinToString("; ")
+                }
+                result
+            }
+
+            is ToolArgs.SetDefaultLocaleArgs -> {
+                val result =
+                    stringResourceEditorOperator.onSetDefaultLocale(
+                        project,
+                        toolArgs.localeCode,
+                    )
+                if (result.errorMessages.isNotEmpty()) {
+                    toolArgs.result = result.errorMessages.joinToString("; ")
+                }
+                result
+            }
+
+            is ToolArgs.ListStringResourcesArgs -> {
+                try {
+                    val stringResourcesResult = stringResourceEditorOperator.onListStringResources(project)
+                    toolArgs.result = stringResourcesResult
+                    EventResult() // Success
+                } catch (e: Exception) {
+                    Logger.e(e) { "Error listing string resources" }
+                    toolArgs.result = "Error listing string resources: ${e.message}"
+                    EventResult().apply { errorMessages.add("Failed to list string resources: ${e.message}") }
+                }
+            }
+
+            is ToolArgs.GetStringResourceArgs -> {
+                try {
+                    val stringResourceResult =
+                        stringResourceEditorOperator.onGetStringResource(project, toolArgs.stringResourceId)
+                    toolArgs.result = stringResourceResult
+                    EventResult() // Success
+                } catch (e: Exception) {
+                    Logger.e(e) { "Error getting string resource" }
+                    toolArgs.result = "Error getting string resource: ${e.message}"
+                    EventResult().apply { errorMessages.add("Failed to get string resource: ${e.message}") }
+                }
+            }
+
+            is ToolArgs.GetSupportedLocalesArgs -> {
+                try {
+                    val supportedLocalesResult = stringResourceEditorOperator.onGetSupportedLocales(project)
+                    toolArgs.result = supportedLocalesResult
+                    EventResult() // Success
+                } catch (e: Exception) {
+                    Logger.e(e) { "Error getting supported locales" }
+                    toolArgs.result = "Error getting supported locales: ${e.message}"
+                    EventResult().apply { errorMessages.add("Failed to get supported locales: ${e.message}") }
                 }
             }
 

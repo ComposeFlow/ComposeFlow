@@ -513,9 +513,35 @@ class LlmRepository(
             is ToolArgs.ListCustomEnumsArgs,
             is ToolArgs.GetProjectIssuesArgs,
             is ToolArgs.ListScreensArgs,
+            is ToolArgs.ListStringResourcesArgs,
+            is ToolArgs.GetSupportedLocalesArgs,
             -> {
                 // These have minimal content but potentially large results
                 estimatedSize += 50
+            }
+
+            is ToolArgs.AddStringResourcesArgs -> {
+                estimatedSize += toolArg.stringResourcesYaml.length
+            }
+
+            is ToolArgs.DeleteStringResourcesArgs -> {
+                estimatedSize += toolArg.stringResourceIds.length
+            }
+
+            is ToolArgs.UpdateStringResourcesArgs -> {
+                estimatedSize += toolArg.stringResourceUpdatesYaml.length
+            }
+
+            is ToolArgs.UpdateSupportedLocalesArgs -> {
+                estimatedSize += toolArg.localesYaml.length
+            }
+
+            is ToolArgs.SetDefaultLocaleArgs -> {
+                estimatedSize += toolArg.localeCode.length
+            }
+
+            is ToolArgs.GetStringResourceArgs -> {
+                estimatedSize += toolArg.stringResourceId.length
             }
 
             is ToolArgs.FakeArgs -> {

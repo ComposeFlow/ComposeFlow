@@ -314,6 +314,78 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                                 value.tool_args,
                             ),
                         )
+
+                    is OpenRouterToolResult.AddStringResourcesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.AddStringResourcesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
+                    is OpenRouterToolResult.DeleteStringResourcesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.DeleteStringResourcesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
+                    is OpenRouterToolResult.UpdateStringResourcesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.UpdateStringResourcesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
+                    is OpenRouterToolResult.UpdateSupportedLocalesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.UpdateSupportedLocalesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
+                    is OpenRouterToolResult.SetDefaultLocaleArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.SetDefaultLocaleArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
+                    is OpenRouterToolResult.ListStringResourcesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.ListStringResourcesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
+                    is OpenRouterToolResult.GetStringResourceArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.GetStringResourceArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
+
+                    is OpenRouterToolResult.GetSupportedLocalesArgs ->
+                        put(
+                            "tool_args",
+                            json.encodeToJsonElement(
+                                ToolArgs.GetSupportedLocalesArgs.serializer(),
+                                value.tool_args,
+                            ),
+                        )
                 }
             }
 
@@ -738,6 +810,110 @@ object OpenRouterToolResultSerializer : KSerializer<OpenRouterToolResult> {
                         processedToolArgsElement,
                     )
                 OpenRouterToolResult.GetScreenDetailsArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "add_string_resources" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.AddStringResourcesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.AddStringResourcesArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "delete_string_resources" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.DeleteStringResourcesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.DeleteStringResourcesArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "update_string_resources" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.UpdateStringResourcesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.UpdateStringResourcesArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "update_supported_locales" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.UpdateSupportedLocalesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.UpdateSupportedLocalesArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "set_default_locale" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.SetDefaultLocaleArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.SetDefaultLocaleArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "list_string_resources" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.ListStringResourcesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.ListStringResourcesArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "get_string_resource" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.GetStringResourceArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.GetStringResourceArgs(
+                    tool_name = toolName,
+                    tool_call_id = toolCallId,
+                    tool_args = toolArgs,
+                )
+            }
+
+            "get_supported_locales" -> {
+                val toolArgs =
+                    json.decodeFromJsonElement(
+                        ToolArgs.GetSupportedLocalesArgs.serializer(),
+                        processedToolArgsElement,
+                    )
+                OpenRouterToolResult.GetSupportedLocalesArgs(
                     tool_name = toolName,
                     tool_call_id = toolCallId,
                     tool_args = toolArgs,

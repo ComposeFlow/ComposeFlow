@@ -225,4 +225,60 @@ sealed interface OpenRouterToolResult {
         override val tool_call_id: String,
         override val tool_args: ToolArgs.GetScreenDetailsArgs,
     ) : OpenRouterToolResult
+
+    @Serializable
+    data class AddStringResourcesArgs(
+        override val tool_name: String = "add_string_resources",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.AddStringResourcesArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class DeleteStringResourcesArgs(
+        override val tool_name: String = "delete_string_resources",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.DeleteStringResourcesArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class UpdateStringResourcesArgs(
+        override val tool_name: String = "update_string_resources",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.UpdateStringResourcesArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class UpdateSupportedLocalesArgs(
+        override val tool_name: String = "update_supported_locales",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.UpdateSupportedLocalesArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class SetDefaultLocaleArgs(
+        override val tool_name: String = "set_default_locale",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.SetDefaultLocaleArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class ListStringResourcesArgs(
+        override val tool_name: String = "list_string_resources",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.ListStringResourcesArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class GetStringResourceArgs(
+        override val tool_name: String = "get_string_resource",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.GetStringResourceArgs,
+    ) : OpenRouterToolResult
+
+    @Serializable
+    data class GetSupportedLocalesArgs(
+        override val tool_name: String = "get_supported_locales",
+        override val tool_call_id: String,
+        override val tool_args: ToolArgs.GetSupportedLocalesArgs,
+    ) : OpenRouterToolResult
 }

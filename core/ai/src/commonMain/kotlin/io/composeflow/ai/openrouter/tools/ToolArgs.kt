@@ -217,6 +217,54 @@ sealed class ToolArgs {
     ) : ToolArgs()
 
     @Serializable
+    @SerialName("add_string_resources")
+    data class AddStringResourcesArgs(
+        val stringResourcesYaml: String,
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("delete_string_resources")
+    data class DeleteStringResourcesArgs(
+        val stringResourceIds: String,
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("update_string_resources")
+    data class UpdateStringResourcesArgs(
+        val stringResourceUpdatesYaml: String,
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("update_supported_locales")
+    data class UpdateSupportedLocalesArgs(
+        val localesYaml: String,
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("set_default_locale")
+    data class SetDefaultLocaleArgs(
+        val localeCode: String,
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("list_string_resources")
+    data class ListStringResourcesArgs(
+        val dummy: String = "",
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("get_string_resource")
+    data class GetStringResourceArgs(
+        val stringResourceId: String,
+    ) : ToolArgs()
+
+    @Serializable
+    @SerialName("get_supported_locales")
+    data class GetSupportedLocalesArgs(
+        val dummy: String = "",
+    ) : ToolArgs()
+
+    @Serializable
     data class FakeArgs(
         val fakeString: String = "fakeString",
     ) : ToolArgs()
