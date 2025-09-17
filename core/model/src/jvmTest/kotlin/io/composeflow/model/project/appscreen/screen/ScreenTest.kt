@@ -136,7 +136,7 @@ class ScreenTest {
         // Verify root node exists and has expected properties
         assertNotNull(screen.rootNode, "Root node should exist")
         assertEquals("editProfileScreen", screen.rootNode.value.id)
-        assertEquals("Edit Profile", screen.rootNode.value.label.value)
+        assertEquals("editProfile", screen.rootNode.value.labelExposed)
 
         // Verify the screen has the expected states
         val project = Project(name = "test")

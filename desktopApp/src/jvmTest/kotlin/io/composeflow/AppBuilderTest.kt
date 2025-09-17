@@ -1326,7 +1326,7 @@ class AppBuilderTest {
 
         rootNode.addChild(
             TextFieldTrait().defaultComposeNode(project).apply {
-                label.value = "textField1"
+                setLabel("textField1")
             },
         )
         val editable = project.screenHolder.currentEditable()
@@ -1416,7 +1416,7 @@ class AppBuilderTest {
         rootNode.addChild(text)
         rootNode.addChild(
             SwitchTrait().defaultComposeNode(project).apply {
-                label.value = "switch1"
+                setLabel("switch1")
             },
         )
         val switchState = ScreenState.BooleanScreenState(name = "switch")
@@ -1469,7 +1469,7 @@ class AppBuilderTest {
         row.addChild(text)
         row.addChild(
             SwitchTrait().defaultComposeNode(project).apply {
-                label.value = "switch1"
+                setLabel("switch1")
             },
         )
         val switchState = ScreenState.BooleanScreenState(name = "switch")
@@ -1507,7 +1507,7 @@ class AppBuilderTest {
         rootNode.addChild(text)
         rootNode.addChild(
             SwitchTrait().defaultComposeNode(project).apply {
-                label.value = "switch1"
+                setLabel("switch1")
             },
         )
         val button = ButtonTrait().defaultComposeNode(project)
@@ -1515,7 +1515,7 @@ class AppBuilderTest {
 
         val textField =
             TextFieldTrait().defaultComposeNode(project).apply {
-                label.value = "textField1"
+                setLabel("textField1")
             }
         rootNode.addChild(textField)
         val switchState = ScreenState.BooleanScreenState(name = "switch")
@@ -1626,7 +1626,7 @@ class AppBuilderTest {
 
         val textField =
             TextFieldTrait().defaultComposeNode(project).apply {
-                label.value = "textField1"
+                setLabel("textField1")
             }
         rootNode.addChild(textField)
         val editable = project.screenHolder.currentEditable()
@@ -1995,7 +1995,7 @@ class AppBuilderTest {
             ComposeNode(
                 trait = mutableStateOf(TextFieldTrait()),
             ).apply {
-                label.value = "textField1"
+                setLabel("textField1")
             }
         val textFieldParams = textField1.trait.value as TextFieldTrait
 
