@@ -89,7 +89,7 @@ data class ChipGroupTrait(
     override fun companionState(composeNode: ComposeNode): ScreenState<*> =
         ScreenState.StringListScreenState(
             id = composeNode.companionStateId,
-            name = composeNode.label.value,
+            name = composeNode.labelExposed,
             companionNodeId = composeNode.id,
         )
 

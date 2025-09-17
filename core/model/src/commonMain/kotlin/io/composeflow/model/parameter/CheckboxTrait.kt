@@ -120,7 +120,7 @@ data class CheckboxTrait(
     override fun companionState(composeNode: ComposeNode): ScreenState<*> =
         ScreenState.BooleanScreenState(
             id = composeNode.companionStateId,
-            name = composeNode.label.value,
+            name = composeNode.labelExposed,
             companionNodeId = composeNode.id,
         )
 
@@ -129,7 +129,7 @@ data class CheckboxTrait(
         stateHolder: StateHolder,
         node: ComposeNode,
     ) {
-        node.label.value = stateHolder.createUniqueLabel(project, node, node.label.value)
+        node.setLabel(stateHolder.createUniqueLabel(project, node, node.labelExposed))
         node.trait.value =
             this.copy(checked = ValueFromCompanionState(node))
     }

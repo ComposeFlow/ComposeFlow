@@ -350,7 +350,7 @@ data class Component(
             getRootNode()
                 .allChildren()
                 .filter { it.id != composeNode.id }
-                .map { it.label.value }
+                .map { it.labelExposed }
                 .toSet()
         return generateUniqueName(
             initial = initial,

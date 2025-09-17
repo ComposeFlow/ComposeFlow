@@ -99,7 +99,7 @@ private fun DynamicSourceChildrenInspector(
     childParams: LazyListChildParams.DynamicItemsSource,
 ) {
     val lazyList =
-        childParams.getSourceId()?.let { node.findDependentDynamicItemsHolderOrNull(node, it) }
+        childParams.getSourceId().let { node.findDependentDynamicItemsHolderOrNull(node, it) }
             ?: return
     childParams.getNumOfItems(project, lazyList)
     BasicEditableTextProperty(
@@ -108,7 +108,7 @@ private fun DynamicSourceChildrenInspector(
                 project,
                 lazyList = lazyList,
             )
-        } [set from ${lazyList.label.value}]",
+        } [set from ${lazyList.labelExposed}]",
         label = "Items",
         enabled = false,
         onValidValueChanged = {},

@@ -133,7 +133,7 @@ data class DropdownTrait(
     override fun companionState(composeNode: ComposeNode): ScreenState<*> =
         ScreenState.StringScreenState(
             id = composeNode.companionStateId,
-            name = composeNode.label.value,
+            name = composeNode.labelExposed,
             companionNodeId = composeNode.id,
         )
 
@@ -142,7 +142,7 @@ data class DropdownTrait(
         stateHolder: StateHolder,
         node: ComposeNode,
     ) {
-        node.label.value = stateHolder.createUniqueLabel(project, node, node.label.value)
+        node.setLabel(stateHolder.createUniqueLabel(project, node, node.labelExposed))
         node.trait.value =
             this.copy(selectedItem = ValueFromCompanionState(node))
     }

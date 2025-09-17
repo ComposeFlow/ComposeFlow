@@ -82,7 +82,7 @@ data class TextFieldTrait(
     override fun companionState(composeNode: ComposeNode): ScreenState<*> =
         ScreenState.StringScreenState(
             id = composeNode.companionStateId,
-            name = composeNode.label.value,
+            name = composeNode.labelExposed,
             companionNodeId = composeNode.id,
         )
 
@@ -91,7 +91,7 @@ data class TextFieldTrait(
         stateHolder: StateHolder,
         node: ComposeNode,
     ) {
-        node.label.value = stateHolder.createUniqueLabel(project, node, node.label.value)
+        node.setLabel(stateHolder.createUniqueLabel(project, node, node.labelExposed))
         node.trait.value =
             this.copy(value = ValueFromCompanionState(node))
     }

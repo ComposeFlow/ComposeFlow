@@ -1412,7 +1412,7 @@ data class ValueFromDynamicItem(
     private fun textFromDynamicItem(project: Project): String {
         val unknownItem = "[Unknown dynamic item]"
         val composeNode = project.findComposeNodeOrNull(composeNodeId) ?: return unknownItem
-        return "[item: ${composeNode.label.value + fieldType.fieldName(project)}]"
+        return "[item: ${composeNode.labelExposed + fieldType.fieldName(project)}]"
     }
 
     private fun fieldNameAsViewModel(fieldName: String): String = fieldName.replace(".", "").replaceFirstChar { it.uppercase() }

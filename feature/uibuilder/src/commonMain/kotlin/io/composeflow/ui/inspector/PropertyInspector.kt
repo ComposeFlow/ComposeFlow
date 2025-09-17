@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
+import io.composeflow.editor.validator.KotlinVariableNameValidator
 import io.composeflow.model.parameter.AbstractIconTrait
 import io.composeflow.model.parameter.BottomAppBarTrait
 import io.composeflow.model.parameter.BoxTrait
@@ -266,10 +267,11 @@ fun ParamsInspector(
                     .hoverIconClickable(),
         ) {
             EditableText(
-                initialText = composeNode.label.value,
+                initialText = composeNode.labelExposed,
                 onValueChange = {
                     composeNodeCallbacks.onComposeNodeLabelUpdated(composeNode, it)
                 },
+                validator = KotlinVariableNameValidator(),
             )
             Spacer(modifier = Modifier.weight(1f))
 

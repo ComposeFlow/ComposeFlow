@@ -212,7 +212,7 @@ data class Screen(
             newRoot.addChild(rootNode.value)
             rootNode.value = newRoot
         }
-        rootNode.value.label.value = label.value
+        rootNode.value.setLabel(label.value)
 
         getAllComposeNodes().forEach { it.updateComposeNodeReferencesForTrait() }
 
@@ -289,7 +289,7 @@ data class Screen(
             getRootNode()
                 .allChildren()
                 .filter { it.id != composeNode.id }
-                .map { it.label.value }
+                .map { it.labelExposed }
                 .toSet()
         return generateUniqueName(
             initial = initial,
