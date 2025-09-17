@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import io.composeflow.Res
+import io.composeflow.editor.validator.KotlinVariableNameValidator
 import io.composeflow.model.parameter.AbstractIconTrait
 import io.composeflow.model.parameter.BottomAppBarTrait
 import io.composeflow.model.parameter.BoxTrait
@@ -119,7 +120,6 @@ import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.text.EditableText
 import io.composeflow.ui.utils.TreeExpanderInverse
 import org.jetbrains.compose.resources.stringResource
-import io.composeflow.editor.validator.KotlinVariableNameValidator
 
 @Composable
 fun PropertyInspector(

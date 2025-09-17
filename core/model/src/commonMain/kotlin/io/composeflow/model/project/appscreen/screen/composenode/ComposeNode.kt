@@ -69,7 +69,6 @@ import io.composeflow.serializer.parseToYamlNode
 import io.composeflow.ui.CanvasNodeCallbacks
 import io.composeflow.ui.adaptive.computeWindowAdaptiveInfo
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
-import io.composeflow.util.toKotlinFileName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -246,6 +245,7 @@ data class ComposeNode(
      * escape characters invalid in Kotlin.
      */
     val labelExposed = label.value.asVariableName()
+
     fun setLabel(value: String) {
         label.value = value
     }
