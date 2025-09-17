@@ -217,7 +217,7 @@ private fun IssuesPanel(
                                                             modifier = Modifier.size(20.dp),
                                                         )
                                                         Text(
-                                                            text = composeNode.label.value,
+                                                            text = composeNode.labelExposed,
                                                             style = MaterialTheme.typography.titleSmall,
                                                             color = MaterialTheme.colorScheme.onSurface,
                                                             modifier = Modifier.padding(start = 8.dp),

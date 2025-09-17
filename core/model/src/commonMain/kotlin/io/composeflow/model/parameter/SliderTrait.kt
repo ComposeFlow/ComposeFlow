@@ -127,7 +127,7 @@ data class SliderTrait(
     override fun companionState(composeNode: ComposeNode): ScreenState<*> =
         ScreenState.FloatScreenState(
             id = composeNode.companionStateId,
-            name = composeNode.label.value,
+            name = composeNode.labelExposed,
             companionNodeId = composeNode.id,
         )
 
@@ -136,7 +136,7 @@ data class SliderTrait(
         stateHolder: StateHolder,
         node: ComposeNode,
     ) {
-        node.label.value = stateHolder.createUniqueLabel(project, node, node.label.value)
+        node.setLabel(stateHolder.createUniqueLabel(project, node, node.labelExposed))
         node.trait.value =
             this.copy(value = ValueFromCompanionState(node))
     }

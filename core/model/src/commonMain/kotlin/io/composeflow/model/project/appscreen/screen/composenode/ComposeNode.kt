@@ -15,6 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.charleskorn.kaml.YamlNode
+import io.composeflow.asVariableName
 import io.composeflow.eachEquals
 import io.composeflow.kotlinpoet.GenerationContext
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
@@ -68,6 +69,7 @@ import io.composeflow.serializer.parseToYamlNode
 import io.composeflow.ui.CanvasNodeCallbacks
 import io.composeflow.ui.adaptive.computeWindowAdaptiveInfo
 import io.composeflow.ui.zoomablecontainer.ZoomableContainerStateHolder
+import io.composeflow.util.toKotlinFileName
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -81,7 +83,7 @@ data class ComposeNode(
     @Serializable(with = MutableStateSerializer::class)
     val trait: MutableState<ComposeTrait> = mutableStateOf(EmptyTrait),
     @Serializable(MutableStateSerializer::class)
-    val label: MutableState<String> = mutableStateOf(trait.value.iconText()),
+    private val label: MutableState<String> = mutableStateOf(trait.value.iconText()),
     /**
      * The level of this node in the tree. The root node's level is 0.
      * This is var intentionally because when the default ComposeNode has a child initially,
@@ -238,6 +240,15 @@ data class ComposeNode(
      */
     @Transient
     val companionStateId: StateId = "$id-companionState"
+
+    /**
+     * Exposed version of the label. To be safely passed to KotlinPoet's code generation,
+     * escape characters invalid in Kotlin.
+     */
+    val labelExposed = label.value.asVariableName()
+    fun setLabel(value: String) {
+        label.value = value
+    }
 
     fun displayName(project: Project): String =
         if (trait.value is ComponentTrait) {

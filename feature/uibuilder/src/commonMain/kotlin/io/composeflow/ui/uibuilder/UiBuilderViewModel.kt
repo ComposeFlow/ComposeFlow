@@ -264,7 +264,7 @@ class UiBuilderViewModel(
         try {
             focusedNodes.forEach { node ->
                 AnalyticsTracker.trackComposeNodeDeleted(
-                    nodeType = node.label.value,
+                    nodeType = node.labelExposed,
                     count = 1,
                 )
             }
@@ -799,7 +799,7 @@ class UiBuilderViewModel(
         )
         val currentEditable = project.screenHolder.currentEditable()
         val newLabel = currentEditable.createUniqueLabel(project, node, label)
-        node.label.value = newLabel
+        node.setLabel(newLabel)
 
         saveProject(project)
     }

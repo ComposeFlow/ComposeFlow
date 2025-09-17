@@ -119,6 +119,7 @@ import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.text.EditableText
 import io.composeflow.ui.utils.TreeExpanderInverse
 import org.jetbrains.compose.resources.stringResource
+import io.composeflow.editor.validator.KotlinVariableNameValidator
 
 @Composable
 fun PropertyInspector(
@@ -266,10 +267,11 @@ fun ParamsInspector(
                     .hoverIconClickable(),
         ) {
             EditableText(
-                initialText = composeNode.label.value,
+                initialText = composeNode.labelExposed,
                 onValueChange = {
                     composeNodeCallbacks.onComposeNodeLabelUpdated(composeNode, it)
                 },
+                validator = KotlinVariableNameValidator(),
             )
             Spacer(modifier = Modifier.weight(1f))
 

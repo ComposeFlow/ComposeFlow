@@ -37,6 +37,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.icon.ComposeFlowIconButton
+import io.composeflow.editor.validator.InputValidator
+import io.composeflow.editor.validator.ValidateResult
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun EditableText(
@@ -44,6 +49,7 @@ fun EditableText(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     allowEmptyText: Boolean = false,
+    validator: InputValidator? = null,
     textStyle: TextStyle =
         TextStyle(
             color = MaterialTheme.colorScheme.onSurface,
@@ -52,6 +58,7 @@ fun EditableText(
     var text by remember(initialText) { mutableStateOf(initialText) }
     var isEditable by remember { mutableStateOf(false) }
     var tempText by remember(initialText) { mutableStateOf(text) }
+    var validationResult by remember { mutableStateOf<ValidateResult>(ValidateResult.Success) }
 
     val focusRequester = remember { FocusRequester() }
     val interactionSource = remember { MutableInteractionSource() }
@@ -64,27 +71,39 @@ fun EditableText(
     }
 
     val onCommitChange = {
+        val currentValidationResult = validator?.validate(tempText) ?: ValidateResult.Success
+        validationResult = currentValidationResult
+
         if (!allowEmptyText && tempText.isBlank()) {
             onCancelEdit()
-        } else {
+        } else if (currentValidationResult is ValidateResult.Success) {
             text = tempText
             isEditable = false
             focusManager.clearFocus()
             onValueChange(text)
         }
+        // If validation fails, keep the field in edit mode
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(8.dp),
+    Column(
+        modifier = modifier,
     ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp),
+        ) {
         Box(contentAlignment = Alignment.CenterStart) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 BasicTextField(
                     value = tempText,
-                    onValueChange = { newText -> tempText = newText },
+                    onValueChange = { newText ->
+                        tempText = newText
+                        if (validator != null) {
+                            validationResult = validator.validate(newText)
+                        }
+                    },
                     readOnly = !isEditable,
                     singleLine = true,
                     textStyle = textStyle,
@@ -103,7 +122,14 @@ fun EditableText(
                         Modifier
                             .focusRequester(focusRequester)
                             .defaultMinSize(minWidth = Dp.Unspecified)
-                            .drawUnderline(isEditable, color = MaterialTheme.colorScheme.primary)
+                            .drawUnderline(
+                                isEditable,
+                                color = if (validationResult is ValidateResult.Failure) {
+                                    MaterialTheme.colorScheme.error
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                }
+                            )
                             .onPreviewKeyEvent { keyEvent ->
                                 // Handle Escape key to cancel edit
                                 if (isEditable && keyEvent.type == KeyEventType.KeyDown && keyEvent.key == Key.Escape) {
@@ -153,6 +179,20 @@ fun EditableText(
                     contentDescription = "Edit",
                 )
             }
+        }
+        }
+
+        // Show validation error message if any
+        val currentValidationResult = validationResult
+        if (isEditable && currentValidationResult is ValidateResult.Failure) {
+            Text(
+                text = currentValidationResult.message,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .padding(start = 8.dp, top = 2.dp, bottom = 4.dp)
+                    .fillMaxWidth(),
+            )
         }
     }
 }

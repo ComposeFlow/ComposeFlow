@@ -412,8 +412,8 @@ class UiBuilderOperator {
         node?.let {
             val oldTrait = it.trait.value
             it.trait.value = trait
-            if (it.label.value == oldTrait.iconText()) {
-                it.label.value = trait.iconText()
+            if (it.labelExposed == oldTrait.iconText()) {
+                it.setLabel(trait.iconText())
             }
         }
     }
