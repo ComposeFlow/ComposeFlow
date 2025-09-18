@@ -78,6 +78,8 @@ fun LeftNavigationRail(navigator: Navigator) {
                             .testTag("$NAVIGATION_RAIL_TEST_TAG/${item.name}"),
                     selected = isSelected,
                     onClick = {
+                        if (isSelected) return@NavigationRailItem
+
                         navigator.navigate(
                             item.route,
                             options =
