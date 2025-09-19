@@ -93,6 +93,8 @@ fun TopScreen(
 
     val projectUiState = viewModel.projectListUiState.collectAsState().value
 
+    println("settings dark theme settings: ${settings.value.composeBuilderDarkThemeSetting}")
+
     CompositionLocalProvider(LocalImageLoader provides ImageLoader.createDefault()) {
         ComposeFlowTheme(useDarkTheme = useComposeFlowDarkTheme) {
             ProvideTopScreenTheme(useDarkTheme = useComposeFlowDarkTheme) {

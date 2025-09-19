@@ -1,65 +1,63 @@
 package io.composeflow.datastore
 
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.ObservableSettings
+import com.russhwolf.settings.StorageSettings
+import com.russhwolf.settings.coroutines.FlowSettings
+import com.russhwolf.settings.coroutines.toFlowSettings
+import com.russhwolf.settings.observable.makeObservable
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
 
-// TODO: Consider using multiplatform-settings as an alternative for DataStore in wasm
 actual object DataStoreFactory {
+    private var dataStore: PlatformDataStore? = null
+
     /**
      * Gets the singleton DataStore instance, creating it if necessary.
-     * WASM implementation provides a no-op in-memory store.
+     * WASM implementation uses multiplatform-settings with localStorage for persistence.
      */
-    actual fun getOrCreateDataStore(producePath: () -> String): PlatformDataStore = WasmDataStore()
+    actual fun getOrCreateDataStore(producePath: () -> String): PlatformDataStore = dataStore ?: WasmDataStore().also { dataStore = it }
 }
 
+@OptIn(ExperimentalSettingsApi::class)
 private class WasmDataStore : PlatformDataStore {
-    private val storage = mutableMapOf<String, Any>()
-    private val storageFlow = MutableStateFlow(storage.toMap())
-
-    private fun updateStorageFlow() {
-        storageFlow.value = storage.toMap()
-    }
+    // Use StorageSettings which persists to browser localStorage
+    private val settings: ObservableSettings = StorageSettings().makeObservable()
+    private val flowSettings: FlowSettings = settings.toFlowSettings()
 
     override suspend fun putString(
         key: String,
         value: String,
     ) {
-        storage[key] = value
-        updateStorageFlow()
+        settings.putString(key, value)
     }
 
-    override suspend fun getString(key: String): String? = storage[key] as? String
+    override suspend fun getString(key: String): String? = settings.getStringOrNull(key)
 
-    override fun observeString(key: String): Flow<String?> = storageFlow.map { it[key] as? String }
+    override fun observeString(key: String): Flow<String?> = flowSettings.getStringOrNullFlow(key)
 
     override suspend fun putBoolean(
         key: String,
         value: Boolean,
     ) {
-        storage[key] = value
-        updateStorageFlow()
+        settings.putBoolean(key, value)
     }
 
-    override suspend fun getBoolean(key: String): Boolean? = storage[key] as? Boolean
+    override suspend fun getBoolean(key: String): Boolean? = settings.getBooleanOrNull(key)
 
     override suspend fun putInt(
         key: String,
         value: Int,
     ) {
-        storage[key] = value
-        updateStorageFlow()
+        settings.putInt(key, value)
     }
 
-    override suspend fun getInt(key: String): Int? = storage[key] as? Int
+    override suspend fun getInt(key: String): Int? = settings.getIntOrNull(key)
 
     override suspend fun remove(key: String) {
-        storage.remove(key)
-        updateStorageFlow()
+        settings.remove(key)
     }
 
     override suspend fun clear() {
-        storage.clear()
-        updateStorageFlow()
+        settings.clear()
     }
 }

@@ -61,7 +61,7 @@ class ToolbarViewModel(
         },
     private val authRepository: AuthRepository = AuthRepository(),
     private val firebaseApiCaller: FirebaseApiCaller = FirebaseApiCaller(),
-    private val settingsRepository: SettingsRepository = SettingsRepository(),
+    private val settingsRepository: SettingsRepository = SettingsRepository.getInstance(),
     private val googleCloudStorageWrapper: GoogleCloudStorageWrapper = GoogleCloudStorageWrapper(),
     private val localAssetSaver: LocalAssetSaver = LocalAssetSaver(),
     private val assertSynchronizer: AssetSynchronizer =

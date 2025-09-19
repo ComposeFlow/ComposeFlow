@@ -49,7 +49,7 @@ class SettingsViewModel(
     private val firebaseIdTokenArg: FirebaseIdToken,
     private val firebaseApiCaller: FirebaseApiCaller = FirebaseApiCaller(),
     private val authRepository: AuthRepository = AuthRepository(),
-    private val settingsRepository: SettingsRepository = SettingsRepository(),
+    private val settingsRepository: SettingsRepository = SettingsRepository.getInstance(),
     private val projectRepository: ProjectRepository = ProjectRepository(firebaseIdTokenArg),
 ) : ViewModel() {
     private val _firebaseApiResultState: MutableStateFlow<FirebaseApiResultState> =

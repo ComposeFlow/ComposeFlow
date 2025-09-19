@@ -12,7 +12,7 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class TitleBarViewModel(
-    private val settingsRepository: SettingsRepository = SettingsRepository(),
+    private val settingsRepository: SettingsRepository = SettingsRepository.getInstance(),
 ) : ViewModel() {
     /**
      * The content of the title bar.

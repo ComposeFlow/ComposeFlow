@@ -13,7 +13,7 @@ import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
 
 class AccountSettingsViewModel(
-    private val settingsRepository: SettingsRepository = SettingsRepository(),
+    private val settingsRepository: SettingsRepository = SettingsRepository.getInstance(),
 ) : ViewModel() {
     val settings =
         settingsRepository.settings.stateIn(
