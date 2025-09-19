@@ -77,7 +77,7 @@ import kotlin.uuid.Uuid
 class UiBuilderViewModel(
     firebaseIdToken: FirebaseIdToken,
     private val project: Project,
-    private val settingsRepository: SettingsRepository = SettingsRepository(),
+    private val settingsRepository: SettingsRepository = SettingsRepository.getInstance(),
     private val projectRepository: ProjectRepository = ProjectRepository(firebaseIdToken),
     private val uiBuilderOperator: UiBuilderOperator = UiBuilderOperator(),
     private val onUpdateProject: (Project) -> Unit,

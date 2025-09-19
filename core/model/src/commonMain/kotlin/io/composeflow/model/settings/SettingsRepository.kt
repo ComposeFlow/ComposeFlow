@@ -132,4 +132,8 @@ class SettingsRepository(
             loadOnboardingStatus()
         }
     }
+    
+    companion object {
+        fun getInstance(): SettingsRepository = ServiceLocator.getOrPut { SettingsRepository() }
+    }
 }

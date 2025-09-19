@@ -108,11 +108,11 @@ kotlinx-serialization-jsonpath = "io.github.nomisrev:kotlinx-serialization-jsonp
 kotlin-result = "com.michael-bull.kotlin-result:kotlin-result:2.0.1"
 ktor-utils = "io.ktor:ktor-utils:3.2.3"
 kaml = "com.charleskorn.kaml:kaml:0.85.0"
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatform-settings-serialization = { module = "com.russhwolf:multiplatform-settings-serialization", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-datastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "multiplatform-settings" }
+multiplatform-settings-make-observable = { module = "com.russhwolf:multiplatform-settings-make-observable", version.ref = "multiplatform-settings" }
 
 # App Build
 compose-code-editor = "com.github.qawaz.compose-code-editor:codeeditor:v3.1.1"

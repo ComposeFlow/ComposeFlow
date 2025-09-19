@@ -30,7 +30,7 @@ class TopScreenViewModel(
         } else {
             ProjectRepository.createAnonymous()
         },
-    settingsRepository: SettingsRepository = SettingsRepository(),
+    settingsRepository: SettingsRepository = SettingsRepository.getInstance(),
     authRepository: AuthRepository = AuthRepository(),
 ) : ViewModel() {
     private val _projectListUiState: MutableStateFlow<ProjectUiState> =

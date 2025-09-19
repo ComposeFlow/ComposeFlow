@@ -35,6 +35,8 @@ kotlin {
             implementation(libs.kotlin.result)
             implementation(libs.kotlinx.atomicfu)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.multiplatform.settings)
+            implementation(libs.multiplatform.settings.make.observable)
         }
 
         jvmTest.dependencies {
@@ -56,6 +58,7 @@ kotlin {
 
         wasmJsMain.dependencies {
             implementation(libs.ktor.client.js)
+            implementation(libs.multiplatform.settings.coroutines)
         }
 
         wasmJsTest.dependencies {
