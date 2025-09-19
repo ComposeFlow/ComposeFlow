@@ -1,11 +1,11 @@
 package io.composeflow.datastore
 
 import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.StorageSettings
 import com.russhwolf.settings.ObservableSettings
-import com.russhwolf.settings.observable.makeObservable
+import com.russhwolf.settings.StorageSettings
 import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.coroutines.toFlowSettings
+import com.russhwolf.settings.observable.makeObservable
 import kotlinx.coroutines.flow.Flow
 
 actual object DataStoreFactory {
@@ -15,9 +15,7 @@ actual object DataStoreFactory {
      * Gets the singleton DataStore instance, creating it if necessary.
      * WASM implementation uses multiplatform-settings with localStorage for persistence.
      */
-    actual fun getOrCreateDataStore(producePath: () -> String): PlatformDataStore {
-        return dataStore ?: WasmDataStore().also { dataStore = it }
-    }
+    actual fun getOrCreateDataStore(producePath: () -> String): PlatformDataStore = dataStore ?: WasmDataStore().also { dataStore = it }
 }
 
 @OptIn(ExperimentalSettingsApi::class)
@@ -34,7 +32,7 @@ private class WasmDataStore : PlatformDataStore {
     }
 
     override suspend fun getString(key: String): String? = settings.getStringOrNull(key)
-    
+
     override fun observeString(key: String): Flow<String?> = flowSettings.getStringOrNullFlow(key)
 
     override suspend fun putBoolean(
