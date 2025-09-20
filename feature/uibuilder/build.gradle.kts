@@ -76,6 +76,10 @@ kotlin {
             implementation(kotlin("test-junit"))
             implementation(libs.coroutines.core)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.mockk)
+            @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+            implementation(compose.desktop.uiTestJUnit4)
+            implementation(compose.desktop.currentOs)
         }
 
         all {
@@ -105,4 +109,13 @@ afterEvaluate {
         // Ensure the KSP task runs
         outputs.upToDateWhen { false }
     }
+}
+
+tasks.withType<Test>().configureEach {
+    jvmArgs(
+        "--add-opens",
+        "java.desktop/java.awt=ALL-UNNAMED",
+        "--add-opens",
+        "java.desktop/sun.awt=ALL-UNNAMED",
+    )
 }

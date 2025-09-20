@@ -22,6 +22,7 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,6 +42,7 @@ import io.composeflow.ui.icon.ComposeFlowIconButton
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.modifier.hoverOverlay
 import io.composeflow.ui.utils.TreeExpander
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 import sh.calvin.reorderable.ReorderableCollectionItemScope
 
@@ -77,6 +79,7 @@ fun ModifierInspectorContainer(
                 .padding(end = 8.dp)
                 .animateContentSize(keyframes { durationMillis = 100 }),
     ) {
+        val coroutineScope = rememberCoroutineScope()
         val reorderScope = LocalReorderableCollectionItemScope.current
         if (reorderScope != null) {
             with(reorderScope) {
@@ -85,7 +88,9 @@ fun ModifierInspectorContainer(
                     wrapper = wrapper,
                     onExpandButtonClicked = { expanded = !expanded },
                     onDeleteButtonClicked = {
-                        composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
+                        coroutineScope.launch {
+                            composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
+                        }
                     },
                     onVisibilityToggleClicked = onVisibilityToggleClicked,
                     modifier = Modifier.draggableHandle(),
@@ -97,7 +102,9 @@ fun ModifierInspectorContainer(
                 wrapper = wrapper,
                 onExpandButtonClicked = { expanded = !expanded },
                 onDeleteButtonClicked = {
-                    composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
+                    coroutineScope.launch {
+                        composeNodeCallbacks.onModifierRemovedAt(node, modifierIndex)
+                    }
                 },
                 onVisibilityToggleClicked = onVisibilityToggleClicked,
             )

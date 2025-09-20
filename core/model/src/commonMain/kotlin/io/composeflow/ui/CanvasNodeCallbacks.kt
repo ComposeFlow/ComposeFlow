@@ -12,7 +12,7 @@ data class CanvasNodeCallbacks(
     val onDraggedNodeUpdated: (ComposeNode?) -> Unit,
     val onDraggedPositionUpdated: (Offset, PaletteDraggable) -> Unit,
     val onDragEnd: () -> Unit,
-    val onNodeDropToPosition: (Offset, ComposeNode) -> EventResult,
+    val onNodeDropToPosition: suspend (Offset, ComposeNode) -> EventResult,
     val onKeyPressed: (KeyEvent) -> EventResult,
     val onDoubleTap: (ComposeNode) -> EventResult,
     val onPopEditedComponent: () -> Unit,
