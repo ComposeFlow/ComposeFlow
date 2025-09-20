@@ -109,3 +109,13 @@ afterEvaluate {
         outputs.upToDateWhen { false }
     }
 }
+
+// Configure test tasks to show detailed stack traces
+tasks.withType<Test>().configureEach {
+    testLogging {
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        showExceptions = true
+        showCauses = true
+        showStackTraces = true
+    }
+}
