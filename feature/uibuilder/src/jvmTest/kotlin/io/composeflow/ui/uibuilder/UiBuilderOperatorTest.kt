@@ -10,8 +10,10 @@ import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.Screen
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 import io.composeflow.serializer.encodeToString
+import io.mockk.junit4.MockKRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -23,6 +25,9 @@ import kotlin.test.assertTrue
  * without making assumptions about internal implementation details.
  */
 class UiBuilderOperatorTest {
+    @get:Rule
+    val mockkRule = MockKRule(this)
+
     private lateinit var uiBuilderOperator: UiBuilderOperator
     private lateinit var project: Project
     private lateinit var screen: Screen
@@ -30,6 +35,7 @@ class UiBuilderOperatorTest {
 
     @Before
     fun setUp() {
+        mockAwtToolkitForComposeResources()
         uiBuilderOperator = UiBuilderOperator()
         project = Project()
         screen = project.screenHolder.screens.first()
