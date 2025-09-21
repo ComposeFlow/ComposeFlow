@@ -599,7 +599,7 @@ instead of in the canvas.</string>
     <string name="locale_name_vi">Vietnamese</string>
     <string name="locale_name_zu">Zulu</string>
 
-    <!-- String Resource Editor Error Messages -->
+    <!-- String Resource Editor error messages -->
     <string name="error_failed_to_add_string_resource">Failed to add string resource '%1$s': %2$s</string>
     <string name="error_failed_to_parse_string_resources_yaml">Failed to parse string resources YAML: %1$s</string>
     <string name="error_string_resource_not_found">String resource with ID %1$s not found.</string>
@@ -611,4 +611,22 @@ instead of in the canvas.</string>
     <string name="error_failed_to_set_default_locale">Failed to set default locale: %1$s</string>
     <string name="error_invalid_locale">Invalid locale code: %1$s. Use one of the supported locales: %2$s</string>
     <string name="error_locale_not_found">Locale %1$s not found.</string>
+
+    <!-- UI Builder Operator error messages -->
+    <string name="error_container_node_not_found">Container node with ID %1$s not found.</string>
+    <string name="error_cannot_drop_node_to">You can't drop a node to %1$s</string>
+    <string name="error_adding_compose_node_to_container">Error adding compose node to container: %1$s</string>
+    <string name="error_node_not_found">Node with ID %1$s not found.</string>
+    <string name="error_adding_modifier_to_node">Error adding modifier to node: %1$s</string>
+    <string name="error_invalid_modifier_index">Invalid modifier index: %1$d. Node has %2$d modifiers.</string>
+    <string name="error_updating_modifier_at_index">Error updating modifier at index %1$d: %2$s</string>
+    <string name="error_removing_modifier_at_index">Error removing modifier at index %1$d: %2$s</string>
+    <string name="error_updating_trait">Error updating trait: %1$s</string>
+    <string name="error_invalid_modifier_indices">Invalid modifier indices: from=%1$d, to=%2$d. Node has %3$d modifiers.</string>
+    <string name="error_swapping_modifiers">Error swapping modifiers at indices %1$d and %2$d: %3$s</string>
+    <string name="error_moving_component_to_position">Error moving component to position: %1$s</string>
+    <string name="error_retrieving_project_issues">Error retrieving project issues: %1$s</string>
+    <string name="error_listing_screens">Error listing screens: %1$s</string>
+    <string name="error_screen_not_found">Screen with ID '%1$s' not found</string>
+    <string name="error_retrieving_screen_details">Error retrieving screen details: %1$s</string>
 </resources>

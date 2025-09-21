@@ -471,7 +471,7 @@ class UiBuilderViewModel(
         return EventResult()
     }
 
-    fun onNodeDropToPosition(
+    suspend fun onNodeDropToPosition(
         dropPosition: Offset,
         node: ComposeNode,
     ): EventResult {
@@ -573,7 +573,7 @@ class UiBuilderViewModel(
         saveProject(project)
     }
 
-    fun onModifierRemovedAt(
+    suspend fun onModifierRemovedAt(
         node: ComposeNode,
         index: Int,
     ) {
@@ -597,7 +597,7 @@ class UiBuilderViewModel(
         saveProject(project)
     }
 
-    fun onModifierSwapped(
+    suspend fun onModifierSwapped(
         node: ComposeNode,
         from: Int,
         to: Int,

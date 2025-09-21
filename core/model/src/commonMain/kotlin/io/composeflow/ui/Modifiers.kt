@@ -367,14 +367,16 @@ private fun Modifier.dragHandlerAndTapGestures(
                                 },
                                 onDragEnd = {
                                     if (isDragging) {
-                                        val eventResult =
-                                            canvasNodeCallbacks.onNodeDropToPosition(
-                                                pointerPosition + node.boundsInWindow.value.topLeft,
-                                                node,
-                                            )
-                                        eventResult.errorMessages.forEach {
-                                            coroutineScope.launch {
-                                                onShowSnackbar(it, null)
+                                        coroutineScope.launch {
+                                            val eventResult =
+                                                canvasNodeCallbacks.onNodeDropToPosition(
+                                                    pointerPosition + node.boundsInWindow.value.topLeft,
+                                                    node,
+                                                )
+                                            eventResult.errorMessages.forEach {
+                                                launch {
+                                                    onShowSnackbar(it, null)
+                                                }
                                             }
                                         }
                                     } else if (onBottomDragHandler || isHeightResizing) {
