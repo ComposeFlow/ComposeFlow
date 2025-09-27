@@ -18,6 +18,7 @@ import io.composeflow.kotlinpoet.wrapper.KModifierWrapper
 import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
+import io.composeflow.kotlinpoet.wrapper.controlFlow
 import io.composeflow.kotlinpoet.wrapper.parameterizedBy
 import io.composeflow.model.datatype.DataType
 import io.composeflow.model.datatype.DataTypeDefaultValue
@@ -426,11 +427,8 @@ sealed interface ScreenState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """
-                    _${getFlowName(context)}.value = $expression
-                """,
-                    )
+                    builder.add("_${getFlowName(context)}.value = ")
+                    builder.add(expression)
                 }
             return builder.build()
         }
@@ -535,11 +533,8 @@ sealed interface ScreenState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """
-                    _${getFlowName(context)}.value = $expression
-                """,
-                    )
+                    builder.add("_${getFlowName(context)}.value = ")
+                    builder.add(expression)
                 }
             return builder.build()
         }
@@ -645,11 +640,8 @@ sealed interface ScreenState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """
-                    _${getFlowName(context)}.value = $expression
-                """,
-                    )
+                    builder.add("_${getFlowName(context)}.value = ")
+                    builder.add(expression)
                 }
             return builder.build()
         }
@@ -761,11 +753,8 @@ sealed interface ScreenState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """
-                    _${getFlowName(context)}.value = $expression
-                """,
-                    )
+                    builder.add("_${getFlowName(context)}.value = ")
+                    builder.add(expression)
                 }
             return builder.build()
         }
@@ -862,11 +851,8 @@ sealed interface ScreenState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """
-                    _${getFlowName(context)}.value = $expression
-                """,
-                    )
+                    builder.add("_${getFlowName(context)}.value = ")
+                    builder.add(expression)
                 }
             return builder.build()
         }
@@ -971,11 +957,8 @@ sealed interface ScreenState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """
-                    _${getFlowName(context)}.value = $expression
-                """,
-                    )
+                    builder.add("_${getFlowName(context)}.value = ")
+                    builder.add(expression)
                 }
             return builder.build()
         }
@@ -1159,13 +1142,15 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """%M.%M {
-                        ${ViewModelConstant.flowSettings.name}.putString("$name", $expression)
-                    }""",
+                    builder.controlFlow(
+                        "%M.%M {",
                         MemberHolder.PreCompose.viewModelScope,
                         MemberHolder.Coroutines.launch,
-                    )
+                    ) {
+                        builder.add("${ViewModelConstant.flowSettings.name}.putString(%S, ", name)
+                        builder.add(expression)
+                        builder.add(")\n")
+                    }
                 }
             return builder.build()
         }
@@ -1258,13 +1243,15 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """%M.%M {
-                        ${ViewModelConstant.flowSettings.name}.putInt("$name", $expression)
-                    }""",
+                    builder.controlFlow(
+                        "%M.%M {",
                         MemberHolder.PreCompose.viewModelScope,
                         MemberHolder.Coroutines.launch,
-                    )
+                    ) {
+                        builder.add("${ViewModelConstant.flowSettings.name}.putInt(%S, ", name)
+                        builder.add(expression)
+                        builder.add(")\n")
+                    }
                 }
             return builder.build()
         }
@@ -1360,13 +1347,15 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """%M.%M {
-                        ${ViewModelConstant.flowSettings.name}.putFloat("$name", $expression)
-                    }""",
+                    builder.controlFlow(
+                        "%M.%M {",
                         MemberHolder.PreCompose.viewModelScope,
                         MemberHolder.Coroutines.launch,
-                    )
+                    ) {
+                        builder.add("${ViewModelConstant.flowSettings.name}.putFloat(%S, ", name)
+                        builder.add(expression)
+                        builder.add(")\n")
+                    }
                 }
             return builder.build()
         }
@@ -1463,13 +1452,15 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """%M.%M {
-                        ${ViewModelConstant.flowSettings.name}.putBoolean("$name", $expression)
-                    }""",
+                    builder.controlFlow(
+                        "%M.%M {",
                         MemberHolder.PreCompose.viewModelScope,
                         MemberHolder.Coroutines.launch,
-                    )
+                    ) {
+                        builder.add("${ViewModelConstant.flowSettings.name}.putBoolean(%S, ", name)
+                        builder.add(expression)
+                        builder.add(")\n")
+                    }
                 }
             return builder.build()
         }
@@ -1578,13 +1569,15 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """%M.%M {
-                        ${ViewModelConstant.flowSettings.name}.putLong("$name", $expression.toEpochMilliseconds())
-                    }""",
+                    builder.controlFlow(
+                        "%M.%M {",
                         MemberHolder.PreCompose.viewModelScope,
                         MemberHolder.Coroutines.launch,
-                    )
+                    ) {
+                        builder.add("${ViewModelConstant.flowSettings.name}.putLong(%S, ", name)
+                        builder.add(expression)
+                        builder.add(".toEpochMilliseconds())\n")
+                    }
                 }
             return builder.build()
         }
@@ -1719,17 +1712,22 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """%M.%M {
-                        val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {
-                            add($expression)
-                        }
-                        ${ViewModelConstant.flowSettings.name}.putString("$name", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-                    }""",
+                    builder.controlFlow(
+                        "%M.%M {",
                         MemberHolder.PreCompose.viewModelScope,
                         MemberHolder.Coroutines.launch,
-                        MemberHolder.Serialization.encodeToString,
-                    )
+                    ) {
+                        builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
+                            builder.add("add(")
+                            builder.add(expression)
+                            builder.add(")\n")
+                        }
+                        builder.addStatement(
+                            "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                            name,
+                            MemberHolder.Serialization.encodeToString,
+                        )
+                    }
                 }
             return builder.build()
         }
@@ -1809,17 +1807,22 @@ sealed interface AppState<T> : State<T> {
                                 inputType = readProperty.valueType(project),
                                 codeBlock = readExpression,
                             )
-                        builder.addStatement(
-                            """%M.%M {
-                        val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {
-                            add($expression)
-                        }
-                        ${ViewModelConstant.flowSettings.name}.putString("$name", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-                    }""",
+                        builder.controlFlow(
+                            "%M.%M {",
                             MemberHolder.PreCompose.viewModelScope,
                             MemberHolder.Coroutines.launch,
-                            MemberHolder.Serialization.encodeToString,
-                        )
+                        ) {
+                            builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
+                                builder.add("add(")
+                                builder.add(expression)
+                                builder.add(")\n")
+                            }
+                            builder.addStatement(
+                                "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                                name,
+                                MemberHolder.Serialization.encodeToString,
+                            )
+                        }
                     }
                 }
             return builder.build()
@@ -1900,17 +1903,22 @@ sealed interface AppState<T> : State<T> {
                                 inputType = readProperty.valueType(project),
                                 codeBlock = readExpression,
                             )
-                        builder.addStatement(
-                            """%M.%M {
-                        val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {
-                            add($expression)
-                        }
-                        ${ViewModelConstant.flowSettings.name}.putString("$name", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-                    }""",
+                        builder.controlFlow(
+                            "%M.%M {",
                             MemberHolder.PreCompose.viewModelScope,
                             MemberHolder.Coroutines.launch,
-                            MemberHolder.Serialization.encodeToString,
-                        )
+                        ) {
+                            builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
+                                builder.add("add(")
+                                builder.add(expression)
+                                builder.add(")\n")
+                            }
+                            builder.addStatement(
+                                "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                                name,
+                                MemberHolder.Serialization.encodeToString,
+                            )
+                        }
                     }
                 }
             return builder.build()
@@ -1991,17 +1999,22 @@ sealed interface AppState<T> : State<T> {
                                 inputType = readProperty.valueType(project),
                                 codeBlock = readExpression,
                             )
-                        builder.addStatement(
-                            """%M.%M {
-                        val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {
-                            add($expression)
-                        }
-                        ${ViewModelConstant.flowSettings.name}.putString("$name", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-                    }""",
+                        builder.controlFlow(
+                            "%M.%M {",
                             MemberHolder.PreCompose.viewModelScope,
                             MemberHolder.Coroutines.launch,
-                            MemberHolder.Serialization.encodeToString,
-                        )
+                        ) {
+                            builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
+                                builder.add("add(")
+                                builder.add(expression)
+                                builder.add(")\n")
+                            }
+                            builder.addStatement(
+                                "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                                name,
+                                MemberHolder.Serialization.encodeToString,
+                            )
+                        }
                     }
                 }
             return builder.build()
@@ -2085,17 +2098,22 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.addStatement(
-                        """%M.%M {
-                        val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {
-                            add($expression)
-                        }
-                        ${ViewModelConstant.flowSettings.name}.putString("$name", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-                    }""",
+                    builder.controlFlow(
+                        "%M.%M {",
                         MemberHolder.PreCompose.viewModelScope,
                         MemberHolder.Coroutines.launch,
-                        MemberHolder.Serialization.encodeToString,
-                    )
+                    ) {
+                        builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
+                            builder.add("add(")
+                            builder.add(expression)
+                            builder.add(")\n")
+                        }
+                        builder.addStatement(
+                            "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                            name,
+                            MemberHolder.Serialization.encodeToString,
+                        )
+                    }
                 }
             return builder.build()
         }
