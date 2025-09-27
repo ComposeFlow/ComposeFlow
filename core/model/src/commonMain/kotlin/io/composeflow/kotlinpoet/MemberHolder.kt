@@ -147,6 +147,8 @@ object MemberHolder {
             MemberNameWrapper.get("org.jetbrains.compose.resources", "stringResource")
         val vectorResource =
             MemberNameWrapper.get("org.jetbrains.compose.resources", "vectorResource")
+        val getString =
+            MemberNameWrapper.get("org.jetbrains.compose.resources", "getString")
     }
 
     object Koin {

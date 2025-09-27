@@ -33,6 +33,7 @@ import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
+import io.composeflow.kotlinpoet.wrapper.controlFlow
 import io.composeflow.model.apieditor.ApiId
 import io.composeflow.model.apieditor.isList
 import io.composeflow.model.datatype.DataFieldType
@@ -439,19 +440,51 @@ sealed interface StringProperty : AssignableProperty {
             dryRun: Boolean,
         ): CodeBlockWrapper {
             val stringResource = project.stringResourceHolder.stringResources.find { it.id == stringResourceId }
-            return if (stringResource != null && stringResource.key.isNotBlank()) {
-                CodeBlockWrapper.of(
-                    "%M(%M.string.%M)",
-                    MemberHolder.JetBrains.stringResource,
-                    MemberHolder.ComposeFlow.Res,
-                    MemberNameWrapper.get(
-                        COMPOSEFLOW_PACKAGE,
-                        stringResource.key,
-                    ),
-                )
-            } else {
-                CodeBlockWrapper.of("\"\"")
+            if (stringResource == null || stringResource.key.isBlank()) {
+                return CodeBlockWrapper.of("\"\"")
             }
+            return when (context.generatedPlace) {
+                GeneratedPlace.ComposeScreen -> {
+                    CodeBlockWrapper.of(
+                        "%M(%M.string.%M)",
+                        MemberHolder.JetBrains.stringResource,
+                        MemberHolder.ComposeFlow.Res,
+                        MemberNameWrapper.get(
+                            COMPOSEFLOW_PACKAGE,
+                            stringResource.key,
+                        ),
+                    )
+                }
+                GeneratedPlace.ViewModel -> {
+                    CodeBlockWrapper.of(
+                        "%M(%M.string.%M)",
+                        MemberHolder.JetBrains.getString,
+                        MemberHolder.ComposeFlow.Res,
+                        MemberNameWrapper.get(
+                            COMPOSEFLOW_PACKAGE,
+                            stringResource.key,
+                        ),
+                    )
+                }
+                GeneratedPlace.Unspecified -> CodeBlockWrapper.of("\"\"")
+            }
+        }
+
+        override fun generateWrapWithViewModelBlock(
+            project: Project,
+            insideContent: CodeBlockWrapper,
+        ): CodeBlockWrapper? {
+            // TODO Return null if the generated code is already in a suspend function.
+            //      https://github.com/ComposeFlow/ComposeFlow/issues/193
+            val builder = CodeBlockWrapper.builder()
+            builder.controlFlow(
+                "%M.%M {",
+                MemberHolder.PreCompose.viewModelScope,
+                MemberHolder.Coroutines.launch,
+            ) {
+                builder.add(insideContent)
+            }
+            return builder.build()
         }
 
         override fun displayText(project: Project): String = textFromStringResource(project)
@@ -473,9 +506,7 @@ sealed interface StringProperty : AssignableProperty {
                             .map { it.id }
                             .toSet()
                     if (stringResourceId !in stringResourceIds) {
-                        add(
-                            Issue.InvalidResourceReference(resourceType = "string"),
-                        )
+                        add(Issue.InvalidResourceReference(resourceType = "string"))
                     }
                 }
     }
