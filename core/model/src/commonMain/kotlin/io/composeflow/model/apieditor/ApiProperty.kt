@@ -21,7 +21,7 @@ sealed interface ApiProperty {
     data class IntrinsicValue(
         val value: String = "",
     ) : ApiProperty {
-        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("\"\"\"$value\"\"\"")
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("%S", value)
 
         override fun asStringValue(): String = value
     }
@@ -45,7 +45,7 @@ sealed interface ApiProperty {
                 .builder(
                     name = name,
                     type = String::class.asTypeNameWrapper(),
-                ).defaultValue("\"$defaultValue\"")
+                ).defaultValue("%S", defaultValue)
                 .build()
     }
 }

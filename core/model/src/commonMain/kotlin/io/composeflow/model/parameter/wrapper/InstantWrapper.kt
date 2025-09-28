@@ -30,8 +30,9 @@ data class InstantWrapper(
             CodeBlockWrapper.of("%T.System.now()", Clock::class.asTypeNameWrapper())
         } else {
             CodeBlockWrapper.of(
-                "%T.parse(\"${asString()}\").%M(%T.UTC)",
+                "%T.parse(%S).%M(%T.UTC)",
                 LocalDate::class.asTypeNameWrapper(),
+                asString(),
                 MemberNameWrapper.get("kotlinx.datetime", "atStartOfDayIn", isExtension = true),
                 TimeZone::class.asTypeNameWrapper(),
             )
