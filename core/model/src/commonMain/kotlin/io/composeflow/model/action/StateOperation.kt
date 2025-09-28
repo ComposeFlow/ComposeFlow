@@ -456,6 +456,8 @@ sealed interface StateOperationForDataType : StateOperation {
                                             inputType = readProperty.valueType(project),
                                             codeBlock = codeBlock,
                                         )
+                                    // TODO: Stop converting CodeBlockWrapper to code by using toString().
+                                    //       https://github.com/ComposeFlow/ComposeFlow/issues/192
                                     append("${dataField.variableName} = $expression,\n")
                                 }
                         }
@@ -955,6 +957,8 @@ sealed interface StateOperationForList : StateOperation {
                                         inputType = properties.assignableProperty.valueType(project),
                                         codeBlock = it,
                                     )
+                                // TODO: Stop converting CodeBlockWrapper to code by using toString().
+                                //       https://github.com/ComposeFlow/ComposeFlow/issues/192
                                 append("${dataField.variableName} = $expression,\n")
                             }
                         }

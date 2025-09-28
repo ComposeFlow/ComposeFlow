@@ -2796,6 +2796,8 @@ sealed interface FirestoreAction : Action {
                                             inputType = readProperty.valueType(project),
                                             codeBlock = codeBlock,
                                         )
+                                    // TODO: Stop converting CodeBlockWrapper to code by using toString().
+                                    //       https://github.com/ComposeFlow/ComposeFlow/issues/192
                                     append("${dataField.variableName} = $expression,\n")
                                 }
                         }
@@ -2976,6 +2978,8 @@ sealed interface FirestoreAction : Action {
                                             inputType = readProperty.valueType(project),
                                             codeBlock = codeBlock,
                                         )
+                                    // TODO: Stop converting CodeBlockWrapper to code by using toString().
+                                    //       https://github.com/ComposeFlow/ComposeFlow/issues/192
                                     append("${dataField.variableName} = $expression,\n")
                                 }
                         }
