@@ -42,7 +42,7 @@ fun OffsetModifierInspector(
                         composeNodeCallbacks.onModifierUpdatedAt(
                             node,
                             modifierIndex,
-                            ModifierWrapper.Offset(
+                            wrapper.copy(
                                 x = if (it.isEmpty()) 0.dp else it.toInt().dp,
                                 y = wrapper.y,
                             ),
@@ -59,7 +59,7 @@ fun OffsetModifierInspector(
                         composeNodeCallbacks.onModifierUpdatedAt(
                             node,
                             modifierIndex,
-                            ModifierWrapper.Offset(
+                            wrapper.copy(
                                 x = wrapper.x,
                                 y = if (it.isEmpty()) 0.dp else it.toInt().dp,
                             ),

@@ -34,7 +34,7 @@ fun AlignVerticalModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.AlignVertical(
+                        wrapper.copy(
                             align = it,
                         ),
                     )

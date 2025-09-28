@@ -40,7 +40,7 @@ fun HeightModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.Height(
+                        wrapper.copy(
                             height = if (it.isEmpty()) 0.dp else it.toFloat().dp,
                         ),
                     )

@@ -60,6 +60,7 @@ import io.composeflow.serializer.LocationAwareDpSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
+import kotlin.uuid.Uuid
 
 @Serializable
 @SerialName("ModifierWrapper")
@@ -67,12 +68,16 @@ sealed class ModifierWrapper(
     // Doesn't have to be restored because this is a tentative property
     @Transient
     val visible: MutableState<Boolean> = mutableStateOf(true),
+    @Transient
+    open val id: String = Uuid.random().toString(),
 ) {
     @Serializable
     @SerialName("Alpha")
     data class Alpha(
         @FloatRange(from = 0.0, to = 1.0)
         val alpha: Float = 1f,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.alpha(alpha)
 
@@ -100,6 +105,8 @@ sealed class ModifierWrapper(
     data class AspectRatio(
         val ratio: Float,
         val matchHeightConstraintsFirst: Boolean? = null,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier =
             Modifier.aspectRatio(
@@ -145,6 +152,8 @@ sealed class ModifierWrapper(
             ),
         val brushWrapper: AssignableProperty? = null,
         val shapeWrapper: ShapeWrapper = ShapeWrapper.Rectangle,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         fun defaultColorProperty() =
             ColorProperty.ColorIntrinsicValue(
@@ -242,6 +251,8 @@ sealed class ModifierWrapper(
                 ColorWrapper(Material3ColorWrapper.Outline),
             ),
         val shapeWrapper: ShapeWrapper = ShapeWrapper.Rectangle,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         fun defaultColorProperty() =
             ColorProperty.ColorIntrinsicValue(
@@ -305,6 +316,8 @@ a color and a shape and clip it"""
     @SerialName("Clip")
     data class Clip(
         val shapeWrapper: ShapeWrapper = ShapeWrapper.Rectangle,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         // TODO: When rendered in canvas, this also clips the border and Composable label. Is it possible to avoid it?
         override fun toModifier(): Modifier = Modifier.clip(shape = shapeWrapper.toShape())
@@ -335,6 +348,8 @@ a color and a shape and clip it"""
     data class Height(
         @Serializable(with = LocationAwareDpSerializer::class)
         val height: Dp,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.height(height = height)
 
@@ -365,6 +380,8 @@ a color and a shape and clip it"""
     data class FillMaxHeight(
         @FloatRange(from = 0.0, to = 1.0)
         val fraction: Float = 1f,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.fillMaxHeight(fraction)
 
@@ -394,6 +411,8 @@ a color and a shape and clip it"""
     data class FillMaxWidth(
         @FloatRange(from = 0.0, to = 1.0)
         val fraction: Float = 1f,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.fillMaxWidth(fraction)
 
@@ -423,6 +442,8 @@ a color and a shape and clip it"""
     data class FillMaxSize(
         @FloatRange(from = 0.0, to = 1.0)
         val fraction: Float = 1f,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.fillMaxSize(fraction)
 
@@ -456,6 +477,8 @@ a color and a shape and clip it"""
         val x: Dp = 0.dp,
         @Serializable(with = LocationAwareDpSerializer::class)
         val y: Dp = 0.dp,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.offset(x = x, y = y)
 
@@ -495,6 +518,8 @@ a color and a shape and clip it"""
         val end: Dp = 0.dp,
         @Serializable(with = LocationAwareDpNonNegativeSerializer::class)
         val bottom: Dp = 0.dp,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         constructor(all: Dp) : this(start = all, top = all, end = all, bottom = all)
 
@@ -597,6 +622,8 @@ a color and a shape and clip it"""
     @SerialName("Rotate")
     data class Rotate(
         val degrees: Float = 0f,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.rotate(degrees)
 
@@ -624,6 +651,8 @@ a color and a shape and clip it"""
     data class Scale(
         val scaleX: Float? = null,
         val scaleY: Float? = null,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         constructor(scale: Float) : this(scale, scale)
 
@@ -683,6 +712,8 @@ scale factors along the horizontal and vertical axis respectively"""
         @Serializable(LocationAwareDpSerializer::class)
         val elevation: Dp = 0.dp,
         val shapeWrapper: ShapeWrapper = ShapeWrapper.Rectangle,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.shadow(elevation = elevation, shape = shapeWrapper.toShape())
 
@@ -717,6 +748,8 @@ scale factors along the horizontal and vertical axis respectively"""
         val width: Dp = Dp.Unspecified,
         @Serializable(with = LocationAwareDpSerializer::class)
         val height: Dp = Dp.Unspecified,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         constructor(size: Dp) : this(width = size, height = size)
 
@@ -759,7 +792,10 @@ scale factors along the horizontal and vertical axis respectively"""
 
     @Serializable
     @SerialName("HorizontalScroll")
-    data object HorizontalScroll : ModifierWrapper() {
+    data class HorizontalScroll(
+        @Transient
+        override val id: String = Uuid.random().toString(),
+    ) : ModifierWrapper() {
         override fun toModifier(): Modifier =
             Modifier.composed {
                 Modifier.horizontalScroll(rememberScrollState())
@@ -788,7 +824,10 @@ scale factors along the horizontal and vertical axis respectively"""
 
     @Serializable
     @SerialName("VerticalScroll")
-    data object VerticalScroll : ModifierWrapper() {
+    data class VerticalScroll(
+        @Transient
+        override val id: String = Uuid.random().toString(),
+    ) : ModifierWrapper() {
         override fun toModifier(): Modifier =
             Modifier.composed {
                 Modifier.verticalScroll(rememberScrollState())
@@ -820,6 +859,8 @@ scale factors along the horizontal and vertical axis respectively"""
     data class Width(
         @Serializable(with = LocationAwareDpSerializer::class)
         val width: Dp,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.width(width = width)
 
@@ -853,6 +894,8 @@ scale factors along the horizontal and vertical axis respectively"""
     data class WrapContentHeight(
         val align: AlignmentVerticalWrapper? = null,
         val unbounded: Boolean? = null,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier =
             Modifier.wrapContentHeight(
@@ -897,6 +940,8 @@ without regard for the incoming measurement"""
     data class WrapContentSize(
         val align: AlignmentWrapper? = null,
         val unbounded: Boolean? = null,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier =
             Modifier.wrapContentSize(
@@ -941,6 +986,8 @@ regard for the incoming measurement"""
     data class WrapContentWidth(
         val align: AlignmentHorizontalWrapper? = null,
         val unbounded: Boolean? = null,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier =
             Modifier.wrapContentWidth(
@@ -984,6 +1031,8 @@ regard for the incoming measurement"""
     @SerialName("ZIndex")
     data class ZIndex(
         val zIndex: Float? = null,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = Modifier.zIndex(zIndex = zIndex ?: 0f)
 
@@ -1012,6 +1061,8 @@ for the children of the same layout parent"""
     @SerialName("Align")
     data class Align(
         val align: AlignmentWrapper = AlignmentWrapper.TopStart,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = createAlignModifier(align.alignment)
 
@@ -1042,6 +1093,8 @@ for the children of the same layout parent"""
     @SerialName("AlignHorizontal")
     data class AlignHorizontal(
         val align: AlignmentHorizontalWrapper = AlignmentHorizontalWrapper.Start,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = ModifierHelper.createHorizontalAlignModifier(align.alignment)
 
@@ -1071,6 +1124,8 @@ for the children of the same layout parent"""
     @SerialName("AlignVertical")
     data class AlignVertical(
         val align: AlignmentVerticalWrapper = AlignmentVerticalWrapper.Top,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = ModifierHelper.createVerticalAlignModifier(align.alignment)
 
@@ -1101,6 +1156,8 @@ for the children of the same layout parent"""
     data class Weight(
         val weight: Float = 1f,
         val fill: Boolean = true,
+        @Transient
+        override val id: String = Uuid.random().toString(),
     ) : ModifierWrapper() {
         override fun toModifier(): Modifier = ModifierHelper.createWeightModifier(weight, fill)
 
@@ -1205,8 +1262,8 @@ relative to other weighted sibling elements in the Row"""
                 FillMaxHeight(),
                 FillMaxWidth(),
                 FillMaxSize(),
-                HorizontalScroll,
-                VerticalScroll,
+                HorizontalScroll(),
+                VerticalScroll(),
                 Offset(),
                 Rotate(),
                 Padding(all = 8.dp),

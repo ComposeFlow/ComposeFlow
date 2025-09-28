@@ -39,7 +39,7 @@ fun RotateModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.Rotate(
+                        wrapper.copy(
                             degrees = if (it.isEmpty()) 0f else it.toFloat(),
                         ),
                     )

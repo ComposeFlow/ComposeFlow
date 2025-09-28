@@ -37,7 +37,7 @@ fun FillMaxHeightModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.FillMaxHeight(
+                        wrapper.copy(
                             fraction = if (it.isEmpty()) 0f else it.toFloat(),
                         ),
                     )

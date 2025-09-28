@@ -34,7 +34,7 @@ fun AlignHorizontalModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.AlignHorizontal(
+                        wrapper.copy(
                             align = it,
                         ),
                     )

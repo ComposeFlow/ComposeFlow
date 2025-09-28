@@ -40,7 +40,7 @@ fun WidthModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.Width(
+                        wrapper.copy(
                             width = if (it.isEmpty()) 0.dp else it.toFloat().dp,
                         ),
                     )

@@ -37,7 +37,7 @@ fun FillMaxSizeModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.FillMaxSize(
+                        wrapper.copy(
                             fraction = if (it.isEmpty()) 0f else it.toFloat(),
                         ),
                     )

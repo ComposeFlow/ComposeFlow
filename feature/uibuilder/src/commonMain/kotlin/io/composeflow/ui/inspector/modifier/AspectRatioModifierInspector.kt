@@ -38,7 +38,7 @@ fun AspectRatioModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.AspectRatio(
+                        wrapper.copy(
                             ratio = if (it.isEmpty()) 0f else it.toFloat(),
                             matchHeightConstraintsFirst = wrapper.matchHeightConstraintsFirst,
                         ),
@@ -53,7 +53,7 @@ fun AspectRatioModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.AspectRatio(
+                        wrapper.copy(
                             ratio = wrapper.ratio,
                             matchHeightConstraintsFirst = it,
                         ),

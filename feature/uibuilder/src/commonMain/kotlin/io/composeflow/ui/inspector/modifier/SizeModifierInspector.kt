@@ -43,7 +43,7 @@ fun SizeModifierInspector(
                         composeNodeCallbacks.onModifierUpdatedAt(
                             node,
                             modifierIndex,
-                            ModifierWrapper.Size(
+                            wrapper.copy(
                                 width = if (it.isEmpty()) Dp.Unspecified else it.toFloat().dp,
                                 height = wrapper.height,
                             ),
@@ -60,7 +60,7 @@ fun SizeModifierInspector(
                         composeNodeCallbacks.onModifierUpdatedAt(
                             node,
                             modifierIndex,
-                            ModifierWrapper.Size(
+                            wrapper.copy(
                                 width = wrapper.width,
                                 height = if (it.isEmpty()) Dp.Unspecified else it.toFloat().dp,
                             ),

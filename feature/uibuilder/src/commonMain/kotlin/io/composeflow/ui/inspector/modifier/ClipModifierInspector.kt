@@ -34,7 +34,7 @@ fun ClipModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.Clip(it),
+                        wrapper.copy(it),
                     )
                 },
             )

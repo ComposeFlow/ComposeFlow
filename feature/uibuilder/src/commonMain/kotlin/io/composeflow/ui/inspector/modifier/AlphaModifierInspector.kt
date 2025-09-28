@@ -37,7 +37,7 @@ fun AlphaModifierInspector(
                     composeNodeCallbacks.onModifierUpdatedAt(
                         node,
                         modifierIndex,
-                        ModifierWrapper.Alpha(
+                        wrapper.copy(
                             alpha = if (it.isEmpty()) 0f else it.toFloat(),
                         ),
                     )

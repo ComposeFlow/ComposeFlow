@@ -138,7 +138,7 @@ private fun AllScaleInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Scale(
+                    wrapper.copy(
                         scaleX = it.toFloat(),
                         scaleY = it.toFloat(),
                     ),
@@ -167,7 +167,7 @@ private fun XandYScaleInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Scale(
+                    wrapper.copy(
                         scaleX = it.toFloat(),
                         scaleY = wrapper.scaleY,
                     ),
@@ -184,7 +184,7 @@ private fun XandYScaleInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Scale(
+                    wrapper.copy(
                         scaleX = wrapper.scaleX,
                         scaleY = it.toFloat(),
                     ),

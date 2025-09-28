@@ -40,9 +40,9 @@ fun ZIndexModifierInspector(
                         node,
                         modifierIndex,
                         if (it.isEmpty()) {
-                            ModifierWrapper.ZIndex()
+                            ModifierWrapper.ZIndex(id = wrapper.id)
                         } else {
-                            ModifierWrapper.ZIndex(
+                            wrapper.copy(
                                 zIndex = it.toFloat(),
                             )
                         },

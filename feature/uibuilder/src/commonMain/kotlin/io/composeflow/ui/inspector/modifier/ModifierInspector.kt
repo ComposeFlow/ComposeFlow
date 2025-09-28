@@ -673,12 +673,13 @@ fun EditModifierDialog(
                         ) {
                             itemsIndexed(
                                 composeNode.modifierList,
-                                key = { index, modifier -> modifier },
+                                key = { index, modifier -> modifier.id },
                             ) { i, chain ->
+
                                 ComposeFlowReorderableItem(
                                     index = i,
                                     reorderableLazyListState,
-                                    key = chain,
+                                    key = chain.id,
                                 ) {
                                     ProvideModifierReorderAllowed(reorderableCollectionItemScope = this) {
                                         val onVisibilityToggleClicked = {

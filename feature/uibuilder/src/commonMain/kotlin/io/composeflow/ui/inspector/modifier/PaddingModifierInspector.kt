@@ -158,7 +158,7 @@ fun AllPaddingInspector(
             composeNodeCallbacks.onModifierUpdatedAt(
                 node,
                 modifierIndex,
-                ModifierWrapper.Padding(
+                wrapper.copy(
                     start = newValue,
                     top = newValue,
                     end = newValue,
@@ -193,7 +193,7 @@ fun HorizontalAndVerticalPaddingInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Padding(
+                    wrapper.copy(
                         start = newValue,
                         top = wrapper.top,
                         end = newValue,
@@ -215,7 +215,7 @@ fun HorizontalAndVerticalPaddingInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Padding(
+                    wrapper.copy(
                         start = wrapper.start,
                         top = newValue,
                         end = wrapper.end,
@@ -252,7 +252,7 @@ fun IndividualPaddingInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Padding(
+                    wrapper.copy(
                         start = if (it.isEmpty()) 0.dp else it.toFloat().dp,
                         top = wrapper.top,
                         end = wrapper.end,
@@ -273,7 +273,7 @@ fun IndividualPaddingInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Padding(
+                    wrapper.copy(
                         start = wrapper.start,
                         top = if (it.isEmpty()) 0.dp else it.toFloat().dp,
                         end = wrapper.end,
@@ -294,7 +294,7 @@ fun IndividualPaddingInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Padding(
+                    wrapper.copy(
                         start = wrapper.start,
                         top = wrapper.top,
                         end = if (it.isEmpty()) 0.dp else it.toFloat().dp,
@@ -315,7 +315,7 @@ fun IndividualPaddingInspector(
                 composeNodeCallbacks.onModifierUpdatedAt(
                     node,
                     modifierIndex,
-                    ModifierWrapper.Padding(
+                    wrapper.copy(
                         start = wrapper.start,
                         top = wrapper.top,
                         end = wrapper.end,
