@@ -61,9 +61,3 @@ expect class CodeBlockBuilderWrapper {
 
     fun endControlFlow(): CodeBlockBuilderWrapper
 }
-
-fun CodeBlockBuilderWrapper.controlFlow(
-    controlFlow: String,
-    vararg args: Any?,
-    block: (CodeBlockBuilderWrapper) -> CodeBlockBuilderWrapper,
-): CodeBlockBuilderWrapper = block(beginControlFlow(controlFlow, *args)).endControlFlow()
