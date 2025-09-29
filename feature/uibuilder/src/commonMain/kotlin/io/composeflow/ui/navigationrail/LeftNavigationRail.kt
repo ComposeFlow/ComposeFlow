@@ -62,11 +62,6 @@ fun LeftNavigationRail(navigator: Navigator) {
                 .fillMaxHeight(),
     ) {
         TopLevelDestination.entries.forEachIndexed { index, item ->
-            if (BuildConfig.isRelease) {
-                if (item == TopLevelDestination.StringEditor) {
-                    return@forEachIndexed
-                }
-            }
             val isSelected = selectedItem == item.ordinal
             Tooltip(item.label) {
                 NavigationRailItem(

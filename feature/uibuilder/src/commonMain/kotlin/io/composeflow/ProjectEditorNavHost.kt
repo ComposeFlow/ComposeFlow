@@ -55,12 +55,9 @@ fun ProjectEditorNavHost(
         assetEditorScreen(
             project = project,
         )
-        @Suppress("KotlinConstantConditions")
-        if (!BuildConfig.isRelease) {
-            stringResourceEditorScreen(
-                project = project,
-            )
-        }
+        stringResourceEditorScreen(
+            project = project,
+        )
         settingsScreen(
             project = project,
         )
