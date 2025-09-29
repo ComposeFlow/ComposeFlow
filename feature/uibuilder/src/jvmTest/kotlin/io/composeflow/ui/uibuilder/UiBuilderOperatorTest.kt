@@ -35,7 +35,7 @@ class UiBuilderOperatorTest {
 
     @Before
     fun setUp() {
-        mockAwtToolkitForComposeResources()
+        mockAwtToolkitForComposeResourcesIfNecessary()
         uiBuilderOperator = UiBuilderOperator()
         project = Project()
         screen = project.screenHolder.screens.first()

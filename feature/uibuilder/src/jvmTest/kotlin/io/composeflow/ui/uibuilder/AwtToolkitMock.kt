@@ -38,9 +38,14 @@ import java.awt.Toolkit
  *
  * @param screenResolution The desired screen resolution to be returned by the mocked Toolkit. Default is 96 DPI.
  */
-fun mockAwtToolkitForComposeResources(screenResolution: Int = 96) {
-    val toolkit = spyk(Toolkit.getDefaultToolkit())
-    every { toolkit.screenResolution } returns screenResolution
-    mockkStatic(Toolkit::class)
-    every { Toolkit.getDefaultToolkit() } returns toolkit
+fun mockAwtToolkitForComposeResourcesIfNecessary(screenResolution: Int = 96) {
+    val toolkit = Toolkit.getDefaultToolkit()
+    try {
+        toolkit.screenResolution
+    } catch (_: HeadlessException) {
+        val spied = spyk(Toolkit.getDefaultToolkit())
+        every { spied.screenResolution } returns screenResolution
+        mockkStatic(Toolkit::class)
+        every { Toolkit.getDefaultToolkit() } returns spied
+    }
 }
