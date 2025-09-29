@@ -257,7 +257,7 @@ class TextTraitTest {
                 dryRun = false,
             )
         val textStr =
-            "\"\"\"Great news! Your package has arrived safely and is now waiting for you at your doorstep. Please check it at your earliest convenience and let us know if everything is in order. Enjoy your purchase!\"\"\""
+            "\"Great news! Your package has arrived safely and is now waiting for you at your doorstep. Please check it at your earliest convenience and let us know if everything is in order. Enjoy your purchase!\""
         assertEquals(
             """
             androidx.compose.material3.Text(
