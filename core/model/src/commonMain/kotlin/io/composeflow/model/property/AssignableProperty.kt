@@ -28,7 +28,6 @@ import io.composeflow.editor.validator.ValidateResult
 import io.composeflow.kotlinpoet.ClassHolder
 import io.composeflow.kotlinpoet.GeneratedPlace
 import io.composeflow.kotlinpoet.GenerationContext
-import io.composeflow.kotlinpoet.KOTLINPOET_COLUMN_LIMIT
 import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
@@ -390,15 +389,7 @@ sealed interface StringProperty : AssignableProperty {
 
         override fun displayText(project: Project): String = value
 
-        override fun asCodeBlock(): CodeBlockWrapper =
-            if (value.contains("\n") || value.contains("\r") || value.length >= KOTLINPOET_COLUMN_LIMIT) {
-                // It looks like Kotlinpoet's column limit is hard-coded as 100.
-                // That means a string more than 100 characters can be translated as multiline
-                // string unintentionally.
-                CodeBlockWrapper.of("\"\"\"%L\"\"\"", value)
-            } else {
-                CodeBlockWrapper.of("\"%L\"", value)
-            }
+        override fun asCodeBlock(): CodeBlockWrapper = CodeBlockWrapper.of("%S", value)
     }
 
     @Serializable

@@ -5,7 +5,6 @@ import androidx.compose.ui.Modifier
 import io.composeflow.asVariableName
 import io.composeflow.editor.validator.FloatValidator
 import io.composeflow.editor.validator.IntValidator
-import io.composeflow.kotlinpoet.KOTLINPOET_COLUMN_LIMIT
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
 import io.composeflow.model.parameter.lazylist.LazyListChildParams
@@ -52,18 +51,7 @@ sealed interface ParameterWrapper<T> {
         @Transient
         override val variableName: String = name.asVariableName()
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper =
-            if (defaultValue.contains("\n") ||
-                defaultValue.contains("\r") ||
-                defaultValue.length >= KOTLINPOET_COLUMN_LIMIT
-            ) {
-                // It looks like Kotlinpoet's column limit is hard-coded as 100.
-                // That means a string more than 100 characters can be translated as multiline
-                // string unintentionally.
-                CodeBlockWrapper.of("\"\"\"${defaultValue}\"\"\"")
-            } else {
-                CodeBlockWrapper.of("\"$defaultValue\"")
-            }
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("%S", defaultValue)
     }
 
     @Serializable

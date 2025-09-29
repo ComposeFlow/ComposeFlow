@@ -36,7 +36,7 @@ sealed interface FieldType<T> : DropdownItem {
 
         override fun defaultValue(): kotlin.String = defaultValue
 
-        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("\"${defaultValue}\"")
+        override fun defaultValueAsCodeBlock(project: Project): CodeBlockWrapper = CodeBlockWrapper.of("%S", defaultValue)
 
         @Composable
         override fun asDropdownText(): AnnotatedString = AnnotatedString("String")

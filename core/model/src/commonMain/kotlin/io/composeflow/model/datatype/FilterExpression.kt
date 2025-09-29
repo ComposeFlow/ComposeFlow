@@ -149,7 +149,7 @@ data class SingleFilter(
             is FilterFieldType.DataField -> {
                 project.findDataTypeOrNull(filterFieldType.dataTypeId)?.let {
                     it.findDataFieldOrNull(filterFieldType.dataFieldId)?.let { dataField ->
-                        builder.add("\"${dataField.variableName}\" ")
+                        builder.add("%S ", dataField.variableName)
                     }
                 }
             }
