@@ -455,7 +455,7 @@ fun ColorPropertyDialogContent(
                     ) {
                         Text(
                             text = extendedColor.name,
-                            color = Color.Black,
+                            color = extendedColor.getContentColor(),
                             style = MaterialTheme.typography.labelSmall,
                             modifier =
                                 Modifier

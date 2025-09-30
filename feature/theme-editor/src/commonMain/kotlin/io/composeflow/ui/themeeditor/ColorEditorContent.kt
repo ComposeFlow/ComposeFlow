@@ -72,7 +72,6 @@ import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.colorspace.ColorSpaces
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -1294,13 +1293,7 @@ private fun ExtendedColorBox(
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    val contentColor =
-        remember(extendedColor.color) {
-            val luminance = extendedColor.color.luminance()
-            val tone = if (luminance > 0.5f) 20 else 90
-            CorePalette.contentOf(extendedColor.color.toArgb()).a1.toneColor(tone)
-        }
-
+    val contentColor = extendedColor.getContentColor()
     val isHovered by interactionSource.collectIsHoveredAsState()
     val backgroundColor = extendedColor.color
     var showMenu by remember { mutableStateOf(false) }
