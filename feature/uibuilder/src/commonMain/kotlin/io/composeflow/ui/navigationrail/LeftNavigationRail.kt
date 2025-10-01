@@ -29,7 +29,6 @@ import androidx.compose.ui.graphics.vector.VectorPath
 import androidx.compose.ui.graphics.vector.group
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
-import io.composeflow.BuildConfig
 import io.composeflow.NAVIGATION_RAIL_TEST_TAG
 import io.composeflow.model.TopLevelDestination
 import io.composeflow.ui.Tooltip
@@ -62,11 +61,6 @@ fun LeftNavigationRail(navigator: Navigator) {
                 .fillMaxHeight(),
     ) {
         TopLevelDestination.entries.forEachIndexed { index, item ->
-            if (BuildConfig.isRelease) {
-                if (item == TopLevelDestination.StringEditor) {
-                    return@forEachIndexed
-                }
-            }
             val isSelected = selectedItem == item.ordinal
             Tooltip(item.label) {
                 NavigationRailItem(
