@@ -530,9 +530,10 @@ topAppBarNode:
                     "OnLongClick": [ ]
             visibilityParams: { }
         -   id: "saveButton"
-            trait: !<IconTrait>
+            trait: !<IconButtonTrait>
                 imageVectorHolder: !<Outlined> "Check"
-                contentDescription: "Save changes"
+                contentDescription: !<StringIntrinsicValue>
+                    value: "Save changes"
                 tint: !<ColorIntrinsicValue>
                     value:
                         themeColor: "Primary"
@@ -564,7 +565,30 @@ topAppBarNode:
     visibilityParams: { }
 bottomAppBarNode: null
 navigationDrawerNode: null
-fabNode: null
+fabNode:
+    id: "addFab"
+    trait: !<FabTrait>
+        imageVectorHolder: !<Outlined> "Add"
+        contentDescription: "Add new item"
+        fabPositionWrapper: "End"
+    label: "Add FAB"
+    lazyListChildParams: !<FixedNumber>
+        numOfItems: 1
+    dynamicItems: null
+    actionHandler: !<ActionHandlerImpl>
+        actionsMap:
+            "OnClick":
+                - !<Simple>
+                    id: "addItemAction"
+                    action: !<ShowInformationDialog>
+                        id: "addItemDialog"
+                        title: !<StringIntrinsicValue>
+                            value: "Add Item"
+                        message: !<StringIntrinsicValue>
+                            value: "Create a new item"
+                        confirmText: !<StringIntrinsicValue>
+                            value: "Create"
+    visibilityParams: { }
 stateHolderImpl:
     states:
         - !<StringScreenState>

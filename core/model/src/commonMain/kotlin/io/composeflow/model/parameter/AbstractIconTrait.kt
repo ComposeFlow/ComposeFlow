@@ -31,6 +31,7 @@ import io.composeflow.model.project.issue.Issue
 import io.composeflow.model.property.AssignableProperty
 import io.composeflow.model.property.ColorProperty
 import io.composeflow.model.property.PropertyContainer
+import io.composeflow.model.property.StringProperty
 import io.composeflow.model.type.ComposeFlowType
 import io.composeflow.serializer.FallbackEnumSerializer
 import io.composeflow.tooltip_icon_trait
@@ -58,7 +59,8 @@ abstract class AbstractIconTrait(
     @Transient
     open val blobInfoWrapper: BlobInfoWrapper? = null,
     @Transient
-    open val contentDescription: String = "Icon for ${imageVectorHolder?.name}",
+    open val contentDescription: AssignableProperty =
+        StringProperty.StringIntrinsicValue(value = "Icon for ${imageVectorHolder?.name}"),
     @Transient
     open val tint: AssignableProperty? =
         ColorProperty.ColorIntrinsicValue(
@@ -149,7 +151,7 @@ abstract class AbstractIconTrait(
                 imageVectorHolder?.let {
                     Icon(
                         imageVector = it.imageVector,
-                        contentDescription = contentDescription,
+                        contentDescription = contentDescription.valueExpression(project),
                         tint =
                             (tint as? ColorProperty.ColorIntrinsicValue)?.value?.getColor()
                                 ?: MaterialTheme.colorScheme.onBackground,
@@ -206,7 +208,16 @@ abstract class AbstractIconTrait(
                     codeBlockBuilder.add("imageVector = ")
                     codeBlockBuilder.add(holder.asCodeBlock())
                     codeBlockBuilder.addStatement(",")
-                    codeBlockBuilder.addStatement("""contentDescription = "$contentDescription",""")
+                    codeBlockBuilder.add("contentDescription = ")
+                    codeBlockBuilder.add(
+                        contentDescription.transformedCodeBlock(
+                            project,
+                            context,
+                            ComposeFlowType.StringType(),
+                            dryRun = dryRun,
+                        ),
+                    )
+                    codeBlockBuilder.addStatement(",")
                     tint?.let {
                         codeBlockBuilder.add("tint = ")
                         codeBlockBuilder.add(

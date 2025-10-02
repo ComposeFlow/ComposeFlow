@@ -30,8 +30,10 @@ import io.composeflow.model.parameter.wrapper.Material3ColorWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 import io.composeflow.model.property.AssignableProperty
+import io.composeflow.model.property.AssignablePropertyOrStringSerializer
 import io.composeflow.model.property.ColorProperty
 import io.composeflow.model.property.PropertyContainer
+import io.composeflow.model.property.StringProperty
 import io.composeflow.model.type.ComposeFlowType
 import io.composeflow.serializer.FallbackEnumSerializer
 import io.composeflow.tooltip_fab_trait
@@ -46,7 +48,9 @@ import org.jetbrains.compose.resources.StringResource
 @SerialName("FabTrait")
 data class FabTrait(
     val imageVectorHolder: ImageVectorHolder = Outlined.Add,
-    val contentDescription: String = "Floating Action Button for ${imageVectorHolder.name}",
+    @Serializable(AssignablePropertyOrStringSerializer::class)
+    val contentDescription: AssignableProperty =
+        StringProperty.StringIntrinsicValue(value = "Floating Action Button for ${imageVectorHolder.name}"),
     val fabPositionWrapper: FabPositionWrapper? = null,
     val containerColorWrapper: AssignableProperty? =
         ColorProperty.ColorIntrinsicValue(
@@ -138,7 +142,7 @@ data class FabTrait(
                 ) {
                     Icon(
                         imageVector = imageVectorHolder.imageVector,
-                        contentDescription = contentDescription,
+                        contentDescription = contentDescription.valueExpression(project),
                     )
                 }
             }
@@ -174,7 +178,7 @@ data class FabTrait(
                 ) {
                     Icon(
                         imageVector = imageVectorHolder.imageVector,
-                        contentDescription = contentDescription,
+                        contentDescription = contentDescription.valueExpression(project),
                     )
                 }
             }
@@ -210,7 +214,7 @@ data class FabTrait(
                 ) {
                     Icon(
                         imageVector = imageVectorHolder.imageVector,
-                        contentDescription = contentDescription,
+                        contentDescription = contentDescription.valueExpression(project),
                     )
                 }
             }
@@ -246,7 +250,7 @@ data class FabTrait(
                 ) {
                     Icon(
                         imageVector = imageVectorHolder.imageVector,
-                        contentDescription = contentDescription,
+                        contentDescription = contentDescription.valueExpression(project),
                     )
                 }
             }
@@ -319,7 +323,16 @@ data class FabTrait(
         codeBlockBuilder.addStatement("imageVector = ")
         codeBlockBuilder.add(imageVectorHolder.asCodeBlock())
         codeBlockBuilder.addStatement(",")
-        codeBlockBuilder.addStatement("""contentDescription = "$contentDescription",""")
+        codeBlockBuilder.add("contentDescription = ")
+        codeBlockBuilder.add(
+            contentDescription.transformedCodeBlock(
+                project,
+                context,
+                ComposeFlowType.StringType(),
+                dryRun = dryRun,
+            ),
+        )
+        codeBlockBuilder.addStatement(",")
         codeBlockBuilder.addStatement(")")
         codeBlockBuilder.addStatement("}")
         return codeBlockBuilder.build()
