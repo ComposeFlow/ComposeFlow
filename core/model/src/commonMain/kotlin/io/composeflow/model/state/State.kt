@@ -19,6 +19,7 @@ import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
 import io.composeflow.kotlinpoet.wrapper.PropertySpecWrapper
 import io.composeflow.kotlinpoet.wrapper.asTypeNameWrapper
 import io.composeflow.kotlinpoet.wrapper.controlFlow
+import io.composeflow.kotlinpoet.wrapper.launchCoroutineIfNeeded
 import io.composeflow.kotlinpoet.wrapper.parameterizedBy
 import io.composeflow.model.datatype.DataType
 import io.composeflow.model.datatype.DataTypeDefaultValue
@@ -225,14 +226,16 @@ sealed interface ListAppState {
                 MemberHolder.Coroutines.Flow.SharingStarted,
             ).build()
 
-    fun generateClearStateCode(stateName: String): CodeBlockWrapper =
-        CodeBlockWrapper.of(
-            """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putString("$stateName", "[]")
-                }""",
-            MemberHolder.PreCompose.viewModelScope,
-            MemberHolder.Coroutines.launch,
-        )
+    fun generateClearStateCode(
+        context: GenerationContext,
+        stateName: String,
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
+        builder.launchCoroutineIfNeeded(context) {
+            builder.addStatement("${ViewModelConstant.flowSettings.name}.putString(%S, %S)", stateName, "[]")
+        }
+        return builder.build()
+    }
 
     fun generateAddValueToStateCode(
         project: Project,
@@ -245,37 +248,41 @@ sealed interface ListAppState {
         project: Project,
         context: GenerationContext,
         writeState: WriteableState,
-    ): CodeBlockWrapper =
-        CodeBlockWrapper.of(
-            """%M.%M {
-                val list = ${writeState.getFlowName(context)}.value.toMutableList()
-                if (list.isNotEmpty()) {
-                    list.removeFirst()
-                }
-                ${ViewModelConstant.flowSettings.name}.putString("${writeState.name}", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-            }""",
-            MemberHolder.PreCompose.viewModelScope,
-            MemberHolder.Coroutines.launch,
-            MemberHolder.Serialization.encodeToString,
-        )
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
+        builder.launchCoroutineIfNeeded(context) {
+            builder.addStatement("val list = ${writeState.getFlowName(context)}.value.toMutableList()")
+            builder.controlFlow("if (list.isNotEmpty())") {
+                builder.addStatement("list.removeFirst()")
+            }
+            builder.addStatement(
+                "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                writeState.name,
+                MemberHolder.Serialization.encodeToString,
+            )
+        }
+        return builder.build()
+    }
 
     fun generateRemoveLastValueCode(
         project: Project,
         context: GenerationContext,
         writeState: WriteableState,
-    ): CodeBlockWrapper =
-        CodeBlockWrapper.of(
-            """%M.%M {
-                val list = ${writeState.getFlowName(context)}.value.toMutableList()
-                if (list.isNotEmpty()) {
-                    list.removeLast()
-                }
-                ${ViewModelConstant.flowSettings.name}.putString("${writeState.name}", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-            }""",
-            MemberHolder.PreCompose.viewModelScope,
-            MemberHolder.Coroutines.launch,
-            MemberHolder.Serialization.encodeToString,
-        )
+    ): CodeBlockWrapper {
+        val builder = CodeBlockWrapper.builder()
+        builder.launchCoroutineIfNeeded(context) {
+            builder.addStatement("val list = ${writeState.getFlowName(context)}.value.toMutableList()")
+            builder.controlFlow("if (list.isNotEmpty())") {
+                builder.addStatement("list.removeLast()")
+            }
+            builder.addStatement(
+                "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                writeState.name,
+                MemberHolder.Serialization.encodeToString,
+            )
+        }
+        return builder.build()
+    }
 
     fun generateRemoveValueAtIndexFun(
         project: Project,
@@ -284,26 +291,27 @@ sealed interface ListAppState {
         writeState: WriteableState,
     ): FunSpecWrapper {
         val indexToRemove = "indexToRemove"
+        val builder = CodeBlockWrapper.builder()
+        builder.addStatement("val list = ${writeState.getFlowName(context)}.value.toMutableList()")
+        builder.addStatement("if ($indexToRemove < 0 || $indexToRemove >= list.size) return")
+        builder.launchCoroutineIfNeeded(context) {
+            builder.controlFlow("if (list.isNotEmpty())") {
+                builder.addStatement("list.removeAt($indexToRemove)")
+            }
+            builder.addStatement(
+                "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                writeState.name,
+                MemberHolder.Serialization.encodeToString,
+            )
+        }
         return FunSpecWrapper
             .builder(functionName)
             .addParameter(
                 ParameterSpecWrapper
                     .builder(name = indexToRemove, Int::class.asTypeNameWrapper())
                     .build(),
-            ).addCode(
-                """
-                val list = ${writeState.getFlowName(context)}.value.toMutableList()
-                if ($indexToRemove < 0 || $indexToRemove >= list.size) return
-                %M.%M {
-                    if (list.isNotEmpty()) {
-                        list.removeAt($indexToRemove)
-                    }
-                    ${ViewModelConstant.flowSettings.name}.putString("${writeState.name}", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-                MemberHolder.Serialization.encodeToString,
-            ).build()
+            ).addCode(builder.build())
+            .build()
     }
 
     fun generateUpdateValueAtIndexFunBuilder(
@@ -314,24 +322,25 @@ sealed interface ListAppState {
         writeState: WriteableState,
     ): FunSpecWrapper {
         val indexToUpdate = "indexToUpdate"
+        val builder = CodeBlockWrapper.builder()
+        builder.addStatement("val list = ${writeState.getFlowName(context)}.value.toMutableList()")
+        builder.addStatement("if ($indexToUpdate < 0 || $indexToUpdate >= list.size) return")
+        builder.launchCoroutineIfNeeded(context) {
+            builder.addStatement("list.set($indexToUpdate, $readCodeBlock)")
+            builder.addStatement(
+                "${ViewModelConstant.flowSettings.name}.putString(%S, ${ViewModelConstant.jsonSerializer.name}.%M(list))",
+                writeState.name,
+                MemberHolder.Serialization.encodeToString,
+            )
+        }
         return FunSpecWrapper
             .builder(functionName)
             .addParameter(
                 ParameterSpecWrapper
                     .builder(name = indexToUpdate, Int::class.asTypeNameWrapper())
                     .build(),
-            ).addCode(
-                """
-                val list = ${writeState.getFlowName(context)}.value.toMutableList()
-                if ($indexToUpdate < 0 || $indexToUpdate >= list.size) return
-                %M.%M {
-                    list.set($indexToUpdate, $readCodeBlock)
-                    ${ViewModelConstant.flowSettings.name}.putString("${writeState.name}", ${ViewModelConstant.jsonSerializer.name}.%M(list))
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-                MemberHolder.Serialization.encodeToString,
-            ).build()
+            ).addCode(builder.build())
+            .build()
     }
 }
 
@@ -1142,11 +1151,7 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.controlFlow(
-                        "%M.%M {",
-                        MemberHolder.PreCompose.viewModelScope,
-                        MemberHolder.Coroutines.launch,
-                    ) {
+                    builder.launchCoroutineIfNeeded(context) {
                         builder.add("${ViewModelConstant.flowSettings.name}.putString(%S, ", name)
                         builder.add(expression)
                         builder.add(")\n")
@@ -1155,14 +1160,13 @@ sealed interface AppState<T> : State<T> {
             return builder.build()
         }
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            CodeBlockWrapper.of(
-                """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putString("$name", "$defaultValue")
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            )
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
+            builder.launchCoroutineIfNeeded(context) {
+                builder.addStatement("${ViewModelConstant.flowSettings.name}.putString(%S, %S)", name, defaultValue)
+            }
+            return builder.build()
+        }
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -1243,11 +1247,7 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.controlFlow(
-                        "%M.%M {",
-                        MemberHolder.PreCompose.viewModelScope,
-                        MemberHolder.Coroutines.launch,
-                    ) {
+                    builder.launchCoroutineIfNeeded(context) {
                         builder.add("${ViewModelConstant.flowSettings.name}.putInt(%S, ", name)
                         builder.add(expression)
                         builder.add(")\n")
@@ -1259,14 +1259,13 @@ sealed interface AppState<T> : State<T> {
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            CodeBlockWrapper.of(
-                """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putInt("$name", $defaultValue)
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            )
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
+            builder.launchCoroutineIfNeeded(context) {
+                builder.addStatement("${ViewModelConstant.flowSettings.name}.putInt(%S, %L)", name, defaultValue)
+            }
+            return builder.build()
+        }
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -1347,11 +1346,7 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.controlFlow(
-                        "%M.%M {",
-                        MemberHolder.PreCompose.viewModelScope,
-                        MemberHolder.Coroutines.launch,
-                    ) {
+                    builder.launchCoroutineIfNeeded(context) {
                         builder.add("${ViewModelConstant.flowSettings.name}.putFloat(%S, ", name)
                         builder.add(expression)
                         builder.add(")\n")
@@ -1363,14 +1358,13 @@ sealed interface AppState<T> : State<T> {
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            CodeBlockWrapper.of(
-                """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putFloat("$name", ${defaultValue}f)
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            )
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
+            builder.launchCoroutineIfNeeded(context) {
+                builder.addStatement("${ViewModelConstant.flowSettings.name}.putFloat(%S, %Lf)", name, defaultValue)
+            }
+            return builder.build()
+        }
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -1452,11 +1446,7 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.controlFlow(
-                        "%M.%M {",
-                        MemberHolder.PreCompose.viewModelScope,
-                        MemberHolder.Coroutines.launch,
-                    ) {
+                    builder.launchCoroutineIfNeeded(context) {
                         builder.add("${ViewModelConstant.flowSettings.name}.putBoolean(%S, ", name)
                         builder.add(expression)
                         builder.add(")\n")
@@ -1468,27 +1458,24 @@ sealed interface AppState<T> : State<T> {
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            CodeBlockWrapper.of(
-                """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putBoolean("$name", $defaultValue)
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            )
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
+            builder.launchCoroutineIfNeeded(context) {
+                builder.addStatement("${ViewModelConstant.flowSettings.name}.putBoolean(%S, %L)", name, defaultValue)
+            }
+            return builder.build()
+        }
 
-        override fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            CodeBlockWrapper.of(
-                """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putBoolean("$name", !${
-                    getFlowName(
-                        context,
-                    )
-                }.value)
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            )
+        override fun generateToggleStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
+            builder.launchCoroutineIfNeeded(context) {
+                builder.addStatement(
+                    "${ViewModelConstant.flowSettings.name}.putBoolean(%S, !${getFlowName(context)}.value)",
+                    name,
+                )
+            }
+            return builder.build()
+        }
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -1569,11 +1556,7 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.controlFlow(
-                        "%M.%M {",
-                        MemberHolder.PreCompose.viewModelScope,
-                        MemberHolder.Coroutines.launch,
-                    ) {
+                    builder.launchCoroutineIfNeeded(context) {
                         builder.add("${ViewModelConstant.flowSettings.name}.putLong(%S, ", name)
                         builder.add(expression)
                         builder.add(".toEpochMilliseconds())\n")
@@ -1585,14 +1568,16 @@ sealed interface AppState<T> : State<T> {
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            CodeBlockWrapper.of(
-                """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putLong("$name", ${defaultValue.generateCode()}.toEpochMilliseconds())
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            )
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
+            builder.launchCoroutineIfNeeded(context) {
+                builder.addStatement(
+                    "${ViewModelConstant.flowSettings.name}.putLong(%S, ${defaultValue.generateCode()}.toEpochMilliseconds())",
+                    name,
+                )
+            }
+            return builder.build()
+        }
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -1681,7 +1666,7 @@ sealed interface AppState<T> : State<T> {
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
         override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            super.generateClearStateCode(stateName = name)
+            super.generateClearStateCode(context = context, stateName = name)
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -1712,11 +1697,7 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.controlFlow(
-                        "%M.%M {",
-                        MemberHolder.PreCompose.viewModelScope,
-                        MemberHolder.Coroutines.launch,
-                    ) {
+                    builder.launchCoroutineIfNeeded(context) {
                         builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
                             builder.add("add(")
                             builder.add(expression)
@@ -1776,7 +1757,7 @@ sealed interface AppState<T> : State<T> {
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
         override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            super.generateClearStateCode(stateName = name)
+            super.generateClearStateCode(context = context, stateName = name)
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -1807,11 +1788,7 @@ sealed interface AppState<T> : State<T> {
                                 inputType = readProperty.valueType(project),
                                 codeBlock = readExpression,
                             )
-                        builder.controlFlow(
-                            "%M.%M {",
-                            MemberHolder.PreCompose.viewModelScope,
-                            MemberHolder.Coroutines.launch,
-                        ) {
+                        builder.launchCoroutineIfNeeded(context) {
                             builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
                                 builder.add("add(")
                                 builder.add(expression)
@@ -1869,7 +1846,7 @@ sealed interface AppState<T> : State<T> {
         ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            super.generateClearStateCode(stateName = name)
+            super.generateClearStateCode(context = context, stateName = name)
 
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
@@ -1903,11 +1880,7 @@ sealed interface AppState<T> : State<T> {
                                 inputType = readProperty.valueType(project),
                                 codeBlock = readExpression,
                             )
-                        builder.controlFlow(
-                            "%M.%M {",
-                            MemberHolder.PreCompose.viewModelScope,
-                            MemberHolder.Coroutines.launch,
-                        ) {
+                        builder.launchCoroutineIfNeeded(context) {
                             builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
                                 builder.add("add(")
                                 builder.add(expression)
@@ -1965,7 +1938,7 @@ sealed interface AppState<T> : State<T> {
         ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            super.generateClearStateCode(stateName = name)
+            super.generateClearStateCode(context = context, stateName = name)
 
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
@@ -1999,11 +1972,7 @@ sealed interface AppState<T> : State<T> {
                                 inputType = readProperty.valueType(project),
                                 codeBlock = readExpression,
                             )
-                        builder.controlFlow(
-                            "%M.%M {",
-                            MemberHolder.PreCompose.viewModelScope,
-                            MemberHolder.Coroutines.launch,
-                        ) {
+                        builder.launchCoroutineIfNeeded(context) {
                             builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
                                 builder.add("add(")
                                 builder.add(expression)
@@ -2067,7 +2036,7 @@ sealed interface AppState<T> : State<T> {
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
         override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            super.generateClearStateCode(stateName = name)
+            super.generateClearStateCode(context = context, stateName = name)
 
         override fun generateStatePropertiesToViewModel(
             project: Project,
@@ -2098,11 +2067,7 @@ sealed interface AppState<T> : State<T> {
                             inputType = readProperty.valueType(project),
                             codeBlock = readExpression,
                         )
-                    builder.controlFlow(
-                        "%M.%M {",
-                        MemberHolder.PreCompose.viewModelScope,
-                        MemberHolder.Coroutines.launch,
-                    ) {
+                    builder.launchCoroutineIfNeeded(context) {
                         builder.controlFlow("val list = ${writeState.getFlowName(context)}.value.toMutableList().apply {") {
                             builder.add("add(")
                             builder.add(expression)
@@ -2165,7 +2130,7 @@ sealed interface AppState<T> : State<T> {
         ): CodeBlockWrapper = CodeBlockWrapper.of("")
 
         override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            super.generateClearStateCode(stateName = name)
+            super.generateClearStateCode(context = context, stateName = name)
 
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
@@ -2252,14 +2217,13 @@ sealed interface AppState<T> : State<T> {
         override fun generateUpdateStateMethodToViewModel(context: GenerationContext): FunSpecWrapper =
             FunSpecWrapper.builder(getUpdateMethodName(context)).build()
 
-        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper =
-            CodeBlockWrapper.of(
-                """%M.%M {
-                    ${ViewModelConstant.flowSettings.name}.putString("$name", "{}")
-                }""",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            )
+        override fun generateClearStateCodeToViewModel(context: GenerationContext): CodeBlockWrapper {
+            val builder = CodeBlockWrapper.builder()
+            builder.launchCoroutineIfNeeded(context) {
+                builder.addStatement("${ViewModelConstant.flowSettings.name}.putString(%S, %S)", name, "{}")
+            }
+            return builder.build()
+        }
 
         override fun generateStatePropertiesToViewModel(
             project: Project,

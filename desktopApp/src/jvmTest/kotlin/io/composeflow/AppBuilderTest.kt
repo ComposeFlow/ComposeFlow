@@ -93,6 +93,7 @@ import io.composeflow.model.project.appscreen.screen.composenode.VisibilityParam
 import io.composeflow.model.project.component.Component
 import io.composeflow.model.project.custom_enum.CustomEnum
 import io.composeflow.model.project.firebase.FirestoreCollection
+import io.composeflow.model.project.string.stringResourceOf
 import io.composeflow.model.project.theme.TextStyleOverride
 import io.composeflow.model.property.ApiResultProperty
 import io.composeflow.model.property.AssignableProperty
@@ -738,6 +739,61 @@ class AppBuilderTest {
     }
 
     @Test
+    fun composables_referring_stringResources() {
+        val project = Project()
+        val rootNode = project.screenHolder.currentContentRootNode()
+
+        // Add string resources to the project
+        project.stringResourceHolder.stringResources.add(
+            stringResourceOf(
+                key = "welcome_message",
+                "en-US" to "Welcome to ComposeFlow!",
+                description = "Welcome message for the app",
+            ),
+        )
+        project.stringResourceHolder.stringResources.add(
+            stringResourceOf(
+                key = "button_label",
+                "en-US" to "Click Me",
+                description = "Button label text",
+            ),
+        )
+
+        // Create a text node that uses a string resource
+        val textNode =
+            ComposeNode(
+                trait =
+                    mutableStateOf(
+                        TextTrait(
+                            text =
+                                StringProperty.ValueFromStringResource(
+                                    stringResourceId = project.stringResourceHolder.stringResources[0].id,
+                                ),
+                        ),
+                    ),
+            )
+        rootNode.addChild(textNode)
+
+        // Create a button that uses a string resource for its text
+        val buttonNode = ButtonTrait().defaultComposeNode(project)
+        val buttonTrait = buttonNode.trait.value as ButtonTrait
+        buttonNode.trait.value =
+            buttonTrait.copy(
+                textProperty =
+                    StringProperty.ValueFromStringResource(
+                        stringResourceId = project.stringResourceHolder.stringResources[1].id,
+                    ),
+            )
+        rootNode.addChild(buttonNode)
+
+        toolbarViewModel.onRunPreviewApp(
+            project = project,
+            onStatusBarUiStateChanged = { _ -> },
+        )
+        assertBuildSucceed()
+    }
+
+    @Test
     fun screens_including_nonTopLevel_verify_noCrash() {
         val project = Project()
         val rootNode = project.screenHolder.currentContentRootNode()
@@ -878,6 +934,11 @@ class AppBuilderTest {
         val appFloatState2 = AppState.FloatAppState(name = "floatState2")
         val switchScreenState = ScreenState.BooleanScreenState(name = "switchScreenState")
         val sliderScreenState = ScreenState.FloatScreenState(name = "sliderScreenState")
+        val stringResource =
+            stringResourceOf(
+                key = "string_key",
+                "en-US" to "String resource value",
+            )
 
         val slider = SliderTrait().defaultComposeNode(project)
         rootNode.addChild(slider)
@@ -891,6 +952,7 @@ class AppBuilderTest {
         project.globalStateHolder.addState(appInstantState2)
         project.globalStateHolder.addState(appFloatState)
         project.globalStateHolder.addState(appFloatState2)
+        project.stringResourceHolder.stringResources.add(stringResource)
         rootNode.actionsMap[ActionType.OnClick] =
             mutableStateListOf(
                 ActionNode.Simple(
@@ -911,6 +973,15 @@ class AppBuilderTest {
                                     SetValueToState(
                                         writeToStateId = appStringState.id,
                                         operation = StateOperation.ClearValue,
+                                    ),
+                                    SetValueToState(
+                                        writeToStateId = appStringState2.id,
+                                        StateOperation.SetValue(
+                                            readProperty =
+                                                StringProperty.ValueFromStringResource(
+                                                    stringResourceId = stringResource.id,
+                                                ),
+                                        ),
                                     ),
                                     SetValueToState(
                                         writeToStateId = appIntState.id,

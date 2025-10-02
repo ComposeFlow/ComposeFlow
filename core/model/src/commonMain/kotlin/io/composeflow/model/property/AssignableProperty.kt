@@ -32,7 +32,7 @@ import io.composeflow.kotlinpoet.MemberHolder
 import io.composeflow.kotlinpoet.wrapper.CodeBlockWrapper
 import io.composeflow.kotlinpoet.wrapper.MemberNameWrapper
 import io.composeflow.kotlinpoet.wrapper.ParameterSpecWrapper
-import io.composeflow.kotlinpoet.wrapper.controlFlow
+import io.composeflow.kotlinpoet.wrapper.launchCoroutineIfNeeded
 import io.composeflow.model.apieditor.ApiId
 import io.composeflow.model.apieditor.isList
 import io.composeflow.model.datatype.DataFieldType
@@ -212,8 +212,9 @@ sealed interface AssignableProperty {
      */
     fun generateWrapWithViewModelBlock(
         project: Project,
-        insideContent: CodeBlockWrapper,
-    ): CodeBlockWrapper? = null
+        context: GenerationContext,
+        insideContent: (GenerationContext) -> CodeBlockWrapper,
+    ): CodeBlockWrapper = insideContent(context)
 
     /**
      * Generate CodeBlock that represents this property including the transformations by using
@@ -463,17 +464,12 @@ sealed interface StringProperty : AssignableProperty {
 
         override fun generateWrapWithViewModelBlock(
             project: Project,
-            insideContent: CodeBlockWrapper,
-        ): CodeBlockWrapper? {
-            // TODO Return null if the generated code is already in a suspend function.
-            //      https://github.com/ComposeFlow/ComposeFlow/issues/193
+            context: GenerationContext,
+            insideContent: (GenerationContext) -> CodeBlockWrapper,
+        ): CodeBlockWrapper {
             val builder = CodeBlockWrapper.builder()
-            builder.controlFlow(
-                "%M.%M {",
-                MemberHolder.PreCompose.viewModelScope,
-                MemberHolder.Coroutines.launch,
-            ) {
-                builder.add(insideContent)
+            builder.launchCoroutineIfNeeded(context) {
+                builder.add(insideContent(context.copy(withinSuspendedFunction = true)))
             }
             return builder.build()
         }
@@ -1737,7 +1733,8 @@ data class FirestoreCollectionProperty(
 
     override fun generateWrapWithViewModelBlock(
         project: Project,
-        insideContent: CodeBlockWrapper,
+        context: GenerationContext,
+        insideContent: (GenerationContext) -> CodeBlockWrapper,
     ): CodeBlockWrapper {
         val builder = CodeBlockWrapper.builder()
         val firestoreCollection =
@@ -1750,7 +1747,7 @@ when ($readVariableName) {
             """,
             ClassHolder.ComposeFlow.DataResult,
         )
-        builder.add(insideContent)
+        builder.add(insideContent(context))
         builder.add(
             """
     }
@@ -1869,7 +1866,8 @@ data class ApiResultProperty(
 
     override fun generateWrapWithViewModelBlock(
         project: Project,
-        insideContent: CodeBlockWrapper,
+        context: GenerationContext,
+        insideContent: (GenerationContext) -> CodeBlockWrapper,
     ): CodeBlockWrapper {
         val builder = CodeBlockWrapper.builder()
         val apiDefinition =
@@ -1882,7 +1880,7 @@ data class ApiResultProperty(
             """,
             ClassHolder.ComposeFlow.DataResult,
         )
-        builder.add(insideContent)
+        builder.add(insideContent(context))
         builder.add(
             """
         }
