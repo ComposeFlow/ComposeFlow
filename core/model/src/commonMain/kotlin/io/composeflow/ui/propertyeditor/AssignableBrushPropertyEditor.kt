@@ -166,6 +166,7 @@ fun AssignableBrushPropertyEditor(
     if (showBrushEditDialog && brushWrapper != null && brushWrapper.colors.isNotEmpty()) {
         BrushEditDialog(
             initialBrush = brushWrapper,
+            extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value,
             onDismissRequest = { showBrushEditDialog = false },
             onConfirm = { newBrush ->
                 onValidPropertyChanged(BrushProperty.BrushIntrinsicValue(newBrush), null)

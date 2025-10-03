@@ -16,6 +16,7 @@ import com.materialkolor.PaletteStyle
 import io.composeflow.auth.FirebaseIdToken
 import io.composeflow.font.FontFamilyWrapper
 import io.composeflow.model.color.ColorSchemeWrapper
+import io.composeflow.model.color.ExtendedColor
 import io.composeflow.model.enumwrapper.TextStyleWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.theme.ColorSchemeHolder
@@ -27,6 +28,7 @@ import io.composeflow.repository.ProjectRepository
 import io.composeflow.ui.EventResult
 import io.composeflow.ui.common.defaultDarkScheme
 import io.composeflow.ui.common.defaultLightScheme
+import io.composeflow.util.generateUniqueName
 import kotlinx.coroutines.launch
 import moe.tlaster.precompose.viewmodel.ViewModel
 import moe.tlaster.precompose.viewmodel.viewModelScope
@@ -79,6 +81,63 @@ class ThemeEditorViewModel(
         }
 
         saveProject()
+    }
+
+    fun onExtendedColorsUpdated(extendedColors: List<ExtendedColor>) {
+        project.themeHolder.colorSchemeHolder.apply {
+            this.extendedColors.value = extendedColors
+        }
+        saveProject()
+    }
+
+    fun onAddNewExtendedColor(extendedColor: ExtendedColor) {
+        val extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value
+        if (extendedColor.name.isNotBlank()) {
+            val names = extendedColors.map { it.name }.toSet()
+            val name = generateUniqueName(extendedColor.name, names)
+            val newExtendedColor =
+                extendedColor.copy(
+                    name = name,
+                )
+            onExtendedColorsUpdated(extendedColors + newExtendedColor)
+        }
+    }
+
+    fun onChangeExtendedColor(
+        extendedColor: ExtendedColor,
+        newExtendedColor: ExtendedColor,
+    ) {
+        val extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value
+        onExtendedColorsUpdated(
+            extendedColors.map { if (it == extendedColor) newExtendedColor else it },
+        )
+    }
+
+    fun onRenameExtendedColor(
+        extendedColor: ExtendedColor,
+        newName: String,
+    ) {
+        val extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value
+        if (newName.isNotBlank()) {
+            val names = extendedColors.map { it.name }.toSet()
+            val name = generateUniqueName(newName, names)
+            onExtendedColorsUpdated(
+                extendedColors.map {
+                    if (it == extendedColor) {
+                        it.copy(name = name)
+                    } else {
+                        it
+                    }
+                },
+            )
+        }
+    }
+
+    fun onDeleteExtendedColor(extendedColor: ExtendedColor) {
+        val extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value
+        onExtendedColorsUpdated(
+            extendedColors.filter { it != extendedColor },
+        )
     }
 
     fun onColorResetToDefault() {
@@ -187,6 +246,7 @@ class ThemeEditorViewModel(
             paletteStyle = holder.paletteStyle
             lightColorScheme.value = holder.lightColorScheme.value
             darkColorScheme.value = holder.darkColorScheme.value
+            extendedColors.value = holder.extendedColors.value
         }
     }
 }

@@ -393,6 +393,12 @@ instead of in the canvas.</string>
     <string name="tap_to_show">Tap to show</string>
     <string name="toggle_value">Toggle value</string>
     <string name="theme_colors">Theme colors</string>
+    <string name="extended_colors">Extended colors</string>
+    <string name="add_a_color">Add a color</string>
+    <string name="color_name">Color name</string>
+    <string name="edit_color">Edit Color</string>
+    <string name="harmonize">Harmonize</string>
+    <string name="rename">Rename</string>
     <string name="to_string">To String</string>
     <string name="toggle_visibility">Toggle visibility</string>
     <string name="tooltip_show_topappbar">Toggle the visibility of the screen specific TopAppBar.\n

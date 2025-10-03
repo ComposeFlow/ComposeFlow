@@ -62,8 +62,9 @@ fun AssignableColorPropertyEditor(
             editable && (initialProperty is IntrinsicProperty<*> || initialProperty == null)
         if (editEnabled) {
             ColorPropertyEditor(
-                initialColor = (initialProperty as? ColorProperty.ColorIntrinsicValue)?.value,
                 label = label,
+                initialColor = (initialProperty as? ColorProperty.ColorIntrinsicValue)?.value,
+                extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value,
                 onColorUpdated = {
                     val newProperty =
                         ColorProperty.ColorIntrinsicValue(ColorWrapper(themeColor = null, color = it))

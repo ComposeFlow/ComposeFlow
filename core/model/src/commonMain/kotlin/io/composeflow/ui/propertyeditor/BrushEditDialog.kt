@@ -48,6 +48,7 @@ import io.composeflow.center_y
 import io.composeflow.edit_brush
 import io.composeflow.end_x
 import io.composeflow.end_y
+import io.composeflow.model.color.ExtendedColor
 import io.composeflow.model.parameter.wrapper.BrushType
 import io.composeflow.model.parameter.wrapper.BrushWrapper
 import io.composeflow.model.parameter.wrapper.ColorWrapper
@@ -68,6 +69,7 @@ import sh.calvin.reorderable.rememberReorderableLazyListState
 @Composable
 fun BrushEditDialog(
     initialBrush: BrushWrapper,
+    extendedColors: List<ExtendedColor>,
     onDismissRequest: () -> Unit,
     onConfirm: (BrushWrapper) -> Unit,
     modifier: Modifier = Modifier,
@@ -229,6 +231,7 @@ fun BrushEditDialog(
                                             editedBrush =
                                                 editedBrush.copy(colors = updatedColors)
                                         },
+                                        extendedColors = extendedColors,
                                         modifier = Modifier.weight(1f),
                                         includeThemeColor = true,
                                     )

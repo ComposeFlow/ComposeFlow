@@ -288,6 +288,7 @@ fun AndroidSplashScreenEditorArea(
                         } else {
                             null
                         },
+                    extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value,
                     onColorUpdated = {
                         callbacks.onChangeAndroidSplashBackgroundColor(it)
                     },
@@ -415,6 +416,7 @@ fun IosSplashScreenEditorArea(
                         } else {
                             null
                         },
+                    extendedColors = project.themeHolder.colorSchemeHolder.extendedColors.value,
                     onColorUpdated = {
                         callbacks.onChangeIosSplashBackgroundColor(it)
                     },

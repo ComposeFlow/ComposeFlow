@@ -38,9 +38,11 @@ import androidx.compose.material.icons.automirrored.outlined.Redo
 import androidx.compose.material.icons.automirrored.outlined.Undo
 import androidx.compose.material.icons.filled.ModeNight
 import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
@@ -88,21 +90,30 @@ import com.github.skydoves.colorpicker.compose.AlphaTile
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.materialkolor.PaletteStyle
+import com.materialkolor.blend.Blend
 import com.materialkolor.dynamicColorScheme
 import com.materialkolor.ktx.toneColor
 import com.materialkolor.palettes.CorePalette
 import io.composeflow.Res
+import io.composeflow.add_a_color
 import io.composeflow.cancel
 import io.composeflow.chane_to_day_theme
 import io.composeflow.chane_to_night_theme
+import io.composeflow.color_name
 import io.composeflow.confirm
 import io.composeflow.dark_scheme
+import io.composeflow.delete
+import io.composeflow.edit_color
+import io.composeflow.extended_colors
+import io.composeflow.harmonize
 import io.composeflow.keyboard.getCtrlKeyStr
 import io.composeflow.light_scheme
+import io.composeflow.model.color.ExtendedColor
 import io.composeflow.model.palette.PaletteRenderParams
 import io.composeflow.model.parameter.wrapper.Material3ColorWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.redo
+import io.composeflow.rename
 import io.composeflow.reset
 import io.composeflow.reset_to_default_colors
 import io.composeflow.seed_color
@@ -117,12 +128,14 @@ import io.composeflow.ui.adaptive.ProvideDeviceSizeDp
 import io.composeflow.ui.background.DotPatternBackground
 import io.composeflow.ui.common.AppTheme
 import io.composeflow.ui.common.ProvideAppThemeTokens
+import io.composeflow.ui.dropdown.PlatformCursorDropdownMenu
 import io.composeflow.ui.emptyCanvasNodeCallbacks
 import io.composeflow.ui.icon.ComposeFlowIcon
 import io.composeflow.ui.modifier.backgroundContainerNeutral
 import io.composeflow.ui.modifier.hoverIconClickable
 import io.composeflow.ui.popup.PositionCustomizablePopup
 import io.composeflow.ui.popup.SimpleConfirmationDialog
+import io.composeflow.ui.popup.SingleTextInputDialog
 import io.composeflow.ui.propertyeditor.BasicDropdownPropertyEditor
 import io.composeflow.ui.propertyeditor.ColorPreviewInfo
 import io.composeflow.ui.switch.ComposeFlowSwitch
@@ -184,6 +197,9 @@ fun ColorEditorContent(
                 mutableStateOf(
                     colorSchemeHolder.darkColorScheme.value.toColorScheme(),
                 )
+            }
+            val extendedColors by remember(colorSchemeHolder.extendedColors.value) {
+                mutableStateOf(colorSchemeHolder.extendedColors.value)
             }
             var syncSchemes by remember { mutableStateOf(true) }
             var schemeInEdit by remember { mutableStateOf(ColorSchemeType.Light) }
@@ -247,16 +263,17 @@ fun ColorEditorContent(
                 onSchemeInEditChanged = {
                     schemeInEdit = it
                 },
-                onShowSnackbar = { message, action ->
-                    coroutineScope.launch {
-                        onShowSnackbar(message, action)
-                    }
-                },
-            )
+            ) { message, action ->
+                coroutineScope.launch {
+                    onShowSnackbar(message, action)
+                }
+            }
             ColorSchemeDetailsContainer(
                 lightScheme = lightScheme,
                 darkScheme = darkScheme,
                 syncSchemes = syncSchemes,
+                sourceColor = sourceColor,
+                extendedColors = extendedColors,
                 onChangeScheme = { (light, dark) ->
                     lightScheme = light
                     darkScheme = dark
@@ -269,6 +286,18 @@ fun ColorEditorContent(
                         )
                         onShowSnackbar(updateColorSchemes, null)
                     }
+                },
+                onRenameExtendedColor = { extendedColor, newName ->
+                    callbacks.onRenameExtendedColor(extendedColor, newName)
+                },
+                onDeleteExtendedColor = {
+                    callbacks.onDeleteExtendedColor(it)
+                },
+                onChangeExtendedColor = { extendedColor, newColor ->
+                    callbacks.onChangeExtendedColor(
+                        extendedColor,
+                        extendedColor.copy(color = newColor),
+                    )
                 },
             )
             CanvasPreview(
@@ -312,6 +341,9 @@ private fun ColorSchemeEditor(
     var colorInEdit by remember { mutableStateOf(false) }
     var resetToDefaultColorsDialogOpen by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
+    var addNewColorDialogOpen by remember { mutableStateOf(false) }
+    val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
+    val onAllDialogsClosed = LocalOnAllDialogsClosed.current
 
     Column(
         modifier =
@@ -354,10 +386,6 @@ private fun ColorSchemeEditor(
                 )
             }
         }
-        Spacer(
-            modifier = Modifier.height(16.dp),
-        )
-        HorizontalDivider()
         if (colorInEdit) {
             Column(modifier = Modifier.animateContentSize(keyframes { durationMillis = 100 })) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -462,10 +490,60 @@ private fun ColorSchemeEditor(
                 Text(stringResource(Res.string.update_colors))
             }
         }
+        Spacer(
+            modifier = Modifier.height(10.dp),
+        )
+        HorizontalDivider()
+        Spacer(
+            modifier = Modifier.height(10.dp),
+        )
+        Text(
+            text = stringResource(Res.string.extended_colors),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        TextButton(
+            onClick = {
+                addNewColorDialogOpen = true
+            },
+            modifier = Modifier.padding(top = 5.dp),
+        ) {
+            ComposeFlowIcon(
+                imageVector = Icons.Outlined.Add,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 4.dp),
+            )
+            Text(
+                text = stringResource(Res.string.add_a_color),
+            )
+        }
+
+        val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
+        val onAllDialogsClosed = LocalOnAllDialogsClosed.current
+        if (addNewColorDialogOpen) {
+            onAnyDialogIsShown()
+
+            val onCloseDialog = {
+                onAllDialogsClosed()
+                addNewColorDialogOpen = false
+            }
+            SingleTextInputDialog(
+                textLabel = stringResource(Res.string.color_name),
+                onTextConfirmed = { name ->
+                    callbacks.onAddNewExtendedColor(
+                        ExtendedColor(
+                            name = name,
+                            color = darkScheme.primary,
+                        ),
+                    )
+                    onCloseDialog()
+                },
+                onDismissDialog = onCloseDialog,
+            )
+        }
     }
 
-    val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
-    val onAllDialogsClosed = LocalOnAllDialogsClosed.current
     if (resetToDefaultColorsDialogOpen) {
         onAnyDialogIsShown()
         val closeDialog = {
@@ -718,8 +796,13 @@ val sampleColors =
 private fun ColorSchemeDetailsContainer(
     lightScheme: ColorScheme,
     darkScheme: ColorScheme,
+    sourceColor: Color?,
+    extendedColors: List<ExtendedColor>,
     syncSchemes: Boolean,
     onChangeScheme: (Pair<ColorScheme, ColorScheme>) -> Unit,
+    onChangeExtendedColor: (ExtendedColor, Color) -> Unit,
+    onRenameExtendedColor: (ExtendedColor, String) -> Unit,
+    onDeleteExtendedColor: (ExtendedColor) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.wrapContentWidth()) {
         item {
@@ -767,6 +850,17 @@ private fun ColorSchemeDetailsContainer(
                     },
                 )
             }
+        }
+
+        item {
+            ExtendedColorPalette(
+                extendedColors = extendedColors,
+                colorScheme = darkScheme,
+                sourceColor = sourceColor,
+                onColorChanged = onChangeExtendedColor,
+                onRename = onRenameExtendedColor,
+                onDelete = onDeleteExtendedColor,
+            )
         }
     }
 }
@@ -1017,6 +1111,123 @@ private fun VerticalColorsPalette(
 }
 
 @Composable
+private fun ExtendedColorPalette(
+    extendedColors: List<ExtendedColor>,
+    colorScheme: ColorScheme,
+    sourceColor: Color?,
+    onColorChanged: (ExtendedColor, Color) -> Unit,
+    onRename: (ExtendedColor, String) -> Unit,
+    onDelete: (ExtendedColor) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val focusRequester = remember { FocusRequester() }
+    val onAnyDialogIsShown = LocalOnAnyDialogIsShown.current
+    val onAllDialogsClosed = LocalOnAllDialogsClosed.current
+    var colorPickerDialogOpen by remember { mutableStateOf(false) }
+    var renameColorDialogOpen by remember { mutableStateOf(false) }
+    var colorSelected by remember {
+        mutableStateOf<ExtendedColor?>(null)
+    }
+
+    Column(
+        modifier =
+            Modifier
+                .padding(16.dp)
+                .background(
+                    colorScheme.surface,
+                    shape = RoundedCornerShape(8.dp),
+                ).border(
+                    width = 1.dp,
+                    color = colorScheme.outline,
+                    shape = RoundedCornerShape(8.dp),
+                ).focusProperties { canFocus = true }
+                .focusRequester(focusRequester),
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp).width(820.dp),
+        ) {
+            Text(
+                text = stringResource(Res.string.extended_colors),
+                style = MaterialTheme.typography.titleSmall,
+                color = colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 16.dp),
+            )
+            FlowRow(
+                modifier = modifier,
+                verticalArrangement = Arrangement.spacedBy(4.dp),
+                maxItemsInEachRow = 4,
+            ) {
+                extendedColors.forEach { extendedColor ->
+                    ExtendedColorBox(
+                        modifier = modifier.size(205.dp, 60.dp),
+                        extendedColor = extendedColor,
+                        onRename = {
+                            colorSelected = extendedColor
+                            renameColorDialogOpen = true
+                        },
+                        onDelete = {
+                            onDelete(extendedColor)
+                        },
+                        onEditColor = {
+                            colorSelected = extendedColor
+                            colorPickerDialogOpen = true
+                        },
+                        onHarmonize = {
+                            val designColorArgb = extendedColor.color.toArgb()
+                            val sourceColorArgb = (sourceColor ?: colorScheme.primary).toArgb()
+                            val newColorArgb = Blend.harmonize(designColorArgb, sourceColorArgb)
+                            val newColor = Color(newColorArgb)
+                            onColorChanged(extendedColor, newColor)
+                        },
+                    )
+                }
+            }
+        }
+    }
+
+    when {
+        colorPickerDialogOpen && colorSelected != null -> {
+            onAnyDialogIsShown()
+
+            ColorPickerDialog(
+                initialColor = colorSelected!!.color,
+                onCloseClick = {
+                    colorPickerDialogOpen = false
+                    colorSelected = null
+                    onAllDialogsClosed()
+                },
+                onColorConfirmed = {
+                    onColorChanged(colorSelected!!, it)
+                    onAllDialogsClosed()
+                    focusRequester.requestFocus()
+                },
+            )
+        }
+
+        renameColorDialogOpen && colorSelected != null -> {
+            onAnyDialogIsShown()
+
+            val onCloseDialog: () -> Unit = {
+                onAllDialogsClosed()
+                renameColorDialogOpen = false
+                focusRequester.requestFocus()
+            }
+            SingleTextInputDialog(
+                textLabel = stringResource(Res.string.color_name),
+                initialValue = colorSelected!!.name,
+                onTextConfirmed = { name ->
+                    if (name.isNotBlank() && extendedColors.none { it.name == name }) {
+                        onRename(colorSelected!!, name)
+                    }
+                    onCloseDialog()
+                },
+                onDismissDialog = onCloseDialog,
+            )
+        }
+    }
+}
+
+@Composable
 private fun ColorBox(
     color: Material3ColorWrapper,
     onClick: () -> Unit,
@@ -1068,6 +1279,105 @@ private fun ColorBox(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ExtendedColorBox(
+    extendedColor: ExtendedColor,
+    onRename: () -> Unit,
+    onDelete: () -> Unit,
+    onEditColor: () -> Unit,
+    onHarmonize: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val contentColor = extendedColor.getContentColor()
+    val isHovered by interactionSource.collectIsHoveredAsState()
+    val backgroundColor = extendedColor.color
+    var showMenu by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = modifier,
+    ) {
+        SelectionContainer {
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .background(backgroundColor.copy(alpha = if (isHovered) 0.9f else 1f))
+                        .hoverable(interactionSource),
+            ) {
+                Text(
+                    text = extendedColor.name,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = contentColor,
+                    modifier = Modifier.align(Alignment.TopStart).padding(8.dp),
+                )
+
+                Text(
+                    text = backgroundColor.asString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = contentColor,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(8.dp),
+                )
+
+                AnimatedVisibility(
+                    visible = isHovered,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.TopEnd),
+                ) {
+                    IconButton(
+                        onClick = {
+                            showMenu = true
+                        },
+                    ) {
+                        ComposeFlowIcon(
+                            imageVector = Icons.Rounded.MoreVert,
+                            contentDescription = null,
+                            tint = contentColor,
+                        )
+                    }
+                }
+            }
+        }
+        PlatformCursorDropdownMenu(
+            expanded = showMenu,
+            onDismissRequest = { showMenu = false },
+            modifier = Modifier.background(color = MaterialTheme.colorScheme.surface),
+        ) {
+            DropdownMenuItem(text = {
+                Text(text = stringResource(Res.string.edit_color))
+            }, onClick = {
+                showMenu = false
+                onEditColor()
+            })
+
+            DropdownMenuItem(text = {
+                Text(text = stringResource(Res.string.harmonize))
+            }, onClick = {
+                showMenu = false
+                onHarmonize()
+            })
+
+            DropdownMenuItem(text = {
+                Text(text = stringResource(Res.string.rename))
+            }, onClick = {
+                showMenu = false
+                onRename()
+            })
+
+            DropdownMenuItem(text = {
+                Text(
+                    text = stringResource(Res.string.delete),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }, onClick = {
+                showMenu = false
+                onDelete()
+            })
         }
     }
 }
