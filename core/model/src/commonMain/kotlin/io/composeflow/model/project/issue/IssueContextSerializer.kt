@@ -39,6 +39,7 @@ object IssueContextSerializer : KSerializer<Any?> {
 
     override fun deserialize(decoder: Decoder): Any? =
         try {
+            // Deserialize as Action since it's the only known type for now. Extend as needed.
             decoder.decodeNullableSerializableValue(actionSerializer)
         } catch (_: Exception) {
             // If deserialization fails, return null
