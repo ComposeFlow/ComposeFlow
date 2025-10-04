@@ -548,7 +548,6 @@ class UiBuilderOperator {
         val result = EventResult()
         try {
             val issues = project.generateTrackableIssues()
-            result.issues.addAll(issues)
 
             Logger.i { "Found ${issues.size} project issues" }
             issues.forEach { trackableIssue ->
@@ -562,6 +561,8 @@ class UiBuilderOperator {
                     }
                 Logger.i { "Issue: $contextInfo - ${trackableIssue.issue::class.simpleName}" }
             }
+
+            // Success - no action needed, data will be stored in ToolArgs.result by ToolDispatcher
         } catch (e: Exception) {
             Logger.e(e) { "Error retrieving project issues" }
             result.errorMessages.add(getString(Res.string.error_retrieving_project_issues, e.message ?: "Unknown error"))

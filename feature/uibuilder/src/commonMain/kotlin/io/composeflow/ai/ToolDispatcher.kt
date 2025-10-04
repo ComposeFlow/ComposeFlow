@@ -336,7 +336,10 @@ class ToolDispatcher(
 
             is ToolArgs.GetProjectIssuesArgs -> {
                 val result = uiBuilderOperator.onGetProjectIssues(project)
-                if (result.errorMessages.isNotEmpty()) {
+                if (result.errorMessages.isEmpty()) {
+                    val issues = project.generateTrackableIssues()
+                    toolArgs.result = encodeToString(issues)
+                } else {
                     toolArgs.result = result.errorMessages.joinToString("; ")
                 }
                 result

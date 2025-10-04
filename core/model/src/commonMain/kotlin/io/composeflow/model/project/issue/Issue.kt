@@ -45,6 +45,7 @@ sealed interface Issue {
     /**
      * Context where this issue is generated. E.g. Action
      */
+    @Serializable(IssueContextSerializer::class)
     val issueContext: Any?
 
     fun issueContextLabel(): String? =
@@ -59,12 +60,15 @@ sealed interface Issue {
     @Composable
     fun errorMessage(project: Project): String
 
+    @Serializable
+    @SerialName("ResolvedToUnknownType")
     data class ResolvedToUnknownType(
         val property: AssignableProperty,
         override val destination: NavigatableDestination =
             NavigatableDestination.UiBuilderScreen(
                 inspectorTabDestination = InspectorTabDestination.Inspector,
             ),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
@@ -75,6 +79,8 @@ sealed interface Issue {
                 )
     }
 
+    @Serializable
+    @SerialName("ResolvedToTypeNotAssignable")
     data class ResolvedToTypeNotAssignable(
         val property: AssignableProperty,
         val acceptableType: ComposeFlowType,
@@ -82,6 +88,7 @@ sealed interface Issue {
             NavigatableDestination.UiBuilderScreen(
                 inspectorTabDestination = InspectorTabDestination.Inspector,
             ),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
@@ -92,71 +99,92 @@ sealed interface Issue {
                 )
     }
 
+    @Serializable
+    @SerialName("InvalidScreenReference")
     data class InvalidScreenReference(
         val screenId: ScreenId,
         override val destination: NavigatableDestination =
             NavigatableDestination.UiBuilderScreen(
                 inspectorTabDestination = InspectorTabDestination.Inspector,
             ),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
         override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_screen_reference)
     }
 
+    @Serializable
+    @SerialName("InvalidApiReference")
     data class InvalidApiReference(
         val apiId: ApiId,
         override val destination: NavigatableDestination =
             NavigatableDestination.UiBuilderScreen(
                 inspectorTabDestination = InspectorTabDestination.Inspector,
             ),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
         override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_api_reference)
     }
 
+    @Serializable
+    @SerialName("InvalidAssetReference")
     data class InvalidAssetReference(
         override val destination: NavigatableDestination =
             NavigatableDestination.UiBuilderScreen(
                 inspectorTabDestination = InspectorTabDestination.Inspector,
             ),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
         override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_asset_reference)
     }
 
+    @Serializable
+    @SerialName("InvalidResourceReference")
     data class InvalidResourceReference(
         val resourceType: String = "string",
         override val destination: NavigatableDestination =
             NavigatableDestination.UiBuilderScreen(
                 inspectorTabDestination = InspectorTabDestination.Inspector,
             ),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
         override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_resource_reference, resourceType)
     }
 
+    @Serializable
+    @SerialName("InvalidApiParameterReference")
     data class InvalidApiParameterReference(
         override val destination: NavigatableDestination = NavigatableDestination.ApiEditorScreen,
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
         override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_api_parameter_reference)
     }
 
+    @Serializable
+    @SerialName("NavigationDrawerIsNotSet")
     data class NavigationDrawerIsNotSet(
         override val destination: NavigatableDestination = NavigatableDestination.UiBuilderScreen(),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
         override fun errorMessage(project: Project): String = stringResource(Res.string.invalid_api_parameter_reference)
     }
 
+    @Serializable
+    @SerialName("InvalidModifierRelation")
     data class InvalidModifierRelation(
         override val destination: NavigatableDestination = NavigatableDestination.UiBuilderScreen(),
+        @Serializable(IssueContextSerializer::class)
         override val issueContext: Any? = null,
     ) : Issue {
         @Composable
