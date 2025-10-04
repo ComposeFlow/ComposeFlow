@@ -18,7 +18,9 @@ import io.composeflow.model.parameter.wrapper.Material3ColorWrapper
 import io.composeflow.model.project.Project
 import io.composeflow.model.project.appscreen.screen.composenode.ComposeNode
 import io.composeflow.model.property.AssignableProperty
+import io.composeflow.model.property.AssignablePropertyOrStringSerializer
 import io.composeflow.model.property.ColorProperty
+import io.composeflow.model.property.StringProperty
 import io.composeflow.tooltip_icon_trait
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -30,7 +32,9 @@ data class IconTrait(
     override val assetType: IconAssetType = IconAssetType.Material,
     override val imageVectorHolder: ImageVectorHolder? = Outlined.Add,
     override val blobInfoWrapper: BlobInfoWrapper? = null,
-    override val contentDescription: String = "Icon for ${imageVectorHolder?.name}",
+    @Serializable(AssignablePropertyOrStringSerializer::class)
+    override val contentDescription: AssignableProperty =
+        StringProperty.StringIntrinsicValue(value = "Icon for ${imageVectorHolder?.name}"),
     override val tint: AssignableProperty? =
         ColorProperty.ColorIntrinsicValue(
             value =
