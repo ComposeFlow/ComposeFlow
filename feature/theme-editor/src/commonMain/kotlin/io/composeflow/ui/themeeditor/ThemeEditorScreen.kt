@@ -66,6 +66,10 @@ fun ThemeEditorScreen(
             onKeyPressed = viewModel::onKeyPressed,
             onUndo = viewModel::onUndo,
             onRedo = viewModel::onRedo,
+            onAddNewExtendedColor = viewModel::onAddNewExtendedColor,
+            onChangeExtendedColor = viewModel::onChangeExtendedColor,
+            onRenameExtendedColor = viewModel::onRenameExtendedColor,
+            onDeleteExtendedColor = viewModel::onDeleteExtendedColor,
         )
     val fontEditableParams =
         FontEditableParams(

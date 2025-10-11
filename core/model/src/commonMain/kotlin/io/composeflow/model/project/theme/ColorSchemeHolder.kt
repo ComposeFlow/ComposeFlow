@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.Color
 import com.materialkolor.PaletteStyle
 import io.composeflow.kotlinpoet.wrapper.FileSpecWrapper
 import io.composeflow.model.color.ColorSchemeWrapper
+import io.composeflow.model.color.ExtendedColor
 import io.composeflow.model.project.COMPOSEFLOW_PACKAGE
 import io.composeflow.serializer.LocationAwareColorSerializer
 import io.composeflow.serializer.MutableStateSerializer
@@ -33,6 +34,8 @@ data class ColorSchemeHolder(
     @Serializable(MutableStateSerializer::class)
     val darkColorScheme: MutableState<ColorSchemeWrapper> =
         mutableStateOf(ColorSchemeWrapper.fromColorScheme(defaultDarkScheme)),
+    @Serializable(MutableStateSerializer::class)
+    val extendedColors: MutableState<List<ExtendedColor>> = mutableStateOf(emptyList()),
 ) {
     fun generateColorFile(): FileSpecWrapper {
         val fileSpecBuilder = FileSpecWrapper.builder("$COMPOSEFLOW_PACKAGE.common", "Color")
@@ -51,4 +54,5 @@ fun ColorSchemeHolder.copyContents(arg: ColorSchemeHolder) {
     paletteStyle = arg.paletteStyle
     lightColorScheme.value = arg.lightColorScheme.value
     darkColorScheme.value = arg.darkColorScheme.value
+    extendedColors.value = arg.extendedColors.value
 }

@@ -44,6 +44,7 @@ class ColorPropertyDialogRobot(
                             ProvideAppThemeTokens(isDarkTheme = isDarkTheme) {
                                 ColorPropertyDialogContent(
                                     initialColor = null,
+                                    extendedColors = emptyList(),
                                     onThemeColorSelected = { color -> },
                                     onColorUpdated = {},
                                     onCloseClick = {},

@@ -53,6 +53,8 @@ import io.composeflow.Res
 import io.composeflow.cancel
 import io.composeflow.confirm
 import io.composeflow.delete_color
+import io.composeflow.extended_colors
+import io.composeflow.model.color.ExtendedColor
 import io.composeflow.model.parameter.wrapper.ColorWrapper
 import io.composeflow.model.parameter.wrapper.Material3ColorWrapper
 import io.composeflow.select_color
@@ -117,6 +119,7 @@ private fun String.toColorOrNull(): Color? =
 fun ColorPropertyEditor(
     label: String,
     initialColor: ColorWrapper?,
+    extendedColors: List<ExtendedColor>,
     onColorUpdated: (Color) -> Unit,
     onThemeColorSelected: (Material3ColorWrapper) -> Unit,
     modifier: Modifier = Modifier,
@@ -198,6 +201,7 @@ fun ColorPropertyEditor(
         onAnyDialogIsShown()
         ColorPropertyDialog(
             initialColor = initialColor,
+            extendedColors = extendedColors,
             onThemeColorSelected = onThemeColorSelected,
             onColorUpdated = onColorUpdated,
             onCloseClick = {
@@ -212,6 +216,7 @@ fun ColorPropertyEditor(
 @Composable
 private fun ColorPropertyDialog(
     initialColor: ColorWrapper?,
+    extendedColors: List<ExtendedColor>,
     onThemeColorSelected: (Material3ColorWrapper) -> Unit,
     onColorUpdated: (Color) -> Unit,
     onCloseClick: () -> Unit,
@@ -240,6 +245,7 @@ private fun ColorPropertyDialog(
         ) {
             ColorPropertyDialogContent(
                 initialColor = initialColor,
+                extendedColors = extendedColors,
                 onThemeColorSelected = onThemeColorSelected,
                 onCloseClick = onCloseClick,
                 onColorUpdated = onColorUpdated,
@@ -252,6 +258,7 @@ private fun ColorPropertyDialog(
 @Composable
 fun ColorPropertyDialogContent(
     initialColor: ColorWrapper?,
+    extendedColors: List<ExtendedColor>,
     onThemeColorSelected: (Material3ColorWrapper) -> Unit,
     onCloseClick: () -> Unit,
     onColorUpdated: (Color) -> Unit,
@@ -341,12 +348,12 @@ fun ColorPropertyDialogContent(
                 }
             }
 
-            if (includeThemeColor) {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(148.dp),
-                    modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(16.dp),
-                ) {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(148.dp),
+                modifier = Modifier.weight(1f),
+                contentPadding = PaddingValues(16.dp),
+            ) {
+                if (includeThemeColor) {
                     item(
                         span = {
                             GridItemSpan(maxLineSpan)
@@ -407,6 +414,58 @@ fun ColorPropertyDialogContent(
                                         ),
                             )
                         }
+                    }
+                }
+                item(
+                    span = {
+                        GridItemSpan(maxLineSpan)
+                    },
+                ) {
+                    Text(
+                        text = stringResource(Res.string.extended_colors),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                }
+
+                items(
+                    extendedColors,
+                ) { extendedColor ->
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier =
+                            Modifier
+                                .size(
+                                    width = 164.dp,
+                                    height = 64.dp,
+                                ).padding(8.dp)
+                                .background(
+                                    color = extendedColor.color,
+                                    shape = RoundedCornerShape(8.dp),
+                                ).border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.surfaceVariant,
+                                    shape = RoundedCornerShape(8.dp),
+                                ).clickable {
+                                    onColorUpdated(extendedColor.color)
+                                    onCloseClick()
+                                }.hoverIconClickable(),
+                    ) {
+                        Text(
+                            text = extendedColor.name,
+                            color = extendedColor.getContentColor(),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier =
+                                Modifier
+                                    .padding(
+                                        start = 8.dp,
+                                        top = 8.dp,
+                                        end = 8.dp,
+                                        bottom = 8.dp,
+                                    ),
+                        )
                     }
                 }
             }
@@ -512,6 +571,7 @@ private fun ThemedColorPropertyEditorPreview(useDarkTheme: Boolean) {
         ColorPropertyEditor(
             label = "Background Color",
             initialColor = ColorWrapper(Material3ColorWrapper.Primary),
+            extendedColors = listOf(),
             onColorUpdated = {},
             onThemeColorSelected = {},
             onColorDeleted = {},
@@ -539,6 +599,7 @@ private fun ThemedColorPropertyDialogContentPreview(
     ComposeFlowTheme(useDarkTheme = useDarkTheme) {
         ColorPropertyDialogContent(
             initialColor = ColorWrapper(Material3ColorWrapper.PrimaryContainer),
+            extendedColors = listOf(),
             onThemeColorSelected = {},
             onCloseClick = {},
             onColorUpdated = {},
